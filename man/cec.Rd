@@ -39,7 +39,7 @@ or a vector of length equal to the number of centers. Possible values are: "cova
 
 \item{param}{
 Parameter (or parameters) specific to particular type of the clustering. Not all types of
-clustering require parameter.
+clustering require parameter. This can be a vector or a list (when one of the parameter is a matrix). 
 }
 
 \item{card.min}{
@@ -74,10 +74,6 @@ Konrad Kamieniecki
 Spurek, P. and Tabor, J. (2012)
 Cross-Entropy Clustering
 \emph{arXiv preprint} arXiv:1210.5594
-}
-\seealso{
-\code{\link{ball}.}
-\code{\link{mouseset}.}
 }
 
 \examples{
