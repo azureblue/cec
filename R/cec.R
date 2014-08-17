@@ -147,11 +147,11 @@ list.triple <- function(type.v, cov.l, param.l)
   L
 }
 
-model.covariance <- function(L)
+model.covariance <- function(type.cov.param.lis)
 {
-  type  <- L[[1]]
-  cov   <- L[[2]]
-  param <- L[[3]]
+  type  <- type.cov.param[[1]]
+  cov   <- type.cov.param[[2]]
+  param <- type.cov.param[[3]]
   
   if (type == resolve.type("covariance"))
   {
