@@ -2,10 +2,10 @@ CC = clang
 CC_FLAGS = -Wall -DR_ALLOC -O0 -fPIC -g -std=c99 -pipe -I/usr/share/R/include 
 #CC_FLAGS = -w -std=c11 -fPIC -S -save-temps -fverbose-asm -masm=intel -I/usr/share/R/include
 
-# File names
-LIB = cec.so
-EXEC = cec_test
-SOURCES = $(wildcard *.c)
+
+LIB = src/cec.so
+EXEC = src/cec_test
+SOURCES = $(wildcard src/*.c)
 OBJECTS = $(SOURCES:.c=.o)
 
 # Main target
@@ -16,10 +16,10 @@ $(EXEC): $(OBJECTS)
 	$(CC) -O0 -g $(OBJECTS) -o $(EXEC) -L/usr/lib/R/lib -lR -lm
 
 
-# To obtain object files
+
 %.o: %.c
 	$(CC) -c $(CC_FLAGS) $< -o $@
 
-# To remove generated files
+
 clean:
-	rm -f $(EXEC) $(LIB) $(OBJECTS) *.s *.so
+	rm -f $(EXEC) $(LIB) $(OBJECTS) *.s *.so src/*.s src/*.so

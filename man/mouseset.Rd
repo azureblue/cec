@@ -5,7 +5,7 @@
 Mouse set
 }
 \description{
-Creates matrix of 2-dimensional points that form "mouse-like" set with uniform density.
+Creates matrix of \code{dim}-dimensional points that form a "mouse-like" set with uniform density.
 }
 \usage{
 mouseset(n = 4000, r.head = 2, r.left.ear = 1.1, r.right.ear = 1.1, left.ear.dist = 2.5,
