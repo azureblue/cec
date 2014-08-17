@@ -1,0 +1,1 @@
+cec::run.cec.tests()

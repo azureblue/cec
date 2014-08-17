@@ -1,0 +1,10 @@
+Package: cec
+Title: Cross-Entropy Clustering
+Version: 0.9.1
+Date: 2014-08-16
+Author: Konrad Kamieniecki
+Maintainer: Konrad Kamieniecki <kk0xf0@gmail.com>
+Description: Clustering method based on Cross-Entropy Clustering theory.
+ByteCompile: true
+License: GPL-3
+Packaged: 2014-08-16 01:38:34 UTC; konrad

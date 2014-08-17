@@ -1,0 +1,62 @@
+\name{plot.cec}
+\alias{plot.cec}
+
+\title{
+Plot CEC.
+}
+\description{
+Presents results of \code{cec} function in the form of plot. Colors of data points depends of the cluster they belongs to. Ellipses are drawn with regards to the covariance (either model or sample) of each cluster.
+}
+\usage{
+\method{plot}{cec}(x, col, cex = 0.5, pch = 16, cex.centers = 1, pch.centers = 8, 
+ellipses.lwd = 4, ellipses = TRUE, model = FALSE, xlab = "x", ylab = "y", ...)
+}
+%- maybe also 'usage' for other objects documented here.
+\arguments{
+  \item{x}{
+The result of \code{cec} function.
+}
+  \item{col}{
+Use this argument to change default color of points of the clusters.
+}
+  \item{cex}{
+Basically the size of the points, see \link{points}.
+}
+  \item{pch}{
+See \link{points}.
+}
+  \item{cex.centers}{
+The same as \code{cex} parameter, except that it's related to center means.
+}
+  \item{pch.centers}{
+The same as \code{pch} parameter, except that it's related to center means.
+}
+  \item{ellipses.lwd}{
+Width of ellipses, \link{points}.
+}
+  \item{ellipses}{
+It this parameter is TRUE, ellipses will be drawn.
+}
+  \item{model}{
+If this parameter is TRUE, model (expected) covariance will be used for each cluster insted of sample covariance (MLE) of the points in the cluster, when drawing ellipses.
+}
+  \item{xlab}{
+See \link{plot}.
+}
+  \item{ylab}{
+See \link{plot}.
+}
+  \item{\dots}{
+Arguments are passed to \code{plot} function when drawing data points.
+}
+}
+
+\seealso{
+\code{\link{print.cec}}
+}
+\examples{
+## See the examples of function cec.
+}
+
+\keyword{ ~plot }
+\keyword{ ~cec }
