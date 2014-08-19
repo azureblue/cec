@@ -51,7 +51,7 @@ int cec(struct cec_context * context)
     for (int i = 0; i < m; i++)
     {
 	double dist = BIG_DOUBLE;
-	for (int j = 0; j < _k; j++)
+	for (int j = 0; j < k; j++)
 	{
 	    double dist_temp = distance2(cec_matrix_row(X, i),
 		    cec_matrix_row(C, j), n);
@@ -77,7 +77,7 @@ int cec(struct cec_context * context)
     /* 
      * Init local arrays
      */
-    for (int i = 0; i < _k; i++)
+    for (int i = 0; i < k; i++)
     {
 	card[i] = 0;
 	removed[i] = 0;
@@ -101,7 +101,7 @@ int cec(struct cec_context * context)
 	 */
 	array_add(cec_matrix_row(C, l), cec_matrix_row(X, i), n);
     }
-    for (int i = 0; i < _k; i++)
+    for (int i = 0; i < k; i++)
     {
 	/*
 	 * Check if cardinality meets remove condition.
@@ -126,7 +126,7 @@ int cec(struct cec_context * context)
     /* 
      * Init covariances matrices.
      */
-    for (int i = 0; i < _k; i++)
+    for (int i = 0; i < k; i++)
     {
 	cec_matrix_set(covariance_matrices[i], 0.0);
 	cec_matrix_set(t_covariance_matrices[i], 0.0);
@@ -147,7 +147,7 @@ int cec(struct cec_context * context)
 	cec_matrix_add(covariance_matrices[l], t_matrix_nn);
     }
 
-    for (int i = 0; i < _k; i++)
+    for (int i = 0; i < k; i++)
     {
 	if (removed[i])
 	    continue;
@@ -194,14 +194,17 @@ int cec(struct cec_context * context)
     clusters_number[0] = _k;
 
     energy[0] = energy_sum;
-
-    int handle_removed_flag = 0;
+    
+    /*
+     * If cluster was removed before first iteration - we must handle it.
+     */
+    int handle_removed_flag = (k == _k) ? 0 : 1;
 
     /*
      * Main loop.
      */
 
-    for (int iter = 0; iter < max; iter++)
+    for (int iter = (handle_removed_flag ? -1 : 0); iter < max; iter++)
     {
 	/*
 	 *  Flag that indicates transfer of point.
