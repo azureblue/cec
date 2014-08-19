@@ -75,7 +75,9 @@ Spurek, P. and Tabor, J. (2012)
 Cross-Entropy Clustering
 \emph{arXiv preprint} arXiv:1210.5594
 }
-
+\seealso{
+\code{\link{cec-package}.}
+}
 \examples{
 # Cross-Entropy Clustering
 #

@@ -5,7 +5,8 @@
 Cross-Entropy Clustering
 }
 \description{
-The package presents clustering method called CEC based on Cross-Entropy Clustering theory. It introduces fast and highly applicable algorithm in the form of customizable funcion \code{cec}.
+The package presents clustering method called CEC based on Cross-Entropy Clustering theory. 
+It introduces fast and highly applicable algorithm in the form of customizable function \code{cec}.
 }
 \details{
 \tabular{ll}{
