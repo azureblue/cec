@@ -4,24 +4,30 @@
 Center initialization
 }
 \description{
-Creates matrix of points (centers) based on given matrix of points. One of two method may be used: Kmeans++ centers initialization method or random choice of data points.
+Creates a matrix of \code{k} points (centers) based on the given matrix of points. 
+One of the two method can be used: Kmeans++ centers initialization method or random choice of data points.
 }
 \usage{
-initcenters(x, c, method = c("kmeans++", "random"))
+initcenters(x, k, method = c("kmeans++", "random"))
 }
 \arguments{
-  \item{x}{
+
+\item{x}{
 Dataset as a matrix of n-dimensional points.
 }
-  \item{c}{
-Number of centers (points) to be computed.
+
+\item{k}{
+Number of points (centers) to generate.
 }
-  \item{method}{
-Method of computing centers. Possible values are: "kmeans++", "random.points".
+
+\item{method}{
+Generation method. Possible values are: "kmeans++", "random.points".
 }
+
 }
+
 \value{
-N-cols matrix representing set of points (centers).
+Matrix points (centers) with \code{k} rows.
 }
 
 \examples{

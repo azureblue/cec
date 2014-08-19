@@ -1,37 +1,47 @@
 \name{cec}
 \alias{cec}
+
 \title{
 Cross-Entropy Clustering
 }
+
 \description{
 Performs Cross-Entropy Clustering on a data matrix.
 }
+
 \usage{
 cec(x, centers, iter.max = 20, nstart = 1, centers.init  = c("kmeans++", "random"), 
 type = c("covariance", "fixedr", "spherical", "diagonal", "all"), param, 
 card.min = "5\%", keep.removed = F, interactive = F, readline = T)
 }
+
 \arguments{
-  \item{x}{
-Numeric matrix of data. 
+
+\item{x}{
+  Numeric matrix of data. 
 }
-  \item{centers}{
+
+\item{centers}{
 Either a matrix of initial centers or the number of initial centers (\code{k}). 
 In the latter case, initial centers will be generated using method depending on
 \code{centers.init} argument.
 }
-  \item{iter.max}{
+
+\item{iter.max}{
 Maximum number of iterations at each start.
 }
-  \item{nstart}{
+
+\item{nstart}{
 Number of clusterings to perform (with different iniial centers). Only the best 
 clustering (with the lowest energy) will be returned. Value grater then one is valid 
 only if \code{centers} argument is a number.
 }
-  \item{centers.init}{
+
+\item{centers.init}{
 Centers initialization method. Possible values are: "kmeans++", "random".
 }
-  \item{type}{
+
+\item{type}{
 Type (or types) of the clustering (density family). This can be either a single value 
 or a vector of length equal to the number of centers. Possible values are: "covariance",
 "fixedr", "spherical", "diagonal", "all".
@@ -39,43 +49,45 @@ or a vector of length equal to the number of centers. Possible values are: "cova
 
 \item{param}{
 Parameter (or parameters) specific to particular type of the clustering. Not all types of
-clustering require parameter. This can be a vector or a list (when one of the parameter is a matrix). 
+clustering require parameter. Types that require parameter: 
+"covariance" (matrix parameter), "fixedr" (numeric parameter). 
+This can be a vector or a list (when one of the parameters is a matrix). 
 }
 
 \item{card.min}{
 Minimal cluster cardinality. If cluster cardinality becomes less than card.min, cluster
-is removed. This argument can be either integer number or string ended with percent sign
-(e.g. "5\%").
+is removed. This argument can be either integer number or string ended with a percent 
+sign (e.g. "5\%").
 }
 
 \item{keep.removed}{
-If this parameter is FASLE, removed clusters will be visible in the results as NA in centers matrix (as well as in the list of covariances).
+If this parameter is TRUE, removed clusters will be visible in the results as NA in centers matrix 
+(as well as corresponding values in the list of covariances).
 }
 
 \item{interactive}{
-Interactive mode. Plotting after every iteration if this arg is TRUE.
+Interactive mode. If TRUE, result of clustering will be plotted after every iteration.
 }
+
 \item{readline}{
-Used only in interactive mode. If \code{readline} is TRUE, at each iteration, before
-plotting it waits for the user to press <Return> instead of standard "before plotting"
+Used only in the interactive mode. If \code{readline} is TRUE, at each iteration, before
+plotting it will wait for the user to press <Return> instead of standard "before plotting"
 (\code{par(ask = TRUE)}) waiting.
 }
 
 }
 \value{
-  Returns object of class "cec" with available components:
-  "data", "cluster", "centers", "iterations", "clusters.number", "energy", "covariances",
-  "time".
+  Returns an object of class "cec" with available components:
+  "data", "cluster", "centers", "iterations", "nclusters", "energy", "covariances", 
+  "covariances.model", "time".
 }
 \author{
 Konrad Kamieniecki
 }
-\references{
-Spurek, P. and Tabor, J. (2012)
-Cross-Entropy Clustering
-\emph{arXiv preprint} arXiv:1210.5594
-}
 
+\seealso{
+\code{\link{cec-package}.}
+}
 \examples{
 # Cross-Entropy Clustering
 #

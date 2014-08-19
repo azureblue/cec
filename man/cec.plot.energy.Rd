@@ -1,47 +1,61 @@
 \name{cec.plot.energy}
 \alias{cec.plot.energy}
+
 \title{
 Plot energy of CEC results.
 }
+
 \description{
 Presents energy changes at each iteration of CEC algorithm in the form of plot.
 }
+
 \usage{
 cec.plot.energy(C, xlab = "Iteration", ylab = "Energy", lwd = 5, col = "red", 
 lwd.points = 5, pch.points = 19, col.points = "black", mgp = c(1.5, 0.5, 0), ...)
 }
 
 \arguments{
-  \item{C}{
+
+\item{C}{
 The result of \code{cec} function.
 }
-  \item{xlab}{
+
+\item{xlab}{
 See \link{title}.
 }
-  \item{ylab}{
+
+\item{ylab}{
 See \link{title}.
 }
-  \item{lwd}{
+
+\item{lwd}{
 Width of lines. See \link{points}.
 }
-  \item{col}{
+
+\item{col}{
 Color of lines. See \link{points}.
 }
-  \item{lwd.points}{
+
+\item{lwd.points}{
 Size of points. See \link{points}.
 }
-  \item{pch.points}{
+
+\item{pch.points}{
 Plotting 'character' of points. See \link{points}.
 }
-  \item{col.points}{
+
+\item{col.points}{
 Color of points.See \link{points}.
 }
-  \item{mgp}{
+
+\item{mgp}{
 See \link{par}.
 }
-  \item{\dots}{
+
+\item{\dots}{
 Passed to line plot function.
 }
+
 }
 \seealso{
 \link{plot.cec}
