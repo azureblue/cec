@@ -84,7 +84,15 @@ plotting it will wait for the user to press <Return> instead of standard "before
 \author{
 Konrad Kamieniecki
 }
+<<<<<<< HEAD
 
+=======
+\references{
+Spurek, P. and Tabor, J. (2012)
+Cross-Entropy Clustering
+\emph{arXiv preprint} arXiv:1210.5594
+}
+>>>>>>> a50ef9e6af12e0776290b9de742a9a8306834414
 \seealso{
 \code{\link{cec-package}.}
 }
