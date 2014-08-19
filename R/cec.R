@@ -129,6 +129,7 @@ cec <- function(
       centers           = Z$centers, 
       probability       = probability,
       energy            = Z$energy  [1:(Z$iterations+1)], 
+      nclusters         = Z$nclusters,
       iterations        = Z$iterations, 
       time              = execution.time,
       covariances       = Z$covariances,
@@ -186,12 +187,14 @@ print.cec <- function(x, ...)
   print(x$probability)
   cat("\nEnergy at each iteration:\n")
   print(x$energy)  
+  cat("\nNumber of clusters at each iteration:\n")
+  print(x$nclusters)  
   cat("\nNumber of iterations:\n")
   print(x$iterations)
   cat("\nComputation time:\n")
   print(x$time)
   cat("\nAvailable components:\n")
-  print(c("data", "cluster", "centers", "probabilities", "energy", "iterations", "covariances", "covariances.model", "time" ))
+  print(c("data", "cluster", "centers", "probabilities", "energy", "nclusters", "iterations", "covariances", "covariances.model", "time" ))
 }
 
 plot.cec <- function(x, col, cex = 0.5, pch = 16, cex.centers = 1, pch.centers = 8, ellipses.lwd = 4, ellipses = TRUE, model = FALSE, xlab = "x", ylab= "y", ...)

@@ -99,12 +99,14 @@ static SEXP create_R_result(struct cec_context * cec_c,
 	int iters = cec_c->iterations;
 	int output_size = iters + 1;
 	SEXP energy_vector;
+	SEXP clusters_number_vector;
 	SEXP assignment_vector;
 	SEXP covariance_list;
 	SEXP centers_matrix;
 	SEXP iterations;
 
 	PROTECT(energy_vector = allocVector(REALSXP, output_size));
+	PROTECT(clusters_number_vector = allocVector(INTSXP, output_size));
 	PROTECT(assignment_vector = allocVector(INTSXP, m));
 	PROTECT(covariance_list = allocVector(VECSXP, k));
 	PROTECT(iterations = allocVector(INTSXP, 1));
@@ -115,6 +117,7 @@ static SEXP create_R_result(struct cec_context * cec_c,
 	for (int i = 0; i < output_size; i++)
 	{
 		REAL(energy_vector)[i] = cec_c->energy[i];
+		INTEGER(clusters_number_vector)[i] = cec_c->clusters_number[i];
 	}
 
 	for (int i = 0; i < m; i++)
@@ -130,7 +133,7 @@ static SEXP create_R_result(struct cec_context * cec_c,
 	}
 
 	SEXP ret;
-	PROTECT(ret = allocList(5));
+	PROTECT(ret = allocList(6));
 	SEXP ret_s = ret;
 	SETCAR(ret, assignment_vector);
 	SET_TAG(ret, install("cluster"));
@@ -141,12 +144,15 @@ static SEXP create_R_result(struct cec_context * cec_c,
 	SETCAR(ret, energy_vector);
 	SET_TAG(ret, install("energy"));
 	ret = CDR(ret);
+	SETCAR(ret, clusters_number_vector);
+	SET_TAG(ret, install("nclusters"));
+	ret = CDR(ret);
 	SETCAR(ret, covariance_list);
 	SET_TAG(ret, install("covariances"));
 	ret = CDR(ret);
 	SETCAR(ret, iterations);
 	SET_TAG(ret, install("iterations"));
-	UNPROTECT(k + 6);
+	UNPROTECT(k + 7);
 	return ret_s;
 }
 
