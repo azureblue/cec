@@ -87,14 +87,13 @@ In the context of implementation, CEC aims to partition \emph{m} points into \em
 minimize the \emph{energy} function by moving the points between clusters.
 
 The energy function \emph{\strong{E}} is given by:
-\deqn{E(Y_1,...,Y_m) = \sum\limits_{i=1}^{k} p(Y_i) \cdot (-ln(p(Y_i)) + H^{\times}(Y_i\|\mathcal{F}))}{
-E(Y1, ..., Yk ) = \sum(p(Yi) * (-ln(p(Yi)) + Hx(Yi | F)))}
-where \emph{Yi} denotes the \emph{i}-th cluster, \emph{p(Yi)} is the ratio of the number of points in \emph{i}-th cluster 
-to the number points, \emph{\strong{Hx}} is the internal cluster energy function defined with respect to a certain Gaussian density 
-family \emph{F} (type of clustering).
+\deqn{E(Y_1, F_1...,Y_m, F_m) = \sum\limits_{i=1}^{k} p(Y_i) \cdot (-ln(p(Y_i)) + H^{\times}(Y_i\|\mathcal{F_i}))}{
+E(Y1, F1 ..., Yk, Fk ) = \sum(p(Yi) * (-ln(p(Yi)) + Hx(Yi | Fi)))}
+where \emph{Yi} denotes the \emph{i}-th cluster, \emph{Fi} denotes a familiy of Gaussian densities, \emph{p(Yi)} is the ratio of the number of points in \emph{i}-th cluster 
+to the number points, \emph{\strong{Hx}} is a function defined with respect to a certain Gaussian density 
+family \emph{Fi} (called "cross-entropy" or "cluster internal energy").
 
-The value of the internal energy function \emph{\strong{Hx}} depends only on the covariance matrix (maximum-likelihood estimate) 
-of the points in the cluster. Five implementations of \emph{\strong{Hx}} have been proposed (expressed as a type - model - of the clustering): 
+Five implementations of \emph{\strong{Hx}} have been proposed, in which the value of the \emph{\strong{Hx}} depends only on the covariance matrix (maximum-likelihood estimate) of the data in the cluster: 
 \itemize{
 \item"covariance" - Gaussian densities with a given covariance. The shapes of clusters depend on the given covariance 
 matrix (additional parameter).
