@@ -83,17 +83,10 @@ plotting it will wait for the user to press <Return> instead of standard "before
 }
 
 \details{
-In the context of implementation, CEC aims to partition \emph{m} points into \emph{k} clusters so as to
-minimize the \emph{energy} function by moving the points between clusters.
+General idea of Cross Entropy Clustering relies on finding the splitting of \eqn{X \subset \R^N}{X⊂Rᴺ} into pairwise disjoint sets \eqn{X_1,\ldots,X_k}{X1, \ldots, Xk} such that the overall energy of the clusters is minimal.
 
-The energy function \emph{\strong{E}} is given by:
-\deqn{E(Y_1, F_1...,Y_m, F_m) = \sum\limits_{i=1}^{k} p(Y_i) \cdot (-ln(p(Y_i)) + H^{\times}(Y_i\|\mathcal{F_i}))}{
-E(Y1, F1 ..., Yk, Fk ) = \sum(p(Yi) * (-ln(p(Yi)) + Hx(Yi | Fi)))}
-where \emph{Yi} denotes the \emph{i}-th cluster, \emph{Fi} denotes a familiy of Gaussian densities, \emph{p(Yi)} is the ratio of the number of points in \emph{i}-th cluster 
-to the number points, \emph{\strong{Hx}} is a function defined with respect to a certain Gaussian density 
-family \emph{Fi} (called "cross-entropy" or "cluster internal energy").
-
-In the implementation, the value of the \emph{\strong{Hx}} depends only on the covariance matrix (maximum-likelihood estimate) of the data in the cluster and a Gaussian density model.
+The CEC algorithm minimizes the cost function which is a small modification of the MLE (Maximum Likelihood Estimation): \deqn{CEC(f,X):= -\sum_{i=1}^m \ln(\max(p_1 f_1(x_i),\ldots,p_k f_k(x_i)))}{CEC(f,X):= -\sumln(max(p1 f1(xi), \ldots, pk fk(xi)))}
+where \eqn{p_i \in [0,1], \sum p_i=1}{0 ≤ pi ≤ 1, \sumpi=1  } and \eqn{f_1, \ldots, f_k}{f1, ..., fk} are Gaussian densities.
 
 Five density models (types of clustering) have been proposed: 
 \itemize{

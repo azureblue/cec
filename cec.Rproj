@@ -14,4 +14,4 @@ LaTeX: pdfLaTeX
 
 BuildType: Package
 PackageInstallArgs: --with-keep.source
-PackageCheckArgs: --as-cran
+PackageCheckArgs: --as-cran -o G:/asd
