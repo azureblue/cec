@@ -33,11 +33,11 @@ Radius of mouse right ear.
 }
 
 \item{left.ear.dist}{
-Distance between the center of head and the center the left ear.
+Distance between the center of the head and the center the left ear.
 }
 
 \item{right.ear.dist}{
-Distance between the center of head and the center the right ear.
+Distance between the center of the head and the center the right ear.
 }
 
 \item{dim}{

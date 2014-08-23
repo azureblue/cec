@@ -4,8 +4,8 @@
 Center initialization
 }
 \description{
-Creates a matrix of \code{k} points (centers) based on the given matrix of points. 
-One of the two method can be used: Kmeans++ centers initialization method or random choice of data points.
+Creates a matrix of \code{k} points (centers) based on a given matrix of points. 
+One of two method can be used: Kmeans++ centers initialization method or a random choice of data points.
 }
 \usage{
 initcenters(x, k, method = c("kmeans++", "random"))

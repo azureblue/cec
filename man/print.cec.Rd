@@ -6,7 +6,7 @@ Print CEC.
 }
 
 \description{
-Presents structure of the \code{cec} results object in the form of text.
+Presents a structure of the \code{cec} results object in the form of text.
 }
 
 \usage{
@@ -16,7 +16,7 @@ Presents structure of the \code{cec} results object in the form of text.
 \arguments{
 
 \item{x}{
-The result of \code{cec} function.
+Result of the \code{cec} function.
 }
 
 \item{\dots}{

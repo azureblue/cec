@@ -18,13 +18,13 @@ card.min = "5\%", keep.removed = F, interactive = F, readline = T)
 \arguments{
 
 \item{x}{
-  Numeric matrix of data. 
+Numeric matrix of data. 
 }
 
 \item{centers}{
-Either a matrix of initial centers or the number of initial centers (\code{k}). 
-In the latter case, initial centers will be generated using method depending on
-\code{centers.init} argument.
+Either a matrix of initial centers or a the number of initial centers (\code{k}). 
+In the latter case, initial centers will be generated using a method depending on
+the \code{centers.init} argument.
 }
 
 \item{iter.max}{
@@ -32,9 +32,9 @@ Maximum number of iterations at each start.
 }
 
 \item{nstart}{
-Number of clusterings to perform (with different iniial centers). Only the best 
+Number of clusterings to perform (with different initial centers). Only the best 
 clustering (with the lowest energy) will be returned. Value grater then one is valid 
-only if \code{centers} argument is a number.
+only if the \code{centers} argument is a number.
 }
 
 \item{centers.init}{
@@ -42,21 +42,21 @@ Centers initialization method. Possible values are: "kmeans++", "random".
 }
 
 \item{type}{
-Type (or types) of the clustering (density family). This can be either a single value 
+Type (or types) of clustering (density family). This can be either a single value 
 or a vector of length equal to the number of centers. Possible values are: "covariance",
 "fixedr", "spherical", "diagonal", "all".
 }
 
 \item{param}{
-Parameter (or parameters) specific to particular type of the clustering. Not all types of
-clustering require parameter. Types that require parameter: 
+Parameter (or parameters) specific to a particular type of clustering. 
+Not all types of clustering require parameter. Types that require parameter: 
 "covariance" (matrix parameter), "fixedr" (numeric parameter). 
 This can be a vector or a list (when one of the parameters is a matrix). 
 }
 
 \item{card.min}{
 Minimal cluster cardinality. If cluster cardinality becomes less than card.min, cluster
-is removed. This argument can be either integer number or string ended with a percent 
+is removed. This argument can be either an integer number or a string ended with a percent 
 sign (e.g. "5\%").
 }
 
@@ -81,8 +81,35 @@ plotting it will wait for the user to press <Return> instead of standard "before
   "data", "cluster", "centers", "iterations", "nclusters", "energy", "covariances", 
   "covariances.model", "time".
 }
+
+\details{
+In the context of implementation, CEC clustering aims to partition \emph{m} points into \emph{k} clusters so as to
+minimize the the \emph{energy} function by moving the points between clusters.
+
+The energy function \strong{E} is given by:
+\deqn{E(Y_1,...,Y_m) = \sum\limits_{i=1}^{k} p(Y_i) \cdot (-ln(p(Y_i)) + H^{\times}(Y_i\|\mathcal{F}))}{
+E(Y1, ..., Yk ) = \sum(p(Yi) * (-ln(p(Yi)) + Hx(Yi | F)))}
+where \emph{Yi} denotes the \emph{i}-th cluster, \emph{p(Yi)} is the ratio of the number of points in \emph{i}-th cluster 
+to the number points, \strong{Hx} is the internal cluster energy function defined with respect certain Gaussian density 
+family \emph{F} (type of clustering).
+
+The value of internal energy function \strong{Hx} depends only on the covariance matrix (maximum-likelihood estimate) 
+of the points in the cluster. Five implementations of \strong{Hx} have been proposed (expressed as a type - model - of the clustering): 
+\itemize{
+\item"covariance" - Gaussian densities with the given covariance. The shapes of clusters depend on the given covariance 
+matrix (additional parameter).
+\item"fixedr" - Special case of "covariance", where the covariance matrix equals \emph{rI} for the given \emph{r} 
+(additional parameter). The clustering will have a tendency to divide data into balls with the specific radius \emph{r}.
+\item"spherical" - Spherical Gaussian densities (covariance proportional to the indentity). Clusters will have a tendency 
+to form balls of arbitrary sizes.
+\item"diagonal" - Gaussian densities with diagonal covariane. Data will form ellipsoids with radiuses parallel to coordinate axes.
+\item"all" - All Gaussian densities. Data will form ellipsoids with arbitrary radiuses. 
+}
+
+The implementation of \code{cec} function allows mixing clustering types.
+}
 \author{
-Konrad Kamieniecki
+Konrad Kamieniecki, Jacek Tabor, Przemysław Spurek
 }
 
 \seealso{

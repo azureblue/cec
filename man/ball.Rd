@@ -20,11 +20,11 @@ Number of points to generate.
 }
 
 \item{r}{
-Radius of ball.
+Radius of the ball.
 }
 
 \item{dim}{
-Dimension of points.
+Dimension of the points.
 }
 
 }

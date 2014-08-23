@@ -6,7 +6,7 @@ Plot CEC.
 }
 
 \description{
-Presents the results of \code{cec} function in the form of plot. 
+Presents the results of \code{cec} function in the form of a plot. 
 Colors of data points depend of the cluster they belong to. 
 Ellipses are drawn with regards to the covariance (either model or sample) of each cluster.
 }
@@ -23,7 +23,7 @@ The result of \code{cec} function.
 }
 
 \item{col}{
-Use this argument to change default colors of points of the clusters.
+Use this argument to change default colors of points in the clusters.
 }
 
 \item{cex}{
