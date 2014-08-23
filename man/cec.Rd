@@ -83,23 +83,23 @@ plotting it will wait for the user to press <Return> instead of standard "before
 }
 
 \details{
-In the context of implementation, CEC clustering aims to partition \emph{m} points into \emph{k} clusters so as to
-minimize the the \emph{energy} function by moving the points between clusters.
+In the context of implementation, CEC aims to partition \emph{m} points into \emph{k} clusters so as to
+minimize the \emph{energy} function by moving the points between clusters.
 
-The energy function \strong{E} is given by:
+The energy function \emph{\strong{E}} is given by:
 \deqn{E(Y_1,...,Y_m) = \sum\limits_{i=1}^{k} p(Y_i) \cdot (-ln(p(Y_i)) + H^{\times}(Y_i\|\mathcal{F}))}{
 E(Y1, ..., Yk ) = \sum(p(Yi) * (-ln(p(Yi)) + Hx(Yi | F)))}
 where \emph{Yi} denotes the \emph{i}-th cluster, \emph{p(Yi)} is the ratio of the number of points in \emph{i}-th cluster 
-to the number points, \strong{Hx} is the internal cluster energy function defined with respect certain Gaussian density 
+to the number points, \emph{\strong{Hx}} is the internal cluster energy function defined with respect to a certain Gaussian density 
 family \emph{F} (type of clustering).
 
-The value of internal energy function \strong{Hx} depends only on the covariance matrix (maximum-likelihood estimate) 
-of the points in the cluster. Five implementations of \strong{Hx} have been proposed (expressed as a type - model - of the clustering): 
+The value of the internal energy function \emph{\strong{Hx}} depends only on the covariance matrix (maximum-likelihood estimate) 
+of the points in the cluster. Five implementations of \emph{\strong{Hx}} have been proposed (expressed as a type - model - of the clustering): 
 \itemize{
-\item"covariance" - Gaussian densities with the given covariance. The shapes of clusters depend on the given covariance 
+\item"covariance" - Gaussian densities with a given covariance. The shapes of clusters depend on the given covariance 
 matrix (additional parameter).
 \item"fixedr" - Special case of "covariance", where the covariance matrix equals \emph{rI} for the given \emph{r} 
-(additional parameter). The clustering will have a tendency to divide data into balls with the specific radius \emph{r}.
+(additional parameter). The clustering will have a tendency to divide data into balls with approximate radius of the square root of \emph{r}.
 \item"spherical" - Spherical Gaussian densities (covariance proportional to the indentity). Clusters will have a tendency 
 to form balls of arbitrary sizes.
 \item"diagonal" - Gaussian densities with diagonal covariane. Data will form ellipsoids with radiuses parallel to coordinate axes.
