@@ -93,7 +93,9 @@ where \emph{Yi} denotes the \emph{i}-th cluster, \emph{Fi} denotes a familiy of 
 to the number points, \emph{\strong{Hx}} is a function defined with respect to a certain Gaussian density 
 family \emph{Fi} (called "cross-entropy" or "cluster internal energy").
 
-Five implementations of \emph{\strong{Hx}} have been proposed, in which the value of the \emph{\strong{Hx}} depends only on the covariance matrix (maximum-likelihood estimate) of the data in the cluster: 
+In the implementation, the value of the \emph{\strong{Hx}} depends only on the covariance matrix (maximum-likelihood estimate) of the data in the cluster and a Gaussian density model.
+
+Five density models (types of clustering) have been proposed: 
 \itemize{
 \item"covariance" - Gaussian densities with a given covariance. The shapes of clusters depend on the given covariance 
 matrix (additional parameter).
