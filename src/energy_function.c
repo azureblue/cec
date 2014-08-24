@@ -5,21 +5,21 @@ energy_function energy_function_for(enum density_family family)
 	switch (family)
 	{
 	case ALL:
-		return hx_all;
+		return h_all;
 	case SPHERICAL:
-		return hx_spherical;
+		return h_spherical;
 	case DIAGONAL:
-		return hx_diagonal;
+		return h_diagonal;
 	case FIXED_R:
-		return hx_fixed_r;
+		return h_fixed_r;
 	case GIVEN_COVARIANCE:
-		return hx_given_covariance;
+		return h_given_covariance;
 	}
 
 	return NULL;
 }
 
-double hx_given_covariance(const struct energy_function_context * context,
+double h_given_covariance(const struct energy_function_context * context,
 		const struct cec_matrix * cov)
 {
 	struct context_gc * cgc = (struct context_gc *) context->custom_context;
@@ -46,7 +46,7 @@ double hx_given_covariance(const struct energy_function_context * context,
 			+ (1.0 / 2.0) * log(det);
 }
 
-double hx_spherical(const struct energy_function_context * context,
+double h_spherical(const struct energy_function_context * context,
 		const struct cec_matrix * cov)
 {
 	int n = context->n;
@@ -60,7 +60,7 @@ double hx_spherical(const struct energy_function_context * context,
 	return (n / 2.0) * log(2.0 * M_PI * M_E / n) + (n / 2.0) * log(trace);
 }
 
-double hx_fixed_r(const struct energy_function_context * context,
+double h_fixed_r(const struct energy_function_context * context,
 		const struct cec_matrix * cov)
 {
 	struct context_r * cr = (struct context_r *) context->custom_context;
@@ -71,7 +71,7 @@ double hx_fixed_r(const struct energy_function_context * context,
 			+ (1.0 / (2.0 * r)) * cec_matrix_trace(cov) + (n / 2.0) * log(r);
 }
 
-double hx_diagonal(const struct energy_function_context * context,
+double h_diagonal(const struct energy_function_context * context,
 		const struct cec_matrix * cov)
 {
 
@@ -88,7 +88,7 @@ double hx_diagonal(const struct energy_function_context * context,
 			+ (1.0 / 2.0) * log(diagonal_product);
 }
 
-double hx_all(const struct energy_function_context * context,
+double h_all(const struct energy_function_context * context,
 		const struct cec_matrix * cov)
 {
 

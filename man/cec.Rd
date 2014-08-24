@@ -85,7 +85,7 @@ plotting it will wait for the user to press <Return> instead of standard "before
 \details{
 General idea of Cross Entropy Clustering relies on finding the splitting of \eqn{X \subset \R^N}{X⊂Rᴺ} into pairwise disjoint sets \eqn{X_1,\ldots,X_k}{X1, \ldots, Xk} such that the overall energy of the clusters is minimal.
 
-The CEC algorithm minimizes the cost function which is a small modification of the MLE (Maximum Likelihood Estimation): \deqn{CEC(f,X):= -\sum_{i=1}^m \ln(\max(p_1 f_1(x_i),\ldots,p_k f_k(x_i)))}{CEC(f,X):= -\sumln(max(p1 f1(xi), \ldots, pk fk(xi)))}
+The CEC algorithm minimizes the cost function which is a small modification of the MLE (Maximum Likelihood Estimation): \deqn{CEC(f,X):= -\sum_{i=1}^m \ln(\max(p_1 f_1(x_i),\ldots,p_k f_k(x_i)))}{CEC(f,X):= -\sumln(max(p1f1(xi), \ldots, pkfk(xi)))}
 where \eqn{p_i \in [0,1], \sum p_i=1}{0 ≤ pi ≤ 1, \sumpi=1  } and \eqn{f_1, \ldots, f_k}{f1, ..., fk} are Gaussian densities.
 
 Five density models (types of clustering) have been proposed: 

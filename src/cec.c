@@ -19,7 +19,7 @@ int cec(struct cec_context * context)
     const int min_card = context->min_card;
 
     energy_function * energy_functions = context->energy_functions;
-    struct energy_function_context ** hx_contexts =
+    struct energy_function_context ** h_contexts =
 	    context->energy_function_contexts;
 
     int _k = k;
@@ -161,7 +161,7 @@ int cec(struct cec_context * context)
 	/*
 	 * Compute energy of each group
 	 */
-	double hx = energy_functions[i](hx_contexts[i], covariance_matrices[i]);
+	double hx = energy_functions[i](h_contexts[i], covariance_matrices[i]);
 	if (isnan(hx)) 	
 	    return POSITIVE_DEFINITE_ERROR;
 	
@@ -262,7 +262,7 @@ int cec(struct cec_context * context)
 		/*
 		 * Compute energy of group 'l' after removing data point 'i'.
 		 */
-		double n_l_hx = energy_functions[l](hx_contexts[l], n_covariance_matrix);
+		double n_l_hx = energy_functions[l](h_contexts[l], n_covariance_matrix);
 		if (isnan(n_l_hx)) 		    
 		    return POSITIVE_DEFINITE_ERROR;
 		
@@ -318,7 +318,7 @@ int cec(struct cec_context * context)
 		/*
 		 * Compute energy of group 'j' after adding data point 'i'.
 		 */
-		double t_hx = energy_functions[j](hx_contexts[j], t_covariance_matrices[j]);
+		double t_hx = energy_functions[j](h_contexts[j], t_covariance_matrices[j]);
 		if (isnan(t_hx)) 		    
 		    return POSITIVE_DEFINITE_ERROR;
 		
