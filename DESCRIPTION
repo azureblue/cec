@@ -7,5 +7,6 @@ Maintainer: Konrad Kamieniecki <kk0xf0@gmail.com>
 Description: Clustering method based on Cross-Entropy Clustering theory.
 ByteCompile: true
 Encoding: UTF-8
+NeedsCompilation: yes
 License: GPL-3 | file LICENSE
 Packaged: 2014-08-25 00:38:34 UTC; konrad
