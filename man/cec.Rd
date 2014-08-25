@@ -84,7 +84,7 @@ plotting it will wait for the user to press <Return> instead of standard "before
 
 \details{
 In the context of implementation, Cross-Entropy Clustering (CEC) aims to partition \emph{m} points into \emph{k} 
-clusters so as to minimize the cost function (energy \emph{\strong{E}} of the clustering) by switching the points between clusters. 
+clusters so as to minimize the cost function (energy \emph{\strong{E}} of the clustering) by switching the points between clusters. 
 The presented method is based on the adapted Hartigan approach, where we reduce clusters which cardinalities decreased below some small prefixed level.
 
 The energy function \emph{\strong{E}} is given by:
