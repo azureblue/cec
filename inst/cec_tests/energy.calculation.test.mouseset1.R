@@ -2,7 +2,7 @@
 
 setup <- function()
 {
-  B <- as.matrix(read.table(system.file("cec_tests", "mouse1.data", package="cec")))
+  B <- as.matrix(read.table(system.file("cec_tests", "mouse1.data", package="CEC")))
 }
 
 test.type.covariance <- function()

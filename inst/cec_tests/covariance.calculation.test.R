@@ -3,8 +3,8 @@
 
 setup <- function()
 {
-  B <- as.matrix(read.table(system.file("cec_tests", "ball1.data", package="cec")))
-  centers <- as.matrix(read.table(system.file("cec_tests", "centers2.data", package="cec")))
+  B <- as.matrix(read.table(system.file("cec_tests", "ball1.data", package="CEC")))
+  centers <- as.matrix(read.table(system.file("cec_tests", "centers2.data", package="CEC")))
 }
 
 test.covariances.before.first.iteraion <- function()

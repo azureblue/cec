@@ -3,7 +3,7 @@
 run.cec.tests <- function()
 {
   errors <- 0
-  tests <- list.files(system.file("cec_tests", package="cec"))
+  tests <- list.files(system.file("cec_tests", package="CEC"))
   for (test in tests)
   {
     if (grepl(".R", test, perl=T))
@@ -17,7 +17,7 @@ run.cec.tests <- function()
           },
         testenv
         )
-      source(system.file("cec_tests", test, package="cec"), local=testenv)
+      source(system.file("cec_tests", test, package="CEC"), local=testenv)
       errors <- errors + local(
         {
           local.errors <- 0

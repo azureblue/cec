@@ -83,31 +83,37 @@ plotting it will wait for the user to press <Return> instead of standard "before
 }
 
 \details{
-General idea of Cross Entropy Clustering relies on finding the splitting of \eqn{X \subset \R^N}{X⊂Rᴺ} into pairwise disjoint sets \eqn{X_1,\ldots,X_k}{X1, \ldots, Xk} such that the overall energy of the clusters is minimal.
+In the context of implementation, Cross-Entropy Clustering (CEC) aims to partition \emph{m} points into \emph{k} 
+clusters so as to minimize the cost function (energy \emph{\strong{E}} of the clustering) by switching the points between clusters. 
+The presented method is based on the adapted Hartigan approach, where we reduce clusters which cardinalities decreased below some small prefixed level.
 
-The CEC algorithm minimizes the cost function which is a small modification of the MLE (Maximum Likelihood Estimation): \deqn{CEC(f,X):= -\sum_{i=1}^m \ln(\max(p_1 f_1(x_i),\ldots,p_k f_k(x_i)))}{CEC(f,X):= -\sumln(max(p1f1(xi), \ldots, pkfk(xi)))}
-where \eqn{p_i \in [0,1], \sum p_i=1}{0 ≤ pi ≤ 1, \sumpi=1  } and \eqn{f_1, \ldots, f_k}{f1, ..., fk} are Gaussian densities.
+The energy function \emph{\strong{E}} is given by:
+\deqn{E(Y_1, ...,Y_k) = \sum\limits_{i=1}^{k} p(Y_i) \cdot (-ln(p(Y_i)) + H^{\times}(Y_i\|\mathcal{F}))}{
+E(Y1, ..., Yk) = \sum(p(Yi) * (-ln(p(Yi)) + H(Yi | F)))}
+where \emph{Yi} denotes the \emph{i}-th cluster, \emph{p(Yi)} is the ratio of the number of points in \emph{i}-th cluster to the total number points, \emph{\strong{H}(Yi|F)} is the value of cross-entropy, which represents the internal cluster energy function of data \emph{Yi} defined with respect to a certain Gaussian density family \emph{F}, which encodes the type of clustering we consider.
 
-Five density models (types of clustering) have been proposed: 
+The value of the internal energy function \emph{\strong{H}} depends only on the covariance matrix of the points in the cluster (computed using maximum-likelihood method). Five implementations of \emph{\strong{H}} have been proposed (expressed as a type - model - of the clustering):
+
 \itemize{
-\item"covariance" - Gaussian densities with a given covariance. The shapes of clusters depend on the given covariance 
+\item"covariance" - Gaussian densities with a fixed given covariance. The shapes of clusters depend on the given covariance 
 matrix (additional parameter).
 \item"fixedr" - Special case of "covariance", where the covariance matrix equals \emph{rI} for the given \emph{r} 
-(additional parameter). The clustering will have a tendency to divide data into balls with approximate radius of the square root of \emph{r}.
-\item"spherical" - Spherical Gaussian densities (covariance proportional to the indentity). Clusters will have a tendency 
-to form balls of arbitrary sizes.
-\item"diagonal" - Gaussian densities with diagonal covariane. Data will form ellipsoids with radiuses parallel to coordinate axes.
+(additional parameter). The clustering will have a tendency to divide data into balls with approximate radius proportional to the square 
+root of \emph{r}.
+\item"spherical" - Spherical (radial) Gaussian densities (covariance proportional to the indentity). 
+Clusters will have a tendency to form balls of arbitrary sizes.
+\item"diagonal" - Gaussian densities with diagonal covariane. Data will form ellipsoids with radiuses parallel to the coordinate axes.
 \item"all" - All Gaussian densities. Data will form ellipsoids with arbitrary radiuses. 
 }
 
-The implementation of \code{cec} function allows mixing clustering types.
+The implementation of \code{cec} function allows mixing of clustering types.
 }
 \author{
 Konrad Kamieniecki, Jacek Tabor, Przemysław Spurek
 }
 
 \seealso{
-\code{\link{cec-package}.}
+\code{\link{CEC-package}.}
 }
 \examples{
 # Cross-Entropy Clustering
@@ -161,6 +167,11 @@ plot(Z)
 # Result:
 Z
 cec.plot.energy(Z)
+}
+\references{
+Spurek, P. and Tabor, J. (2014)
+Cross-Entropy Clustering
+\emph{Pattern Recognition} \bold{47, 9} 3046--3059
 }
 \keyword{ ~cec }
 \keyword{ ~clustering }
