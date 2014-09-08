@@ -103,7 +103,7 @@ root of \emph{r}.
 \item"spherical" - Spherical (radial) Gaussian densities (covariance proportional to the indentity). 
 Clusters will have a tendency to form balls of arbitrary sizes.
 \item"diagonal" - Gaussian densities with diagonal covariane. Data will form ellipsoids with radiuses parallel to the coordinate axes.
-\item"eigenvalues" - Gaussian densities with covariance matrix having fixed eigenvalues (additional parameter). The clustering will try to divide the data into ellipsoids with fixed shape rotated by arbitrary angle. 
+\item"eigenvalues" - Gaussian densities with covariance matrix having fixed eigenvalues (additional parameter). The clustering will try to divide the data into ellipsoids with fixed shape rotated by an arbitrary angle. 
 \item"all" - All Gaussian densities. Data will form ellipsoids with arbitrary radiuses. 
 }
 

@@ -61,20 +61,9 @@ printmsg <- function(msg)
   else ""      
 }
 
-cov.mle <- function(M)
-{
-  mean <- colMeans(M)
-  mat <- matrix(0,ncol(M),ncol(M))
-  for (i in seq(1, nrow(M)))
-  {
-    v <- M[i,]   
-    mat <- mat + (t(t(v - mean)) %*% t(v - mean))
-  }
-  mat <- mat / nrow(M)
-  mat
-}
 
-checkNumericVectorEquals <- function(ex, ac, tolerance = .Machine$double.eps ^ 0.5, msg=NULL)  
+
+checkNumericVectorEquals <- function(ex, ac, msg=NULL, tolerance = .Machine$double.eps ^ 0.5)  
 {  
   if (length(ex) != length(ac)) stop (paste(printmsg(msg),"Vectors have different length."))  
   for (i in seq(1, length(ex)))      
@@ -83,7 +72,7 @@ checkNumericVectorEquals <- function(ex, ac, tolerance = .Machine$double.eps ^ 0
   
 }
 
-checkNumericEquals <- function(ex, ac, tolerance = .Machine$double.eps ^ 0.5, msg=NULL)
+checkNumericEquals <- function(ex, ac, msg=NULL, tolerance = .Machine$double.eps ^ 0.5)
 {
   if(!is.numeric(ex)) stop(paste(printmsg(msg), "Expression:",ex,"is not numeric type."))
   if(!is.numeric(ac)) stop(paste(printmsg(msg), "Expression:",ac,"is not numeric type."))
@@ -109,7 +98,7 @@ checkTrue <- function(exp, msg=NULL)
   }
 }
 
-checkNumericMatrixEquals <- function(ex, ac, tolerance = .Machine$double.eps ^ 0.5, msg=NULL)  
+checkNumericMatrixEquals <- function(ex, ac, msg=NULL, tolerance = .Machine$double.eps ^ 0.5)  
 {
 
   if (nrow(ex) != nrow(ac)) stop (paste(printmsg(msg),"Matrices have different dimensions."))
@@ -121,3 +110,51 @@ checkNumericMatrixEquals <- function(ex, ac, tolerance = .Machine$double.eps ^ 0
         stop (paste(printmsg(msg), "Matrices differ at row:", i, " col:", j, ": expected:", ex[i, j], ", actuall:",ac[i, j]))
   
 }
+
+cov.mle <- function(M)
+{
+  mean <- colMeans(M)
+  mat <- matrix(0,ncol(M),ncol(M))
+  for (i in seq(1, nrow(M)))
+  {
+    v <- M[i,]   
+    mat <- mat + (t(t(v - mean)) %*% t(v - mean))
+  }
+  mat <- mat / nrow(M)
+  mat
+}
+
+H.covariance <- function(cov, given.cov) 
+{
+  igiven.cov <- solve(given.cov)  
+  ncol(cov) / 2 * log(2 * pi) + 1/2 * sum(diag(igiven.cov %*% cov)) + 1 / 2 * log (det(given.cov))    
+}
+
+H.fixedr <- function(cov, r) 
+{  
+  ncol(cov) / 2 * log(2 * pi) + 1 / (2*r) * sum(diag(cov)) + ncol(cov) / 2 * log (r)      
+}
+
+H.spherical <- function(cov) 
+{
+  ncol(cov) / 2 * log(2 * pi * 2.718281828 / ncol(cov)) + ncol(cov) / 2 * log (sum(diag(cov))) 
+}
+
+H.diagonal <- function(cov) 
+{
+  ncol(cov) / 2 * log(2 * pi * 2.718281828) + log(prod(diag(cov))) / 2
+}
+
+H.all <- function(cov) 
+{
+  ncol(cov) / 2 * log(2 * pi * 2.718281828) + log(det(cov)) / 2    
+}
+
+H.eigenvalues <- function(cov, evals) 
+{  
+  c.evals = sort(eigen(cov)$val)
+  evals = sort(evals)
+  ncol(cov) / 2 * log(2 * pi) + 1 / 2 * sum(c.evals / evals) + 1 / 2 * log (prod(evals))    
+}
+
+

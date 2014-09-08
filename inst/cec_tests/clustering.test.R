@@ -4,12 +4,12 @@ setup <- function()
 {
   M <- as.matrix(read.table(system.file("cec_tests", "mouse1.data", package="CEC")))
   C <- as.matrix(read.table(system.file("cec_tests", "centers1.data", package="CEC")))
-  expected <- dget(system.file("cec_tests", "cec1.dp", package="CEC"))
-  CEC <- cec(M, C)
+  expected <- dget(system.file("cec_tests", "cec1.dp", package="CEC"))  
 }
 test.clustering.mouse1 <- function()
 {  
-  checkNumericVectorEquals(expected$cluster, CEC$cluster, msg="Clustering vector")
-  checkNumericVectorEquals(expected$energy, CEC$energy, msg="Energy")
-  checkNumericMatrixEquals(expected$centers, CEC$centers, msg="Centers")  
+  CE <- cec(M, C)
+  CEC:::checkNumericVectorEquals(expected$cluster, CE$cluster, msg="Clustering vector")
+  CEC:::checkNumericVectorEquals(expected$energy, CE$energy, msg="Energy")
+  CEC:::checkNumericMatrixEquals(expected$centers, CE$centers, msg="Centers")  
 }
