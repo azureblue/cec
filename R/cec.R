@@ -210,7 +210,7 @@ print.cec <- function(x, ...)
   print(c("data", "cluster", "centers", "probabilities", "energy", "nclusters", "iterations", "covariances", "covariances.model", "time" ))
 }
 
-plot.cec <- function(x, col, cex = 0.5, pch = 16, cex.centers = 1, pch.centers = 8, ellipses.lwd = 4, ellipses = TRUE, model = FALSE, xlab = "x", ylab= "y", ...)
+plot.cec <- function(x, col, cex = 0.5, pch = 16, cex.centers = 1, pch.centers = 8, ellipses.lwd = 4, ellipses = TRUE, model = T, xlab = "x", ylab= "y", ...)
 {
   if (ncol (x $ data) != 2 )
     stop("plotting available only for 2-dimensional data")
