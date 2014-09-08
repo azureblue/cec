@@ -96,7 +96,7 @@ cec <- function(
      {
        stop("All starts faild with error.")
      }    
-    execution.time = (proc.time() - startTime)  
+    execution.time = as.vector((proc.time() - startTime))[1]
   
     Z$centers[is.nan(Z$centers)] <- NA
   
