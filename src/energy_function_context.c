@@ -4,92 +4,131 @@
 #include "energy_function_context.h"
 #include "matrix.h"
 
+static const int LAPACK_WORKSPACE_BLOCK = 128;
+
 void destroy_energy_function_context(struct energy_function_context * context)
 {
-	if (context == NULL)
-		return;
+    if (context == NULL)
+	return;
 
-	cec_matrix_destroy(context->temp_matrix);
-	switch (context->family)
-	{
+    cec_matrix_destroy(context->temp_matrix);
+    switch (context->family)
+    {
 	case FIXED_R:
-		m_free(context->custom_context);
-		break;
+	    m_free(context->custom_context);
+	    break;
 	case GIVEN_COVARIANCE:
 	{
-		struct context_gc * c_gc = (struct context_gc *) context->custom_context;
-		if (context->custom_context == NULL)
-			break;
-
-		cec_matrix_destroy(c_gc->given_cov);
-		cec_matrix_destroy(c_gc->i_given_cov);
+	    struct context_gc * c_gc = (struct context_gc *) context->custom_context;
+	    if (context->custom_context == NULL)
 		break;
+
+	    cec_matrix_destroy(c_gc->given_cov);
+	    cec_matrix_destroy(c_gc->i_given_cov);
+	    m_free(context->custom_context);
+	    break;
+	}
+	case FIXEDEIGENVALUES:
+	{
+	    if (context->custom_context == NULL)
+		break;
+
+	    struct context_fe * c_fe = (struct context_fe *) context->custom_context;
+	    m_free(c_fe->evals);
+	    m_free(c_fe->given_evals);
+	    m_free(c_fe->lapack_workspace);
+	    m_free(context->custom_context);
+	    break;
+
 	}
 	case ALL:
 	case SPHERICAL:
 	case DIAGONAL:
-		break;
-	}
+	    break;
+    }
 
-	m_free(context);
+    m_free(context);
 }
 
 struct energy_function_context * create_energy_function_context(
-		enum density_family family, int n)
+	enum density_family family, int n)
 {
-	struct energy_function_context * context = m_alloc(
-			sizeof(struct energy_function_context));
-	if (context == NULL)
-		return NULL;
+    struct energy_function_context * context = m_alloc(
+	    sizeof (struct energy_function_context));
+    if (context == NULL)
+	return NULL;
 
-	context->n = n;
-	context->custom_context = NULL;
-	context->temp_matrix = cec_matrix_create(n, n);
-	context->family = family;
+    context->n = n;
+    context->custom_context = NULL;
+    context->temp_matrix = cec_matrix_create(n, n);
+    context->family = family;
 
-	if (context->temp_matrix == NULL)
-	{
-		destroy_energy_function_context(context);
-		return NULL;
-	}
+    if (context->temp_matrix == NULL)
+    {
+	destroy_energy_function_context(context);
+	return NULL;
+    }
 
-	switch (family)
-	{
+    switch (family)
+    {
 	case FIXED_R:
 	{
-		struct context_r * c_r = m_alloc(sizeof(struct context_r));
-		if (c_r == NULL)
-		{
-			destroy_energy_function_context(context);
-			return NULL;
-		}
-		context->custom_context = c_r;
-		break;
+	    struct context_r * c_r = m_alloc(sizeof (struct context_r));
+	    if (c_r == NULL)
+	    {
+		destroy_energy_function_context(context);
+		return NULL;
+	    }
+	    context->custom_context = c_r;
+	    break;
 	}
 	case GIVEN_COVARIANCE:
 	{
-		struct context_gc * context_gc = m_alloc(sizeof(struct context_gc));
-		if (context_gc == NULL)
-		{
-			destroy_energy_function_context(context);
-			return NULL;
-		}
+	    struct context_gc * context_gc = m_alloc(sizeof (struct context_gc));
+	    if (context_gc == NULL)
+	    {
+		destroy_energy_function_context(context);
+		return NULL;
+	    }
+	    context->custom_context = context_gc;
 
-		context_gc->given_cov = cec_matrix_create(n, n);
-		context_gc->i_given_cov = cec_matrix_create(n, n);
-		if (context_gc->given_cov == NULL || context_gc->i_given_cov == NULL)
-		{
-			destroy_energy_function_context(context);
-			return NULL;
-		}
-		context->custom_context = context_gc;
-		break;
+	    context_gc->given_cov = cec_matrix_create(n, n);
+	    context_gc->i_given_cov = cec_matrix_create(n, n);
+	    if (context_gc->given_cov == NULL || context_gc->i_given_cov == NULL)
+	    {
+		destroy_energy_function_context(context);
+		return NULL;
+	    }
+	    break;
 	}
+	case FIXEDEIGENVALUES:
+	{
+	    struct context_fe * context_fe = m_alloc(sizeof (struct context_fe));
+	    if (context_fe == NULL)
+	    {
+		destroy_energy_function_context(context);
+		return NULL;
+	    }
+	    context->custom_context = context_fe;
+	    
+	    context_fe->evals	    = m_alloc(sizeof (double) * n);
+	    context_fe->given_evals = m_alloc(sizeof (double) * n);
+	    context_fe->lapack_workspace_length = (LAPACK_WORKSPACE_BLOCK + 2) * n;
+
+	    context_fe->lapack_workspace = m_alloc(sizeof (double) * context_fe -> lapack_workspace_length);
+	    if (context_fe->evals == NULL || context_fe->given_evals == NULL || context_fe->lapack_workspace == NULL)
+	    {
+		destroy_energy_function_context(context);
+		return NULL;
+	    }
+	    break;
+	}
+
 	case ALL:
 	case SPHERICAL:
 	case DIAGONAL:
-		break;
-	}
+	    break;
+    }
 
-	return context;
+    return context;
 }

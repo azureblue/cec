@@ -162,9 +162,9 @@ int cec(struct cec_context * context)
 	 * Compute energy of each group
 	 */
 	double hx = energy_functions[i](h_contexts[i], covariance_matrices[i]);
-	if (isnan(hx)) 	
+	if (isnan(hx))
 	    return POSITIVE_DEFINITE_ERROR;
-	
+
 	clusters_energy[i] = compute_energy(m, hx, card[i]);
 
 	/*
@@ -194,7 +194,7 @@ int cec(struct cec_context * context)
     clusters_number[0] = _k;
 
     energy[0] = energy_sum;
-    
+
     /*
      * If cluster was removed before first iteration - we must handle it.
      */
@@ -263,9 +263,9 @@ int cec(struct cec_context * context)
 		 * Compute energy of group 'l' after removing data point 'i'.
 		 */
 		double n_l_hx = energy_functions[l](h_contexts[l], n_covariance_matrix);
-		if (isnan(n_l_hx)) 		    
+		if (isnan(n_l_hx))
 		    return POSITIVE_DEFINITE_ERROR;
-		
+
 		n_l_energy = compute_energy(m, n_l_hx, card[l] - 1);
 
 		energy_gain = 0;
@@ -319,9 +319,9 @@ int cec(struct cec_context * context)
 		 * Compute energy of group 'j' after adding data point 'i'.
 		 */
 		double t_hx = energy_functions[j](h_contexts[j], t_covariance_matrices[j]);
-		if (isnan(t_hx)) 		    
+		if (isnan(t_hx))
 		    return POSITIVE_DEFINITE_ERROR;
-		
+
 		double t_energy = compute_energy(m, t_hx, card[j] + 1);
 
 		if (removed[l] == 1)

@@ -6,23 +6,23 @@
 void * m_alloc(size_t size)
 {
 	return R_alloc(size / sizeof(char), 1);
-}
-
+    }
+    
 void m_free(void * ptr)
 {
-	return;
+    return;
 }
 
 #else
 
 void * m_alloc(size_t size)
 {
-	return malloc(size);
+    return malloc(size);
 }
 
 void m_free(void * ptr)
 {
-	free(ptr);
+    free(ptr);
 }
 
 #endif
