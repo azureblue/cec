@@ -11,7 +11,7 @@ Performs Cross-Entropy Clustering on a data matrix.
 
 \usage{
 cec(x, centers, iter.max = 20, nstart = 1, centers.init  = c("kmeans++", "random"), 
-type = c("covariance", "fixedr", "spherical", "diagonal", "all"), param, 
+type = c("covariance", "fixedr", "spherical", "diagonal", "eigenvalues", "all"), param, 
 card.min = "5\%", keep.removed = F, interactive = F, readline = T)
 }
 
@@ -44,7 +44,7 @@ Centers initialization method. Possible values are: "kmeans++", "random".
 \item{type}{
 Type (or types) of clustering (density family). This can be either a single value 
 or a vector of length equal to the number of centers. Possible values are: "covariance",
-"fixedr", "spherical", "diagonal", "all".
+"fixedr", "spherical", "diagonal", "eigenvalues", "all".
 }
 
 \item{param}{
@@ -103,6 +103,7 @@ root of \emph{r}.
 \item"spherical" - Spherical (radial) Gaussian densities (covariance proportional to the indentity). 
 Clusters will have a tendency to form balls of arbitrary sizes.
 \item"diagonal" - Gaussian densities with diagonal covariane. Data will form ellipsoids with radiuses parallel to the coordinate axes.
+\item"eigenvalues" - Gaussian densities with covariance matrix having fixed eigenvalues (additional parameter). The clustering will try to divide the data into ellipsoids with fixed shape rotated by arbitrary angle. 
 \item"all" - All Gaussian densities. Data will form ellipsoids with arbitrary radiuses. 
 }
 

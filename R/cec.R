@@ -5,7 +5,7 @@ cec <- function(
   iter.max      = 20,
   nstart        = 1,
   centers.init  = c("kmeans++", "random"), 
-  type          = c("covariance", "fixedr", "spherical", "diagonal", "all"),  
+  type          = c("covariance", "fixedr", "spherical", "diagonal", "eigenvalues", "all"),  
   param,
   card.min      = "5%",
   keep.removed  = F,
@@ -115,11 +115,12 @@ cec <- function(
         
         Z$cluster  <- as.integer(vapply(Z$cluster,function(asgn) {as.integer(cluster.map[asgn])}, 0))
         
-        #in case of having single row - make it a matrix
+        #in case of having single row - convert it to a matrix
         Z$centers <- matrix(Z$centers[-na.rows,],,n)
         
         Z$covariances <- Z$covariances[-na.rows]
         probability <- probability[-na.rows]
+        params <- params[-na.rows]
         type <- type[-na.rows]
       }     
     }
@@ -154,7 +155,11 @@ model.covariance <- function(type.cov.param)
   cov   <- type.cov.param[[2]]
   param <- type.cov.param[[3]]
   
-  if (type == resolve.type("covariance"))
+  if (length(which(is.na(cov))) > 0)
+  {
+    matrix(NA, nrow(cov), ncol(cov))
+  }  
+  else if (type == resolve.type("covariance"))
   {
     param[[1]]
   }  
@@ -169,6 +174,14 @@ model.covariance <- function(type.cov.param)
   else if (type == resolve.type("diagonal"))
   {
     cov * diag(ncol(cov))
+  }
+  else if (type == resolve.type("eigenvalues"))
+  {
+    
+    V <- eigen(cov)$vec
+    D <- diag(sort(param, decreasing=T))
+    
+    V %*% D %*% t(V)
   }
   else if (type == resolve.type("all"))
   {
@@ -243,7 +256,7 @@ cec_interactive <- function(
   iter.max      = 20,
   nstart        = 1,
   centers.init  = c("kmeans++", "random"), 
-  type          = c("covariance", "fixedr", "spherical", "diagonal", "all"),  
+  type          = c("covariance", "fixedr", "spherical", "diagonal", "eigenvalues", "all"),  
   param,
   card.min      = "5%",
   keep.removed  = F,

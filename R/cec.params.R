@@ -1,7 +1,7 @@
 resolve.type <- function(type)
 {
-  types <- c("covariance", "fixedr", "spherical", "diagonal", "all")
-  int.type <- switch (match.arg(type, types), covariance = 0, fixedr = 1, spherical = 2, diagonal = 3, all = 4)
+  types <- c("covariance", "fixedr", "spherical", "diagonal", "eigenvalues", "all")
+  int.type <- switch (match.arg(type, types), covariance = 0, fixedr = 1, spherical = 2, diagonal = 3, eigenvalues = 4, all = 5)
   int.type  
 }
 
@@ -35,7 +35,17 @@ create.cec.params <- function(k, n, type, param)
       r <- param[1]
       if (!r > 0)  stop("Illegal argument: illegal parameter for \"fixedr\" type.")
       params = rep(list(r), k)
-    }   
+    }
+    else if ( type.i == resolve.type("eigenvalues"))
+    {
+      if (is.list(param))
+        evals <- param[[1]]
+      else if (is.vector(param))
+        evals <- param
+      
+      if (length(evals) != n) stop("Illegal argument: illegal parameter for \"eigenvalues\" type.")
+      params = rep(list(sort(evals)), k)
+    }
   }
   else 
   {
@@ -78,9 +88,22 @@ create.cec.params <- function(k, n, type, param)
          
          #expect numeric param
          r = param[[idx]]
+         if (length(r) != 1) stop("Illegal argument: illegal parameter for \"fixedr\" type.")
          if (!is.numeric(r)) stop("Illegal argument: illegal parameter for \"fixedr\" type.")
          if (!r > 0)  stop("Illegal argument: illegal parameter for \"fixedr\" type.")
          params[i] <- r
+       } 
+       else if ( type.i == resolve.type("eigenvalues"))
+       {
+         idx <- idx + 1
+         #check param length
+         if (length(param) < idx)
+           stop("Illegal argument: illegal param length.")         
+         
+           evals <- param[[idx]]         
+         
+         if (length(evals) != n) stop("Illegal argument: illegal parameter for \"eigenvalues\" type.")
+         params[[i]] = sort(evals)
        }
      }          
   }
