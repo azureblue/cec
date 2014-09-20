@@ -13,7 +13,7 @@ Ellipses are drawn with regards to the covariance (either model or sample) of ea
 
 \usage{
 \method{plot}{cec}(x, col, cex = 0.5, pch = 16, cex.centers = 1, pch.centers = 8, 
-ellipses.lwd = 4, ellipses = TRUE, model = FALSE, xlab = "x", ylab = "y", ...)
+ellipses.lwd = 4, ellipses = TRUE, model = T, xlab = "x", ylab = "y", ...)
 }
 
 \arguments{
