@@ -10,9 +10,10 @@ Performs Cross-Entropy Clustering on a data matrix.
 }
 
 \usage{
-cec(x, centers, type = c("covariance", "fixedr", "spherical", "diagonal", 
-"eigenvalues", "all"), iter.max = 20, nstart = 1, centers.init = c("kmeans++", "random"), 
-param, card.min = "5\%", keep.removed = F, interactive = F, readline = T)
+cec(x, centers, type = c("covariance", "fixedr", "spherical", "diagonal",  
+"eigenvalues", "all"), iter.max = 20, nstart = 1, param, 
+centers.init = c("kmeans++", "random"), card.min = "5\%", keep.removed = F, 
+interactive = F, readline = T)
 }
 
 \arguments{

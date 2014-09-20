@@ -8,8 +8,8 @@ setup <- function()
 }
 test.clustering.mouse1 <- function()
 {  
-  CE <- cec(M, C)
-  CEC:::checkNumericVectorEquals(expected$cluster, CE$cluster, msg="Clustering vector")
-  CEC:::checkNumericVectorEquals(expected$cost, CE$cost, msg="Energy")
-  CEC:::checkNumericMatrixEquals(expected$centers, CE$centers, msg="Centers")  
+  CEC <- cec(M, C)
+  CEC:::checkNumericVectorEquals(expected$cluster, CEC$cluster, msg="Clustering vector")
+  CEC:::checkNumericVectorEquals(expected$cost, CEC$cost, msg="Energy")
+  CEC:::checkNumericMatrixEquals(expected$centers, CEC$centers, msg="Centers")  
 }

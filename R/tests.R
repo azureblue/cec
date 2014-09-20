@@ -62,7 +62,6 @@ printmsg <- function(msg)
 }
 
 
-
 checkNumericVectorEquals <- function(ex, ac, msg=NULL, tolerance = .Machine$double.eps ^ 0.5)  
 {  
   if (length(ex) != length(ac)) stop (paste(printmsg(msg),"Vectors have different length."))  
