@@ -2,11 +2,11 @@
 cec <- function(
   x, 
   centers,   
+  type          = c("covariance", "fixedr", "spherical", "diagonal", "eigenvalues", "all"),  
   iter.max      = 20,
   nstart        = 1,
-  centers.init  = c("kmeans++", "random"), 
-  type          = c("covariance", "fixedr", "spherical", "diagonal", "eigenvalues", "all"),  
   param,
+  centers.init  = c("kmeans++", "random"), 
   card.min      = "5%",
   keep.removed  = F,
   interactive   = F,
@@ -21,10 +21,19 @@ cec <- function(
   if (!is.matrix(x)) stop("Illegal argument: 'x' is not a matrix.")
   if (ncol(x) < 1) stop("Illegal argument: ncol(x) < 1.")
   if (nrow(x) < 1) stop("Illegal argument: nrow(x) < 1.")  
-  
+    
+  var.centers <- F
   if (!is.matrix(centers))
   {
-    if (centers < 1) stop("Illegal argument: 'centers' < 1")
+    if (length(centers) > 1)
+    {
+      var.centers <- T
+      if (hasArg(nstart) && nstart != length(centers))
+        stop("Illegal argument: 'nstart' != length(centers)")
+      nstart <- length(centers)
+    }
+    for (i in centers) 
+      if (i < 1) stop("Illegal argument: 'centers' < 1")    
     centers.initilized <- F
   } 
   else 
@@ -42,6 +51,8 @@ cec <- function(
   if (!hasArg(type))
     type <- "all"
   
+  if (var.centers && length(type) > 1)
+    stop("Illegal argument: 'type' with length > 1 is not supported for variable number of centers ('centers' as a vector).")
   ####################################################
   
   # run interactive mode if requested
@@ -56,12 +67,7 @@ cec <- function(
   k <- NULL
   if (is.matrix(centers)) k <- nrow(centers) 
   else k <- centers
-
-  params <- create.cec.params(k, n, type, param)
-  type <- as.integer(vapply(type, resolve.type, 0))
-  if (length(type) == 1) type <- rep(type, k)
-    
-  
+ 
   if (substr(card.min, nchar(card.min), nchar(card.min)) == "%") 
   {
     card.min = as.integer(as.double(substr(card.min , 1, nchar(card.min) - 1)) * m / 100)
@@ -69,23 +75,44 @@ cec <- function(
   else
   {
     card.min = as.integer(card.min)
-  }
-  
+  }  
     tenergy = .Machine$integer.max
     Z <- NULL
-    if (!is.matrix(centers)) centers <- initcenters(x, centers, centers.init)        
-    ok.flag <- F
+    ok.flag <- F    
+    if (!var.centers)
+    {
+      params <- create.cec.params(k, n, type, param)
+      types <- as.integer(vapply(type, resolve.type, 0))
+      if (length(types) == 1) 
+        types <- rep(types, k)
+    }
     startTime <- proc.time()     
-    for (start in 1:nstart) {
-      if (!centers.initilized) centers <- initcenters(x, k, centers.init)     
+    for (start in 1:nstart) 
+    {      
+      if (var.centers)
+      {
+        k <- centers[start]        
+        params <- create.cec.params(k, n, type, param)
+        types <- as.integer(vapply(type, resolve.type, 0))
+        if (length(types) == 1) 
+          types <- rep(types, k)
+      }
+      if (!centers.initilized) 
+        centers.matrix <- initcenters(x, k, centers.init)     
+      else
+        centers.matrix <- centers      
+      
       tryCatch( 
        {
-         X <- .Call(cec_r, x, centers, iter.max, type, card.min, params)  
+         X <- .Call(cec_r, x, centers.matrix, iter.max, types, card.min, params)  
          ok.flag <- T
          if (X$iterations < 0 || X$energy[X$iterations + 1] < tenergy)
          {
            tenergy = X$energy[X$iterations+1]
            Z <- X
+           k.final <- k
+           types.final <- types
+           params.final <- params
          }
        }, error = function(er) {
          warning(paste("Error at start #", start, ": ", er$message), immediate.=T, call.=F)
@@ -105,12 +132,12 @@ cec <- function(
   
     if (!keep.removed)
     {
-      cluster.map = 1:k
+      cluster.map = 1:k.final
       na.rows = which(is.na(Z$centers[, 1]))
       if (length(na.rows) > 0)
       {
         for (i in 1:length(na.rows))        
-          for (j in na.rows[i]:k)          
+          for (j in na.rows[i]:k.final)          
             cluster.map[j] <- cluster.map[j] - 1    
         
         Z$cluster  <- as.integer(vapply(Z$cluster,function(asgn) {as.integer(cluster.map[asgn])}, 0))
@@ -120,21 +147,23 @@ cec <- function(
         
         Z$covariances <- Z$covariances[-na.rows]
         probability <- probability[-na.rows]
-        params <- params[-na.rows]
-        type <- type[-na.rows]
+        params.final <- params.final[-na.rows]
+        types.final <- types.final[-na.rows]
       }     
     }
     structure(list(
-      data              = x,
-      cluster           = Z$cluster,
-      centers           = Z$centers, 
-      probability       = probability,
-      energy            = Z$energy  [1:(Z$iterations+1)], 
-      nclusters         = Z$nclusters,
-      iterations        = Z$iterations, 
-      time              = execution.time,
-      covariances       = Z$covariances,
-      covariances.model = lapply(list.triple(type, Z$covariances, params), model.covariance)
+      data                = x,
+      cluster             = Z$cluster,
+      centers             = Z$centers, 
+      probability         = probability,
+      cost.function       = Z$energy  [1:(Z$iterations + 1)], 
+      nclusters           = Z$nclusters,
+      final.cost.function = Z$energy  [Z$iterations + 1], 
+      final.nclusters     = Z$nclusters[Z$iterations + 1],
+      iterations          = Z$iterations, 
+      time                = execution.time,
+      covariances         = Z$covariances,
+      covariances.model   = lapply(list.triple(types.final, Z$covariances, params.final), model.covariance)
     ), class = "cec");    
 }
 
@@ -196,10 +225,10 @@ print.cec <- function(x, ...)
   print(x$cluster)
   cat("\nProbability vector:\n")
   print(x$probability)
-  cat("\nMeans of cluster:\n")
+  cat("\nMeans of clusters:\n")
   print(x$centers)
-  cat("\nEnergy at each iteration:\n")
-  print(x$energy)  
+  cat("\nCost function at each iteration:\n")
+  print(x$cost)  
   cat("\nNumber of clusters at each iteration:\n")
   print(x$nclusters)  
   cat("\nNumber of iterations:\n")
@@ -207,7 +236,7 @@ print.cec <- function(x, ...)
   cat("\nComputation time:\n")
   print(x$time)
   cat("\nAvailable components:\n")
-  print(c("data", "cluster", "probabilities", "centers", "energy", "nclusters", "iterations", "covariances", "covariances.model", "time" ))
+  print(c("data", "cluster", "probabilities", "centers", "cost.function", "nclusters", "final.cost.function", "final.nclusters", "iterations", "covariances", "covariances.model", "time" ))
 }
 
 plot.cec <- function(x, col, cex = 0.5, pch = 16, cex.centers = 1, pch.centers = 8, ellipses.lwd = 4, ellipses = TRUE, model = T, xlab = "x", ylab= "y", ...)
@@ -235,18 +264,18 @@ plot.cec <- function(x, col, cex = 0.5, pch = 16, cex.centers = 1, pch.centers =
             pts <- ellipse(x$centers[i, ], cov)
             lines(pts, lwd = ellipses.lwd)
           },
-          warning = function(e) {warning("some ellipses will not be drawn (probably not positive-definite covariance matrix)")},
-          error = function(e) {warning("some ellipses will not be drawn (probably not positive-definite covariance matrix)")}, 
+       #   warning = function(e) {warning("some ellipses will not be drawn (probably not positive-definite covariance matrix)")},
+       #   error = function(e) {warning("some ellipses will not be drawn (probably not positive-definite covariance matrix)")}, 
           finally = {})     
       }
     }  
 }
 
-cec.plot.energy <- function(C, xlab="Iteration", ylab="Energy", lwd=5, col="red", lwd.points=5, pch.points=19, col.points="black", mgp=c(1.5,0.5,0), ...)
+cec.plot.cost.function <- function(C, xlab="Iteration", ylab="Cost function", lwd=5, col="red", lwd.points=5, pch.points=19, col.points="black", mgp=c(1.5,0.5,0), ...)
 {
-  plot(x = 1:(length(C$energy) - 1), y = C$energy[2:(length(C$energy))], xlab=xlab, ylab=ylab, type="l", lwd=lwd, col=col, mgp=mgp, ...)
-  points(x = 1:(length(C$energy) - 1), y = C$energy[2:(length(C$energy))], lwd=lwd.points, pch=pch.points, col=col.points)
-  title("Energy at each iteraion")
+  plot(x = 1:(length(C$cost) - 1), y = C$cost[2:(length(C$cost))], xlab=xlab, ylab=ylab, type="l", lwd=lwd, col=col, mgp=mgp, ...)
+  points(x = 1:(length(C$cost) - 1), y = C$cost[2:(length(C$cost))], lwd=lwd.points, pch=pch.points, col=col.points)
+  title("Cost function at each iteraion")
 }
 
 
@@ -293,7 +322,7 @@ cec_interactive <- function(
       else if (i == 0)
         desc = "(position of center means before first iteration)"      
       
-      cat("Iterations:", Z$iterations, desc, "energy:", Z$energy[(Z$iterations + 1)]," \n ")
+      cat("Iterations:", Z$iterations, desc, "cost function:", Z$cost[(Z$iterations + 1)]," \n ")
       
       if (i == -1)
         plot(Z, ellipses = FALSE)

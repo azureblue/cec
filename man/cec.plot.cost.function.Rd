@@ -1,17 +1,18 @@
-\name{cec.plot.energy}
-\alias{cec.plot.energy}
+\name{cec.plot.cost.function}
+\alias{cec.plot.cost.function}
 
 \title{
-Plot energy of CEC results.
+Plot cost function of CEC results.
 }
 
 \description{
-Presents energy changes at each iteration of CEC algorithm in the form of plot.
+Presents cost function changes at each iteration of the CEC algorithm in the form of plot.
 }
 
 \usage{
-cec.plot.energy(C, xlab = "Iteration", ylab = "Energy", lwd = 5, col = "red", 
-lwd.points = 5, pch.points = 19, col.points = "black", mgp = c(1.5, 0.5, 0), ...)
+cec.plot.cost.function(C, xlab = "Iteration", ylab = "Cost function", lwd = 5, 
+col = "red", lwd.points = 5, pch.points = 19, col.points = "black", 
+mgp = c(1.5, 0.5, 0), ...)
 }
 
 \arguments{

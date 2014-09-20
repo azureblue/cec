@@ -33,7 +33,7 @@ create.cec.params <- function(k, n, type, param)
     else if ( type.i == resolve.type("fixedr")) 
     {
       r <- param[1]
-      if (!r > 0)  stop("Illegal argument: illegal parameter for \"fixedr\" type.")
+      if (!r > 0 || !is.numeric(r))  stop("Illegal argument: illegal parameter for \"fixedr\" type.")
       params = rep(list(r), k)
     }
     else if ( type.i == resolve.type("eigenvalues"))

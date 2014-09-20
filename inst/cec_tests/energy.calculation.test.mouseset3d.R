@@ -23,7 +23,7 @@ test.type.covariance <- function()
     expected.energy <- expected.energy + p * (-log(p) + Hx)
   } 
   
-  CEC:::checkNumericVectorEquals(expected.energy, CE$energy[CE$iterations + 1], msg="Energy")
+  CEC:::checkNumericVectorEquals(expected.energy, CE$cost[CE$iterations + 1], msg="Energy")
 }
 
 test.type.fixedr.mixture <- function()
@@ -43,7 +43,7 @@ test.type.fixedr.mixture <- function()
     expected.energy <- expected.energy + p * (-log(p) + Hx)
   } 
   
-  CEC:::checkNumericVectorEquals(expected.energy, CE$energy[CE$iterations + 1], msg="Energy")
+  CEC:::checkNumericVectorEquals(expected.energy, CE$cost[CE$iterations + 1], msg="Energy")
 }
 
 
@@ -62,7 +62,7 @@ test.type.spherical.one.cluster.removed <- function()
     expected.energy <- expected.energy + p * (-log(p) + Hx)
   } 
   
-  CEC:::checkNumericVectorEquals(expected.energy, CE$energy[CE$iterations + 1], msg="Energy")
+  CEC:::checkNumericVectorEquals(expected.energy, CE$cost[CE$iterations + 1], msg="Energy")
 }
 
 test.type.diagonal.spherical.mixture <- function()
@@ -84,7 +84,7 @@ test.type.diagonal.spherical.mixture <- function()
     expected.energy <- expected.energy + p * (-log(p) + Hx)
   } 
   
-  CEC:::checkNumericVectorEquals(expected.energy, CE$energy[CE$iterations + 1], msg="Energy")
+  CEC:::checkNumericVectorEquals(expected.energy, CE$cost[CE$iterations + 1], msg="Energy")
 }
 
 test.type.diagonal.spherical.mixture <- function()
@@ -106,7 +106,7 @@ test.type.diagonal.spherical.mixture <- function()
     expected.energy <- expected.energy + p * (-log(p) + Hx)
   } 
   
-  CEC:::checkNumericVectorEquals(expected.energy, CE$energy[CE$iterations + 1], msg="Energy")
+  CEC:::checkNumericVectorEquals(expected.energy, CE$cost[CE$iterations + 1], msg="Energy")
 }
 
 test.type.eigenvalues.all.fixedr.mixture <- function()
@@ -138,5 +138,5 @@ test.type.eigenvalues.all.fixedr.mixture <- function()
     expected.energy <- expected.energy + p * (-log(p) + Hx)
   } 
   
-  CEC:::checkNumericVectorEquals(expected.energy, CE$energy[CE$iterations + 1], msg="Energy")
+  CEC:::checkNumericVectorEquals(expected.energy, CE$cost[CE$iterations + 1], msg="Energy")
 }

@@ -10,6 +10,6 @@ test.clustering.mouse1 <- function()
 {  
   CE <- cec(M, C)
   CEC:::checkNumericVectorEquals(expected$cluster, CE$cluster, msg="Clustering vector")
-  CEC:::checkNumericVectorEquals(expected$energy, CE$energy, msg="Energy")
+  CEC:::checkNumericVectorEquals(expected$cost, CE$cost, msg="Energy")
   CEC:::checkNumericMatrixEquals(expected$centers, CE$centers, msg="Centers")  
 }

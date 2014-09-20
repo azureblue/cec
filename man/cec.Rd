@@ -10,9 +10,9 @@ Performs Cross-Entropy Clustering on a data matrix.
 }
 
 \usage{
-cec(x, centers, iter.max = 20, nstart = 1, centers.init  = c("kmeans++", "random"), 
-type = c("covariance", "fixedr", "spherical", "diagonal", "eigenvalues", "all"), param, 
-card.min = "5\%", keep.removed = F, interactive = F, readline = T)
+cec(x, centers, type = c("covariance", "fixedr", "spherical", "diagonal", 
+"eigenvalues", "all"), iter.max = 20, nstart = 1, centers.init = c("kmeans++", "random"), 
+param, card.min = "5\%", keep.removed = F, interactive = F, readline = T)
 }
 
 \arguments{
@@ -22,9 +22,16 @@ Numeric matrix of data.
 }
 
 \item{centers}{
-Either a matrix of initial centers or a the number of initial centers (\code{k}). 
+Either a matrix of initial centers or the number of initial centers (\code{k}, single 
+number or a vector of numbers for variable number of initial centers at each start). 
 In the latter case, initial centers will be generated using a method depending on
 the \code{centers.init} argument.
+}
+
+\item{type}{
+Type (or types) of clustering (density family). This can be either a single value 
+or a vector of length equal to the number of centers. Possible values are: "covariance",
+"fixedr", "spherical", "diagonal", "eigenvalues", "all".
 }
 
 \item{iter.max}{
@@ -33,18 +40,12 @@ Maximum number of iterations at each start.
 
 \item{nstart}{
 Number of clusterings to perform (with different initial centers). Only the best 
-clustering (with the lowest energy) will be returned. Value grater then one is valid 
+clustering (with the lowest cost) will be returned. Value grater then one is valid 
 only if the \code{centers} argument is a number.
 }
 
 \item{centers.init}{
 Centers initialization method. Possible values are: "kmeans++", "random".
-}
-
-\item{type}{
-Type (or types) of clustering (density family). This can be either a single value 
-or a vector of length equal to the number of centers. Possible values are: "covariance",
-"fixedr", "spherical", "diagonal", "eigenvalues", "all".
 }
 
 \item{param}{
@@ -78,7 +79,8 @@ plotting it will wait for the user to press <Return> instead of standard "before
 }
 \value{
   Returns an object of class "cec" with available components:
-  "data", "cluster", "centers", "iterations", "nclusters", "energy", "covariances", 
+  "data", "cluster", "probabilities", "centers", "cost.function", "nclusters", "final.cost.function", 
+  "final.nclusters", "iterations", "cost", "covariances", 
   "covariances.model", "time".
 }
 
@@ -88,9 +90,9 @@ clusters so as to minimize the cost function (energy \emph{\strong{E}} of the cl
 The presented method is based on the adapted Hartigan approach, where we reduce clusters which cardinalities decreased below some small prefixed level.
 
 The energy function \emph{\strong{E}} is given by:
-\deqn{E(Y_1, ...,Y_k) = \sum\limits_{i=1}^{k} p(Y_i) \cdot (-ln(p(Y_i)) + H^{\times}(Y_i\|\mathcal{F}))}{
-E(Y1, ..., Yk) = \sum(p(Yi) * (-ln(p(Yi)) + H(Yi | F)))}
-where \emph{Yi} denotes the \emph{i}-th cluster, \emph{p(Yi)} is the ratio of the number of points in \emph{i}-th cluster to the total number points, \emph{\strong{H}(Yi|F)} is the value of cross-entropy, which represents the internal cluster energy function of data \emph{Yi} defined with respect to a certain Gaussian density family \emph{F}, which encodes the type of clustering we consider.
+\deqn{E(Y_1,F1;...;Y_k,F_k) = \sum\limits_{i=1}^{k} p(Y_i) \cdot (-ln(p(Y_i)) + H^{\times}(Y_i\|\mathcal{F_i}))}{
+E(Y1, F1; ...; Yk, Fk) = \sum(p(Yi) * (-ln(p(Yi)) + H(Yi | Fi)))}
+where \emph{Yi} denotes the \emph{i}-th cluster, \emph{p(Yi)} is the ratio of the number of points in \emph{i}-th cluster to the total number points, \emph{\strong{H}(Yi|Fi)} is the value of cross-entropy, which represents the internal cluster energy function of data \emph{Yi} defined with respect to a certain Gaussian density family \emph{Fi}, which encodes the type of clustering we consider.
 
 The value of the internal energy function \emph{\strong{H}} depends only on the covariance matrix of the points in the cluster (computed using maximum-likelihood method). Five implementations of \emph{\strong{H}} have been proposed (expressed as a type - model - of the clustering):
 
@@ -140,7 +142,7 @@ plot(Z)
 #
 # Result:
 Z
-cec.plot.energy(Z)
+cec.plot.cost.function(Z)
 cat ("Example of clustering mouse-like set. Press <Enter>.")
 m = mouseset(n=7000, r.head=2, r.left.ear=1.1, r.right.ear=1.1, left.ear.dist=2.5,
 right.ear.dist=2.5, dim=2)
@@ -154,20 +156,20 @@ plot(Z)
 #
 # Result:
 Z
-cec.plot.energy(Z)
+cec.plot.cost.function(Z)
 cat ("Example of clustering uniform density ball starting with 2 clusters")
 m = ball(7000, 1)
 plot(m, cex = 0.5, pch = 16)
 centers = initcenters(m, 2)
-Z = cec(m, centers, type="sp", iter.max = -1, card.min="5\%")
+Z = cec(m, centers, "sp", iter.max = -1, card.min="5\%")
 plot(Z)
-Z = cec(m, centers, type="sp", iter.max = 100, card.min="5\%")
+Z = cec(m, centers, "sp", iter.max = 100, card.min="5\%")
 plot(Z)
 # Finished
 #
 # Result:
 Z
-cec.plot.energy(Z)
+cec.plot.cost.function(Z)
 }
 \references{
 Spurek, P. and Tabor, J. (2014)
