@@ -3,6 +3,7 @@
 #include <math.h>
 #include "covariance.h"
 #include "cec.h"
+#include "matrix_utils.h"
 
 int cec(struct cec_context * context)
 {
@@ -163,7 +164,7 @@ int cec(struct cec_context * context)
 	 */
 	double hx = energy_functions[i](h_contexts[i], covariance_matrices[i]);
 	if (isnan(hx))
-	    return POSITIVE_DEFINITE_ERROR;
+	    return *(h_contexts[i]->last_error);
 
 	clusters_energy[i] = compute_energy(m, hx, card[i]);
 
@@ -264,7 +265,7 @@ int cec(struct cec_context * context)
 		 */
 		double n_l_hx = energy_functions[l](h_contexts[l], n_covariance_matrix);
 		if (isnan(n_l_hx))
-		    return POSITIVE_DEFINITE_ERROR;
+		    return *(h_contexts[l]->last_error);
 
 		n_l_energy = compute_energy(m, n_l_hx, card[l] - 1);
 
@@ -320,7 +321,7 @@ int cec(struct cec_context * context)
 		 */
 		double t_hx = energy_functions[j](h_contexts[j], t_covariance_matrices[j]);
 		if (isnan(t_hx))
-		    return POSITIVE_DEFINITE_ERROR;
+		    return *(h_contexts[j]->last_error);
 
 		double t_energy = compute_energy(m, t_hx, card[j] + 1);
 
