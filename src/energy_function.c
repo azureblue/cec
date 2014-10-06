@@ -1,5 +1,22 @@
 #include "energy_function.h"
 #include "matrix_utils.h"
+#include <float.h>
+
+static double _ZERO = DBL_MIN;
+static double ZERO_DELTA = 1.11e-16;
+
+static inline double handle_zero(double d) {
+    if (d <= ZERO_DELTA) 
+	d = _ZERO;
+    return d;
+}
+
+static inline double det_z(double det) {
+    if(isnan(det)) 
+	return handle_zero(0);
+    return handle_zero(det);
+		
+}
 
 energy_function energy_function_for(enum density_family family)
 {
@@ -31,14 +48,15 @@ double h_given_covariance(const struct energy_function_context * context,
 
     cec_matrix_multiply_sq(cgc->i_given_cov, cov, temp_matrix);
     double trace = cec_matrix_trace(temp_matrix);
-
+    trace = handle_zero(trace);
     if (isnan(trace))
     {
 	*context->last_error = POSITIVE_DEFINITE_ERROR;
 	return NAN;
     }
 
-    double det = cec_matrix_det_positive_definite(cgc->given_cov, temp_matrix);
+    double det = cec_cov_cholesky_det(cgc->given_cov, temp_matrix);
+    det = det_z(det);
     if (isnan(det))
     {
 	*context->last_error = POSITIVE_DEFINITE_ERROR;
@@ -54,12 +72,14 @@ double h_spherical(const struct energy_function_context * context,
 {
     int n = context->n;
 
-    double trace = cec_matrix_trace_assert_positive(cov);
+    double trace = cec_matrix_trace(cov);
+    trace = handle_zero(trace);
     if (isnan(trace))
     {
 	*context->last_error = POSITIVE_DEFINITE_ERROR;
 	return NAN;
     }
+    
     return (n / 2.0) * log(2.0 * M_PI * M_E / n) + (n / 2.0) * log(trace);
 }
 
@@ -80,8 +100,9 @@ double h_diagonal(const struct energy_function_context * context,
 
     int n = context->n;
 
-    double diagonal_product = cec_matrix_diagonal_product(cov);
-    if (diagonal_product <= 0)
+    double diagonal_product = cec_diagonal_product(cov);
+    diagonal_product = handle_zero(diagonal_product);
+    if (isnan(diagonal_product))
     {
 	*context->last_error = POSITIVE_DEFINITE_ERROR;
 	return NAN;
@@ -100,7 +121,12 @@ double h_fixedeigenvalues(const struct energy_function_context * context,
     double * evals	 = cfe -> evals;
     int n = context->n;
 
-    cec_eigenvalues_sm(cov, temp_matrix, cfe->lapack_workspace, cfe->lapack_workspace_length, evals);
+    int error = cec_cov_eigenvalues(cov, temp_matrix, cfe->workspace, evals);
+    if (error != 0) 
+    {
+	*context->last_error = error;
+	return NAN;
+    }
 
     double e_sum = 0;
     for (int i = 0; i < n; i++)
@@ -117,8 +143,9 @@ double h_all(const struct energy_function_context * context,
     struct cec_matrix * temp_matrix = context->temp_matrix;
     int n = context->n;
 
-    double det = cec_matrix_det_positive_definite(cov, temp_matrix);
-
+    double det = cec_cov_cholesky_det(cov, temp_matrix);
+    det = det_z(det);
+    
     if (isnan(det))
     {
 	*context->last_error = POSITIVE_DEFINITE_ERROR;
