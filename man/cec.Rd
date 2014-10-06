@@ -91,7 +91,7 @@ clusters so as to minimize the cost function (energy \emph{\strong{E}} of the cl
 The presented method is based on the adapted Hartigan approach, where we reduce clusters which cardinalities decreased below some small prefixed level.
 
 The energy function \emph{\strong{E}} is given by:
-\deqn{E(Y_1,F1;...;Y_k,F_k) = \sum\limits_{i=1}^{k} p(Y_i) \cdot (-ln(p(Y_i)) + H^{\times}(Y_i\|\mathcal{F_i}))}{
+\deqn{E(Y_1,\mathcal{F}_1;...;Y_k,\mathcal{F}_k) = \sum\limits_{i=1}^{k} p(Y_i) \cdot (-ln(p(Y_i)) + H^{\times}(Y_i\|\mathcal{F}_i))}{
 E(Y1, F1; ...; Yk, Fk) = \sum(p(Yi) * (-ln(p(Yi)) + H(Yi | Fi)))}
 where \emph{Yi} denotes the \emph{i}-th cluster, \emph{p(Yi)} is the ratio of the number of points in \emph{i}-th cluster to the total number points, \emph{\strong{H}(Yi|Fi)} is the value of cross-entropy, which represents the internal cluster energy function of data \emph{Yi} defined with respect to a certain Gaussian density family \emph{Fi}, which encodes the type of clustering we consider.
 
@@ -120,13 +120,17 @@ Konrad Kamieniecki, Jacek Tabor, Przemysław Spurek
 \code{\link{CEC-package}.}
 }
 \examples{
+#
+#
+#
 # Cross-Entropy Clustering
 #
 #
 # 
-#
-cat("Example of clustering random dataset of 3 Gaussians using spherical Gaussian densities,
-10 random initial centers and 7\% as minimal cluster size.")
+
+## Example of clustering random dataset of 3 Gaussians using spherical Gaussian densities, 
+## 10 random initial centers and 7\% as minimal cluster size.
+
 m1 = matrix(rnorm(2000, sd=1), ncol=2)
 m2 = matrix(rnorm(2000, mean = 3, sd = 1.5), ncol = 2)
 m3 = matrix(rnorm(2000, mean = 3, sd = 1), ncol = 2)
@@ -139,12 +143,11 @@ Z = cec(m, centers, type="sp", iter.max = -1, card.min="7\%")
 plot(Z)
 Z = cec(m, centers, type="sp", iter.max = 100, card.min="7\%")
 plot(Z)
-# Finished
-#
 # Result:
 Z
+# Cost function:
 cec.plot.cost.function(Z)
-cat ("Example of clustering mouse-like set. Press <Enter>.")
+## Example of clustering mouse-like set.
 m = mouseset(n=7000, r.head=2, r.left.ear=1.1, r.right.ear=1.1, left.ear.dist=2.5,
 right.ear.dist=2.5, dim=2)
 plot(m, cex = 0.5, pch = 16)
@@ -153,23 +156,21 @@ Z = cec(m, centers, type="sp", iter.max = -1, card.min="5\%")
 plot(Z)
 Z = cec(m, centers, type="sp", iter.max = 100, nstart=3, card.min="5\%")
 plot(Z)
-# Finished
-#
 # Result:
 Z
+# Cost function:
 cec.plot.cost.function(Z)
-cat ("Example of clustering uniform density ball starting with 2 clusters")
-m = ball(7000, 1)
-plot(m, cex = 0.5, pch = 16)
-centers = initcenters(m, 2)
-Z = cec(m, centers, "sp", iter.max = -1, card.min="5\%")
+## Example of clustering data set "Tset" using "eigenvalues" clustering type.
+data(Tset)
+plot(Tset, cex = 0.5, pch = 16)
+centers = initcenters(Tset, 2)
+Z <- cec(Tset, 5, type="eigenvalues", param=c(0.02,0.002), iter.max= -1)
 plot(Z)
-Z = cec(m, centers, "sp", iter.max = 100, card.min="5\%")
+Z <- cec(Tset, 5, "eigenvalues", param=c(0.02,0.002), nstart=4)
 plot(Z)
-# Finished
-#
 # Result:
 Z
+# Cost function:
 cec.plot.cost.function(Z)
 }
 \references{
