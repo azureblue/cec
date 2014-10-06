@@ -4,7 +4,7 @@
 #include "energy_function_context.h"
 #include "matrix.h"
 
-static const int LAPACK_WORKSPACE_BLOCK = 128;
+static const int EIGENVALUES_WORKSPACE_BLOCK = 128;
 
 void destroy_energy_function_context(struct energy_function_context * context)
 {
@@ -36,7 +36,7 @@ void destroy_energy_function_context(struct energy_function_context * context)
 	    struct context_fe * c_fe = (struct context_fe *) context->custom_context;
 	    m_free(c_fe->evals);
 	    m_free(c_fe->given_evals);
-	    m_free(c_fe->lapack_workspace);
+	    cec_matrix_destroy(c_fe->workspace);
 	    m_free(context->custom_context);
 	    break;
 
@@ -113,10 +113,9 @@ struct energy_function_context * create_energy_function_context(
 	    
 	    context_fe->evals	    = m_alloc(sizeof (double) * n);
 	    context_fe->given_evals = m_alloc(sizeof (double) * n);
-	    context_fe->lapack_workspace_length = (LAPACK_WORKSPACE_BLOCK + 2) * n;
+	    context_fe->workspace   = cec_matrix_create((EIGENVALUES_WORKSPACE_BLOCK + 2) * n, 1);
 
-	    context_fe->lapack_workspace = m_alloc(sizeof (double) * context_fe -> lapack_workspace_length);
-	    if (context_fe->evals == NULL || context_fe->given_evals == NULL || context_fe->lapack_workspace == NULL)
+	    if (context_fe->evals == NULL || context_fe->given_evals == NULL || context_fe->workspace == NULL)
 	    {
 		destroy_energy_function_context(context);
 		return NULL;

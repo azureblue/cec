@@ -26,8 +26,7 @@ struct context_fe
     double * given_evals;
     double given_evals_product;
     double * evals;
-    double * lapack_workspace;
-    int lapack_workspace_length;
+    struct cec_matrix * workspace;
 };
 
 struct context_r
