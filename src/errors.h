@@ -15,7 +15,8 @@ enum error_code
     NO_ERROR = 0,
     MALLOC_ERROR = 1,
     POSITIVE_DEFINITE_ERROR = 2,
-    ALL_CLUSTERS_REMOVED_ERROR = 3
+    ALL_CLUSTERS_REMOVED_ERROR = 3,
+    UNKNOWN_ERROR = 4	    
 };
 
 #endif	/* ERRORS_H */
