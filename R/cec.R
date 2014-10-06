@@ -58,7 +58,7 @@ cec <- function(
   # run interactive mode if requested
   
   if (interactive)
-    return(cec_interactive(x, centers, iter.max, 1, centers.init, type, param, card.min, keep.removed, readline))
+    return(cec_interactive(x, centers, type, iter.max, 1, param, centers.init, card.min, keep.removed, readline))
     
   ####################################################
   
@@ -70,12 +70,15 @@ cec <- function(
  
   if (substr(card.min, nchar(card.min), nchar(card.min)) == "%") 
   {
-    card.min = as.integer(as.double(substr(card.min , 1, nchar(card.min) - 1)) * m / 100)
+    card.min = as.integer(as.double(substr(card.min , 1, nchar(card.min) - 1)) * m / 100)    
   } 
   else
   {
     card.min = as.integer(card.min)
   }  
+  
+  card.min = max(card.min, n + 1)
+  
     tenergy = .Machine$integer.max
     Z <- NULL
     ok.flag <- F    
@@ -282,11 +285,11 @@ cec.plot.cost.function <- function(C, xlab="Iteration", ylab="Cost function", lw
 cec_interactive <- function(
   x, 
   centers,   
+  type          = c("covariance", "fixedr", "spherical", "diagonal", "eigenvalues", "all"),  
   iter.max      = 20,
   nstart        = 1,
-  centers.init  = c("kmeans++", "random"), 
-  type          = c("covariance", "fixedr", "spherical", "diagonal", "eigenvalues", "all"),  
   param,
+  centers.init  = c("kmeans++", "random"), 
   card.min      = "5%",
   keep.removed  = F,
   readline      = T
@@ -311,7 +314,7 @@ cec_interactive <- function(
     }
     while (TRUE) 
     {      
-      Z <- cec(x, centers, i, 1, centers.init, type, param, card.min, keep.removed, F);
+      Z <- cec(x, centers, type, i, 1, param, centers.init , card.min, keep.removed, F);
       
       if(i > Z$iterations | i>= iter.max) 
         break
