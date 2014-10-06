@@ -1,4 +1,5 @@
 #include "covariance.h"
+#include "matrix_utils.h"
 
 void covariance_add_point(const struct cec_matrix * covariance,
 	struct cec_matrix * new_covarioance, const double * mean,
