@@ -5,13 +5,15 @@
 static double _ZERO = DBL_MIN;
 static double ZERO_DELTA = 1.11e-16;
 
-static inline double handle_zero(double d) {
+static inline double handle_zero(double d) 
+{
     if (d <= ZERO_DELTA) 
 	d = _ZERO;
     return d;
 }
 
-static inline double det_z(double det) {
+static inline double det_z(double det) 
+{
     if(isnan(det)) 
 	return handle_zero(0);
     return handle_zero(det);
