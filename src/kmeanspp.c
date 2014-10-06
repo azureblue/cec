@@ -45,7 +45,7 @@ int kmeanspp(struct cec_matrix * X, struct cec_matrix * C)
 
     for (int i = 1; i < m; i++)
     {
-	double dist = distance2(cec_matrix_row(X, i), cec_matrix_row(C, 0), n);
+	double dist = dist2(cec_matrix_row(X, i), cec_matrix_row(C, 0), n);
 	dists[i] = dist;
 	sums[i] = sums[i - 1] + dist;
     }
@@ -58,7 +58,7 @@ int kmeanspp(struct cec_matrix * X, struct cec_matrix * C)
 	array_copy(cec_matrix_row(X, idx), cec_matrix_row(C, i), n);
 	for (int j = 1; j < m; j++)
 	{
-	    double dist = distance2(cec_matrix_row(X, j), cec_matrix_row(C, i), n);
+	    double dist = dist2(cec_matrix_row(X, j), cec_matrix_row(C, i), n);
 	    if (dist < dists[j])
 	    {
 		dists[j] = dist;

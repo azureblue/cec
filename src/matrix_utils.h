@@ -9,10 +9,10 @@ void cec_vector_outer_product(const double *restrict vec,
 
 double cec_matrix_trace(const struct cec_matrix * m);
 
+double cec_matrix_diagonal_product(const struct cec_matrix * m);
+
 void cec_matrix_multiply_sq(const struct cec_matrix *restrict m1,
 	const struct cec_matrix *restrict m2, struct cec_matrix *restrict dest);
-
-double cec_diagonal_product(const struct cec_matrix * m);
 
 double cec_cov_cholesky_det(const struct cec_matrix * m,
 	struct cec_matrix * temp);

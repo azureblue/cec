@@ -54,7 +54,7 @@ int cec(struct cec_context * context)
 	double dist = BIG_DOUBLE;
 	for (int j = 0; j < k; j++)
 	{
-	    double dist_temp = distance2(cec_matrix_row(X, i),
+	    double dist_temp = dist2(cec_matrix_row(X, i),
 		    cec_matrix_row(C, j), n);
 	    if (dist > dist_temp)
 	    {
@@ -256,7 +256,7 @@ int cec(struct cec_context * context)
 		 * Compute covariance of group 'l' after removing data point 'i' and store
 		 * its value in n_covariance_matrix.
 		 */
-		covariance_remove_point(covariance_matrices[l],
+		cec_cov_remove_point(covariance_matrices[l],
 			n_covariance_matrix, cec_matrix_row(C, l),
 			cec_matrix_row(X, i), card[l], t_matrix_nn);
 
@@ -312,7 +312,7 @@ int cec(struct cec_context * context)
 		 * Compute covariance of group 'j' after adding data point 'i' and store
 		 * its value in the array of temporary covariance matrices at index 'j'.
 		 */
-		covariance_add_point(covariance_matrices[j],
+		cec_cov_add_point(covariance_matrices[j],
 			t_covariance_matrices[j], cec_matrix_row(C, j),
 			cec_matrix_row(X, i), card[j], t_matrix_nn);
 

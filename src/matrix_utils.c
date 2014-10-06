@@ -23,18 +23,12 @@ double cec_matrix_trace(const struct cec_matrix * m)
     return res;
 }
 
-double cec_matrix_trace_assert_positive(const struct cec_matrix * m)
+double cec_matrix_diagonal_product(const struct cec_matrix * m)
 {
-    double res = 0;
-    for (int i = 0; i < m->n; i++)
-    {
-	double el = cec_matrix_element(m, i, i);
-	if (el <= 0)
-	{
-	    return NAN;
-	}
-	res += el;
-    }
+    double res = 1.0;
+    int n = m->n;
+    for (int i = 0; i < n; i++)
+	res *= cec_matrix_element(m, i, i);
     return res;
 }
 
@@ -126,14 +120,6 @@ int cec_cov_cholesky(const struct cec_matrix * m, struct cec_matrix * target)
     return NO_ERROR;
 }
 */
-double cec_diagonal_product(const struct cec_matrix * m)
-{
-    double res = 1.0;
-    int n = m->n;
-    for (int i = 0; i < n; i++)
-	res *= cec_matrix_element(m, i, i);
-    return res;
-}
 
 double cec_cov_cholesky_det(const struct cec_matrix * m,
 	struct cec_matrix * temp)
@@ -151,6 +137,6 @@ double cec_cov_cholesky_det(const struct cec_matrix * m,
     {
 	return NAN;
     }
-    double prod = cec_diagonal_product(temp);
+    double prod = cec_matrix_diagonal_product(temp);
     return prod * prod;
 }

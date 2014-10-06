@@ -100,7 +100,7 @@ double h_diagonal(const struct energy_function_context * context,
 
     int n = context->n;
 
-    double diagonal_product = cec_diagonal_product(cov);
+    double diagonal_product = cec_matrix_diagonal_product(cov);
     diagonal_product = handle_zero(diagonal_product);
     if (isnan(diagonal_product))
     {

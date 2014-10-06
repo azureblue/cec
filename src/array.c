@@ -49,7 +49,7 @@ void array_mul(double * x1, const double val, const int n)
     }
 }
 
-double distance2(const double * x1, const double * x2, const int n)
+double dist2(const double * x1, const double * x2, const int n)
 {
     double res = 0;
     for (int i = 0; i < n; i++)
