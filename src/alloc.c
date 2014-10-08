@@ -2,27 +2,23 @@
 
 #ifdef R_ALLOC
 #include <Rinternals.h>
-
-void * m_alloc(size_t size)
-{
-	return R_alloc(size / sizeof(char), 1);
-    }
-    
-void m_free(void * ptr)
-{
-    return;
-}
-
-#else
-
-void * m_alloc(size_t size)
-{
-    return malloc(size);
-}
-
-void m_free(void * ptr)
-{
-    free(ptr);
-}
-
 #endif
+
+void * m_alloc(size_t size)
+{
+#ifdef R_ALLOC
+    return R_alloc(size / sizeof (char), 1);
+#else
+    return malloc(size);
+#endif
+    
+}
+
+void m_free(void * ptr)
+{
+#ifdef R_ALLOC
+    return;
+#else
+    free(ptr);
+#endif
+}
