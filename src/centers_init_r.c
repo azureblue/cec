@@ -1,8 +1,9 @@
-#include "init_centers_r.h"
-#include "cec_r_utils.h"
-#include "kmeanspp.h"
-#include "errors.h"
 #include <stdio.h>
+#include "cec_r_utils.h"
+#include "centers_init_r.h"
+#include "errors.h"
+#include "kmeanspp.h"
+#include "rand.h"
 
 SEXP init_kmeanspp_r(SEXP x, SEXP k)
 {
@@ -59,13 +60,17 @@ SEXP init_random_r(SEXP x, SEXP rk)
 	cec_matrix_destroy(ma_x);
 	error(MALLOC_ERROR_MSG);
     }
-
+    
+    cec_rand_init();
+    
     for (int i = 0; i < k; i++)
     {
-	double r = (double) rand();
-	int p = (int) ((r / (double) RAND_MAX) * ma_x->m);
+	double r = cec_rand();
+	int p = (int) (r * ma_x->m);
 	array_copy(cec_matrix_row(ma_x, p), cec_matrix_row(ma_c, i), ma_x->n);
     }
+    
+    cec_rand_end();
 
     SEXP result;
     PROTECT(result = create_R_matrix(ma_c));

@@ -3,6 +3,7 @@
 #include "alloc.h"
 #include "errors.h"
 #include "kmeanspp.h"
+#include "rand.h"
 
 int binary_search_d(double key, double * array, int len)
 {
@@ -23,8 +24,6 @@ int binary_search_d(double key, double * array, int len)
 
 int kmeanspp(struct cec_matrix * X, struct cec_matrix * C)
 {
-    const double D_RANDOM_MAX = (double) RAND_MAX;
-
     int m = X->m;
     int k = C->m;
     int n = X->n;
@@ -49,11 +48,13 @@ int kmeanspp(struct cec_matrix * X, struct cec_matrix * C)
 	dists[i] = dist;
 	sums[i] = sums[i - 1] + dist;
     }
+    
+    cec_rand_init();
 
     for (int i = 1; i < k; i++)
     {
-	double random = (double) rand();
-	double n_sum = random * (sums[m - 1] / D_RANDOM_MAX);
+	double r = cec_rand();
+	double n_sum = r * sums[m - 1];
 	int idx = binary_search_d(n_sum, sums, m);
 	array_copy(cec_matrix_row(X, idx), cec_matrix_row(C, i), n);
 	for (int j = 1; j < m; j++)
@@ -66,6 +67,9 @@ int kmeanspp(struct cec_matrix * X, struct cec_matrix * C)
 	    sums[j] = sums[j - 1] + dists[j];
 	}
     }
+    
+    cec_rand_end();
+    
     m_free(dists);
     m_free(sums);
     return 0;
