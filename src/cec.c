@@ -1,9 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include "covariance.h"
 #include "cec.h"
-#include "matrix_utils.h"
+#include "cov_utils.h"
 
 int cec(struct cec_context * context)
 {

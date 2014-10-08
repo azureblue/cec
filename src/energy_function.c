@@ -1,5 +1,5 @@
 #include "energy_function.h"
-#include "matrix_utils.h"
+#include "cov_utils.h"
 #include <float.h>
 
 static double _ZERO = DBL_MIN;
@@ -48,8 +48,8 @@ double h_given_covariance(const struct energy_function_context * context,
     struct cec_matrix * temp_matrix = context->temp_matrix;
     int n = context->n;
 
-    cec_matrix_multiply_sq(cgc->i_given_cov, cov, temp_matrix);
-    double trace = cec_matrix_trace(temp_matrix);
+    cec_cov_multiply(cgc->i_given_cov, cov, temp_matrix);
+    double trace = cec_cov_trace(temp_matrix);
     trace = handle_zero(trace);
     if (isnan(trace))
     {
@@ -74,7 +74,7 @@ double h_spherical(const struct energy_function_context * context,
 {
     int n = context->n;
 
-    double trace = cec_matrix_trace(cov);
+    double trace = cec_cov_trace(cov);
     trace = handle_zero(trace);
     if (isnan(trace))
     {
@@ -93,7 +93,7 @@ double h_fixed_r(const struct energy_function_context * context,
     double r = cr->r;
 
     return (n / 2.0) * log(2.0 * M_PI)
-	    + (1.0 / (2.0 * r)) * cec_matrix_trace(cov) + (n / 2.0) * log(r);
+	    + (1.0 / (2.0 * r)) * cec_cov_trace(cov) + (n / 2.0) * log(r);
 }
 
 double h_diagonal(const struct energy_function_context * context,
@@ -102,7 +102,7 @@ double h_diagonal(const struct energy_function_context * context,
 
     int n = context->n;
 
-    double diagonal_product = cec_matrix_diagonal_product(cov);
+    double diagonal_product = cec_cov_diagonal_product(cov);
     diagonal_product = handle_zero(diagonal_product);
     if (isnan(diagonal_product))
     {

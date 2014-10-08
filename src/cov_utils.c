@@ -1,19 +1,10 @@
 #include <stdio.h>
 #include <float.h>
-
-#include "matrix_utils.h"
 #include <R_ext/Lapack.h>
 
+#include "cov_utils.h"
 
-void cec_vector_outer_product(const double * vec,
-	struct cec_matrix * output_matrix, int n)
-{
-    for (int j = 0; j < n; j++)
-	for (int k = 0; k < n; k++)
-	    cec_matrix_set_element(output_matrix, j, k, vec[j] * vec[k]);
-}
-
-double cec_matrix_trace(const struct cec_matrix * m)
+double cec_cov_trace(const struct cec_matrix * m)
 {
     double res = 0;
     for (int i = 0; i < m->n; i++)
@@ -23,7 +14,7 @@ double cec_matrix_trace(const struct cec_matrix * m)
     return res;
 }
 
-double cec_matrix_diagonal_product(const struct cec_matrix * m)
+double cec_cov_diagonal_product(const struct cec_matrix * m)
 {
     double res = 1.0;
     int n = m->n;
@@ -32,7 +23,7 @@ double cec_matrix_diagonal_product(const struct cec_matrix * m)
     return res;
 }
 
-void cec_matrix_multiply_sq(const struct cec_matrix * m1,
+void cec_cov_multiply(const struct cec_matrix * m1,
 	const struct cec_matrix * m2, struct cec_matrix * dest)
 {
     /*
@@ -73,7 +64,7 @@ int cec_cov_cholesky(const struct cec_matrix * sym_matrix, struct cec_matrix * t
     else
 	return 0;
 }
-/* -- using lapack cholesky insted --
+/* -- using lapack cholesky instead --
  
 int cec_cov_cholesky(const struct cec_matrix * m, struct cec_matrix * target)
 {
@@ -137,6 +128,34 @@ double cec_cov_cholesky_det(const struct cec_matrix * m,
     {
 	return NAN;
     }
-    double prod = cec_matrix_diagonal_product(temp);
+    double prod = cec_cov_diagonal_product(temp);
     return prod * prod;
+}
+
+void cec_cov_add_point(const struct cec_matrix * covariance,
+	struct cec_matrix * new_covarioance, const double * mean,
+	double const * point, int card, struct cec_matrix * t_matrix)
+{
+    int n = covariance->n;
+    double vec[n];
+    array_copy(mean, vec, n);
+    array_sub(vec, point, n);
+    cec_vector_outer_product(vec, t_matrix, n);
+    double d_card_1 = (double) card + 1.0;
+    cec_matrix_sum_multiplied(covariance, t_matrix, new_covarioance,
+	    card / d_card_1, card / (d_card_1 * d_card_1));
+}
+
+void cec_cov_remove_point(const struct cec_matrix * covariance,
+	struct cec_matrix * new_covarioance, const double * mean,
+	double const * point, int card, struct cec_matrix * t_matrix)
+{
+    int n = covariance->n;
+    double vec[n];
+    array_copy(mean, vec, n);
+    array_sub(vec, point, n);
+    cec_vector_outer_product(vec, t_matrix, n);
+    double d_card_1 = (double) card - 1.0;
+    cec_matrix_sum_multiplied(covariance, t_matrix, new_covarioance,
+	    card / d_card_1, -card / (d_card_1 * d_card_1));
 }

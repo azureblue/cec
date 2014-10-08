@@ -1,6 +1,6 @@
 #include "alloc.h"
 #include "matrix.h"
-#include "matrix_utils.h"
+#include "cov_utils.h"
 
 void cec_matrix_set(struct cec_matrix * m, double val)
 {
@@ -50,4 +50,12 @@ struct cec_matrix * cec_matrix_create(int m, int n)
 void cec_matrix_destroy(struct cec_matrix * m)
 {
     m_free(m);
+}
+
+void cec_vector_outer_product(const double * vec,
+	struct cec_matrix * output_matrix, int n)
+{
+    for (int j = 0; j < n; j++)
+	for (int k = 0; k < n; k++)
+	    cec_matrix_set_element(output_matrix, j, k, vec[j] * vec[k]);
 }

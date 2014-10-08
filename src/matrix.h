@@ -54,5 +54,9 @@ void cec_matrix_sum_multiplied(const struct cec_matrix *restrict m1,
 void cec_matrix_copy_data(const struct cec_matrix *restrict from,
 	struct cec_matrix *restrict to);
 
+void cec_vector_outer_product(const double *restrict vec,
+	struct cec_matrix *restrict output_matrix, int n);
+
+
 #endif	/* MATRIX_DOUBLE_H */
 
