@@ -11,7 +11,7 @@ Performs Cross-Entropy Clustering on a data matrix.
 
 \usage{
 cec(x, centers, type = c("covariance", "fixedr", "spherical", "diagonal",  
-"eigenvalues", "all"), iter.max = 20, nstart = 1, param, 
+"eigenvalues", "all"), iter.max = 25, nstart = 1, param, 
 centers.init = c("kmeans++", "random"), card.min = "5\%", keep.removed = F, 
 interactive = F, readline = T)
 }
@@ -32,7 +32,7 @@ the \code{centers.init} argument.
 \item{type}{
 Type (or types) of clustering (density family). This can be either a single value 
 or a vector of length equal to the number of centers. Possible values are: "covariance",
-"fixedr", "spherical", "diagonal", "eigenvalues", "all".
+"fixedr", "spherical", "diagonal", "eigenvalues", "all" (default).
 }
 
 \item{iter.max}{
@@ -46,14 +46,15 @@ only if the \code{centers} argument is a number.
 }
 
 \item{centers.init}{
-Centers initialization method. Possible values are: "kmeans++", "random".
+Centers initialization method. Possible values are: "kmeans++" (default), "random".
 }
 
 \item{param}{
 Parameter (or parameters) specific to a particular type of clustering. 
 Not all types of clustering require parameter. Types that require parameter: 
-"covariance" (matrix parameter), "fixedr" (numeric parameter). 
-This can be a vector or a list (when one of the parameters is a matrix). 
+"covariance" (matrix parameter), "fixedr" (numeric parameter), 
+"eigenvalues" (vector parameter). This can be a vector or a list 
+(when one of the parameters is a matrix or a vector). 
 }
 
 \item{card.min}{
@@ -68,7 +69,7 @@ If this parameter is TRUE, removed clusters will be visible in the results as NA
 }
 
 \item{interactive}{
-Interactive mode. If TRUE, result of clustering will be plotted after every iteration.
+Interactive mode. If TRUE, the result of clustering will be plotted after every iteration.
 }
 
 \item{readline}{
