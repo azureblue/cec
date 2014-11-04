@@ -66,7 +66,7 @@ int cec(struct cec_context * context)
     if (max == -1)
     {
 	/*
-	 * Just return initial cluster assignment
+	 * Just return initial cluster assignment.
 	 */
 	context->iterations = -1;
 	return NO_ERROR;
@@ -104,7 +104,7 @@ int cec(struct cec_context * context)
     for (int i = 0; i < k; i++)
     {
 	/*
-	 * Check if cardinality meets remove condition.
+	 * Check if cardinality meets the remove condition.
 	 */
 	if (card[i] < min_card)
 	{
@@ -114,7 +114,7 @@ int cec(struct cec_context * context)
 	    continue;
 	}
 	/*
-	 * Set the center vector as a mean of all data points in cluster.
+	 * Set the center vector as a mean of all data points in the cluster.
 	 */
 	array_mul(cec_matrix_row(C, i), 1.0 / card[i], n);
     }
@@ -124,7 +124,7 @@ int cec(struct cec_context * context)
      */
 
     /* 
-     * Init covariances matrices.
+     * Init covariance matrices.
      */
     for (int i = 0; i < k; i++)
     {
@@ -138,11 +138,11 @@ int cec(struct cec_context * context)
 	int l = cluster[i];
 	double t_vec[n];
 
-	/* For each data point compute difference between data point and group mean   */
+	/* Compute difference between the data point and the group mean.   */
 	array_copy(cec_matrix_row(X, i), t_vec, n);
 	array_sub(t_vec, cec_matrix_row(C, l), n);
 
-	/* Sum outer product of difference      */
+	/* Sum outer product of the differences. */
 	cec_vector_outer_product(t_vec, t_matrix_nn, n);
 	cec_matrix_add(covariance_matrices[l], t_matrix_nn);
     }
@@ -153,13 +153,13 @@ int cec(struct cec_context * context)
 	    continue;
 
 	/*
-	 * Compute covariances by dividing sum of outer products of differences
-	 * between data points and clusters means by cardinality of each group
+	 * Compute covariances by dividing the sum differences of outer products 
+	   by the cardinality of each group.
 	 */
 	cec_matrix_mul(covariance_matrices[i], 1.0 / card[i]);
 
 	/*
-	 * Compute energy of each group
+	 * Compute energy of each group.
 	 */
 	double hx = energy_functions[i](h_contexts[i], covariance_matrices[i]);
 	if (isnan(hx))
@@ -168,7 +168,7 @@ int cec(struct cec_context * context)
 	clusters_energy[i] = compute_energy(m, hx, card[i]);
 
 	/*
-	 * Sum of energy of all groups
+	 * The sum of energy of all groups.
 	 */
 	energy_sum += clusters_energy[i];
     }
@@ -196,7 +196,7 @@ int cec(struct cec_context * context)
     energy[0] = energy_sum;
 
     /*
-     * If cluster was removed before first iteration - we must handle it.
+     * Special case when cluster was removed before first iteration.
      */
     int handle_removed_flag = (k == _k) ? 0 : 1;
 
@@ -219,7 +219,7 @@ int cec(struct cec_context * context)
 	{
 
 	    /*
-	     * Group that the point is assigned to.
+	     * Group which the point is assigned to.
 	     */
 	    int l = cluster[i];
 
@@ -227,7 +227,7 @@ int cec(struct cec_context * context)
 		continue;
 
 	    /*
-	     * Energy of group l after remove point i.
+	     * Energy of group l after removing point i.
 	     */
 	    double n_l_energy = NAN;
 
@@ -237,7 +237,7 @@ int cec(struct cec_context * context)
 	    double energy_gain;
 
 	    /*
-	     * New mean of group l after remove point i.
+	     * New mean of group l after removing point i.
 	     */
 	    double n_mean[n];
 
@@ -276,7 +276,7 @@ int cec(struct cec_context * context)
 	    }
 
 	    /*
-	     * Index of the best group (energy gain) for point 'i' to transfered.
+	     * Index of the best group (energy gain) for point 'i' to transfer.
 	     */
 	    int idx = -1;
 
@@ -327,8 +327,8 @@ int cec(struct cec_context * context)
 		if (removed[l] == 1)
 		{
 		    /*
-		     * Since the energy of cluster 'l' was subtracted from energy sum (when 'l' was removed),
-		     * gain is only a change of the energy of the cluster 'j' by adding point 'i' to it.
+		     * Since the energy of cluster 'l' was subtracted from the energy sum (when 'l' was removed),
+		     * gain is only the change of the energy of cluster 'j' by adding point 'i'.
 		     */
 		    double gain = (t_energy - clusters_energy[j]);
 		    if (gain < energy_gain)
