@@ -2,7 +2,7 @@
 #include "cov_utils.h"
 #include <float.h>
 
-static double ZERO_EPSILON = 1.11e-16;
+static double ZERO_EPSILON = 1.0e-32;
 
 static inline double handle_zero(double d) 
 {
