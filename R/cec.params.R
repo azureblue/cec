@@ -26,7 +26,7 @@ create.cec.params <- function(k, n, type, param)
       if (ncol(cov) != n) stop("Illegal argument: illegal parameter for \"covariance\" type.")    
       if (nrow(cov) != n) stop("Illegal argument: illegal parameter for \"covariance\" type.")
       if("try-error" %in% class(try(chol(cov), silent=TRUE))) 
-        stop("Illegal argument: illegal parameter for \"covariance\" type. Matrix must be positive-definite.")
+        stop("Illegal argument: illegal parameter for \"covariance\" type - matrix must be positive-definite.")
       i_cov = solve(cov)  
       params <- rep(list(list(cov, i_cov)), k)
     }
@@ -43,7 +43,8 @@ create.cec.params <- function(k, n, type, param)
       else if (is.vector(param))
         evals <- param
       
-      if (length(evals) != n) stop("Illegal argument: illegal parameter for \"eigenvalues\" type.")
+      if (length(evals) != n) stop("Illegal argument: illegal parameter for \"eigenvalues\" type - invalid length.")
+      if (!all(evals != 0)) stop("Illegal argument: illegal parameter for \"eigenvalues\" type - all values must be greater than 0.")
       params = rep(list(sort(evals)), k)
     }
   }
@@ -74,7 +75,7 @@ create.cec.params <- function(k, n, type, param)
          if (ncol(cov) != n) stop("Illegal argument: illegal parameter for \"covariance\" type.")    
          if (nrow(cov) != n) stop("Illegal argument: illegal parameter for \"covariance\" type.")
          if("try-error" %in% class(try(chol(cov), silent=TRUE))) 
-           stop("Illegal argument: illegal parameter for \"covariance\" type. Matrix must be positive-definite.")
+           stop("Illegal argument: illegal parameter for \"covariance\" type - matrix must be positive-definite.")
          i.cov = solve(cov)  
        params[[i]] <- list(cov, i.cov)
        }
@@ -102,7 +103,8 @@ create.cec.params <- function(k, n, type, param)
          
            evals <- param[[idx]]         
          
-         if (length(evals) != n) stop("Illegal argument: illegal parameter for \"eigenvalues\" type.")
+         if (length(evals) != n) stop("Illegal argument: illegal parameter for \"eigenvalues\" type: invalid length.")
+         if (!all(evals != 0)) stop("Illegal argument: illegal parameter for \"eigenvalues\" type: all values must be greater than 0.")
          params[[i]] = sort(evals)
        }
      }          
