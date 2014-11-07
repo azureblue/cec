@@ -1,7 +1,7 @@
 #include "errors.h"
 
-const char * const POSITIVE_DEFINITE_ERROR_MSG =
-	"There was a group with not positive-definite covariance matrix during computation.";
+const char * const INVALID_COVARIANCE_ERROR_MSG =
+	"There was a group with invalid covariance matrix (perhaps not positive-definite).";
 
 const char * const MALLOC_ERROR_MSG = "Memory allocation error.";
 

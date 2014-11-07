@@ -60,7 +60,7 @@ int cec_cov_cholesky(const struct cec_matrix * sym_matrix, struct cec_matrix * t
     array_copy(sym_matrix->data, temp_matrix->data, n * n);   
     F77_NAME(dpotrf)("U", &n, temp_matrix->data, &n, &info);  
     if (info != 0) 
-	return POSITIVE_DEFINITE_ERROR;
+	return INVALID_COVARIANCE_ERROR;
     else
 	return 0;
 }
@@ -124,7 +124,7 @@ double cec_cov_cholesky_det(const struct cec_matrix * m,
 	double det = m->data[0] * m->data[3] - m->data[1] * m->data[2];
 	return det;
 	
-    } else if (cec_cov_cholesky(m, temp) == POSITIVE_DEFINITE_ERROR)
+    } else if (cec_cov_cholesky(m, temp) == INVALID_COVARIANCE_ERROR)
     {
 	return NAN;
     }

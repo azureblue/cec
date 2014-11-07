@@ -82,8 +82,8 @@ SEXP cec_r(SEXP x, SEXP centers, SEXP iter_max, SEXP type, SEXP card_min,
     {
 	switch (res)
 	{
-	    case POSITIVE_DEFINITE_ERROR:
-		error(POSITIVE_DEFINITE_ERROR_MSG);
+	    case INVALID_COVARIANCE_ERROR:
+		error(INVALID_COVARIANCE_ERROR_MSG);
 	    case ALL_CLUSTERS_REMOVED_ERROR:
 		error(ALL_CLUSTERS_REMOVED_MSG);
 	    default:
