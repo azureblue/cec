@@ -5,7 +5,7 @@
 #include "kmeanspp.h"
 #include "rand.h"
 
-int binary_search_d(double key, double * array, int len)
+static int binary_search_d(double key, double * array, int len)
 {
     int a = 0, b = len - 1;
     while (a != b)
