@@ -7,9 +7,9 @@ enum density_family
 };
 
 /*
- * Static context of all internal energy functions.
+ * Static context of all cross entropy functions.
  */
-struct energy_function_context
+struct cross_entropy_context
 {
     int n;
     struct cec_matrix * temp_matrix;
@@ -19,7 +19,7 @@ struct energy_function_context
 };
 
 /*
- * Custom contexts for specific energy function implementations.
+ * Custom contexts for specific implementations.
  */
 
 struct context_gc
@@ -41,9 +41,9 @@ struct context_r
     double r;
 };
 
-void destroy_energy_function_context(struct energy_function_context * context);
+void destroy_cross_entropy_context(struct cross_entropy_context * context);
 
-struct energy_function_context * create_energy_function_context(
+struct cross_entropy_context * create_cross_entropy_context(
 	enum density_family family, int n);
 
 #endif	/* ENERGY_FUNCTION_CONTEXT_H */

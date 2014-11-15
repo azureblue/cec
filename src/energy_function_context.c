@@ -6,7 +6,7 @@
 
 static const int EIGENVALUES_WORKSPACE_BLOCK = 128;
 
-void destroy_energy_function_context(struct energy_function_context * context)
+void destroy_cross_entropy_context(struct cross_entropy_context * context)
 {
     if (context == NULL)
 	return;
@@ -50,11 +50,11 @@ void destroy_energy_function_context(struct energy_function_context * context)
     m_free(context);
 }
 
-struct energy_function_context * create_energy_function_context(
+struct cross_entropy_context * create_cross_entropy_context(
 	enum density_family family, int n)
 {
-    struct energy_function_context * context = m_alloc(
-	    sizeof (struct energy_function_context));
+    struct cross_entropy_context * context = m_alloc(
+	    sizeof (struct cross_entropy_context));
     if (context == NULL)
 	return NULL;
 
@@ -65,7 +65,7 @@ struct energy_function_context * create_energy_function_context(
 
     if (context->temp_matrix == NULL)
     {
-	destroy_energy_function_context(context);
+	destroy_cross_entropy_context(context);
 	return NULL;
     }
 
@@ -76,7 +76,7 @@ struct energy_function_context * create_energy_function_context(
 	    struct context_r * c_r = m_alloc(sizeof (struct context_r));
 	    if (c_r == NULL)
 	    {
-		destroy_energy_function_context(context);
+		destroy_cross_entropy_context(context);
 		return NULL;
 	    }
 	    context->custom_context = c_r;
@@ -87,7 +87,7 @@ struct energy_function_context * create_energy_function_context(
 	    struct context_gc * context_gc = m_alloc(sizeof (struct context_gc));
 	    if (context_gc == NULL)
 	    {
-		destroy_energy_function_context(context);
+		destroy_cross_entropy_context(context);
 		return NULL;
 	    }
 	    context->custom_context = context_gc;
@@ -96,7 +96,7 @@ struct energy_function_context * create_energy_function_context(
 	    context_gc->i_given_cov = cec_matrix_create(n, n);
 	    if (context_gc->given_cov == NULL || context_gc->i_given_cov == NULL)
 	    {
-		destroy_energy_function_context(context);
+		destroy_cross_entropy_context(context);
 		return NULL;
 	    }
 	    break;
@@ -106,7 +106,7 @@ struct energy_function_context * create_energy_function_context(
 	    struct context_fe * context_fe = m_alloc(sizeof (struct context_fe));
 	    if (context_fe == NULL)
 	    {
-		destroy_energy_function_context(context);
+		destroy_cross_entropy_context(context);
 		return NULL;
 	    }
 	    context->custom_context = context_fe;
@@ -117,7 +117,7 @@ struct energy_function_context * create_energy_function_context(
 
 	    if (context_fe->evals == NULL || context_fe->given_evals == NULL || context_fe->workspace == NULL)
 	    {
-		destroy_energy_function_context(context);
+		destroy_cross_entropy_context(context);
 		return NULL;
 	    }
 	    break;

@@ -16,9 +16,9 @@ int cec(struct cec_context * context)
     const int max = context->max_iterations;
     const int min_card = context->min_card;
 
-    energy_function * energy_functions = context->energy_functions;
-    struct energy_function_context ** h_contexts =
-	    context->energy_function_contexts;
+    cross_entropy_function * cross_entropy_functions = context->cross_entropy_functions;
+    struct cross_entropy_context ** h_contexts =
+	    context->cross_entropy_contexts;
 
     int _k = k;
     int removed_clusters = 0;
@@ -128,7 +128,7 @@ int cec(struct cec_context * context)
 
 	cec_matrix_mul(covariance_matrices[i], 1.0 / card[i]);
 	
-	double hx = energy_functions[i](h_contexts[i], covariance_matrices[i]);
+	double hx = cross_entropy_functions[i](h_contexts[i], covariance_matrices[i]);
 	if (isnan(hx))
 	    return *(h_contexts[i]->last_error);
 
@@ -208,7 +208,7 @@ int cec(struct cec_context * context)
 		/*
 		 * Compute energy of group 'l' after removing data point 'i'.
 		 */
-		double n_l_hx = energy_functions[l](h_contexts[l], n_covariance_matrix);
+		double n_l_hx = cross_entropy_functions[l](h_contexts[l], n_covariance_matrix);
 		if (isnan(n_l_hx))
 		    return *(h_contexts[l]->last_error);
 
@@ -240,7 +240,7 @@ int cec(struct cec_context * context)
 			t_covariance_matrices[j], cec_matrix_row(C, j),
 			cec_matrix_row(X, i), card[j], t_matrix_nn);
 
-		double t_hx = energy_functions[j](h_contexts[j], t_covariance_matrices[j]);
+		double t_hx = cross_entropy_functions[j](h_contexts[j], t_covariance_matrices[j]);
 		if (isnan(t_hx))
 		    return *(h_contexts[j]->last_error);
 

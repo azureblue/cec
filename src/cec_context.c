@@ -91,8 +91,8 @@ static struct cec_temp_data * create_temp_data(int k, int n)
 
 struct cec_context *
 create_cec_context(struct cec_matrix * points, struct cec_matrix * centers,
-	struct energy_function_context ** energy_function_contexts,
-	energy_function * energy_functions, int max_iterations, int min_card)
+	struct cross_entropy_context ** cross_entropy_contexts,
+	cross_entropy_function * cross_entropy_functions, int max_iterations, int min_card)
 {
     struct cec_context * context = m_alloc(sizeof (struct cec_context));
 
@@ -105,8 +105,8 @@ create_cec_context(struct cec_matrix * points, struct cec_matrix * centers,
 
     context->points = points;
     context->centers = centers;
-    context->energy_function_contexts = energy_function_contexts;
-    context->energy_functions = energy_functions;
+    context->cross_entropy_contexts = cross_entropy_contexts;
+    context->cross_entropy_functions = cross_entropy_functions;
     context->max_iterations = max_iterations;
     context->min_card = min_card;
     context->error = NO_ERROR;

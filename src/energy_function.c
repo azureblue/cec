@@ -19,7 +19,7 @@ static inline double handle_cholesky_nan(double d)
 		
 }
 
-energy_function energy_function_for(enum density_family family)
+cross_entropy_function cross_entropy_for(enum density_family family)
 {
     switch (family)
     {
@@ -40,7 +40,7 @@ energy_function energy_function_for(enum density_family family)
     return NULL;
 }
 
-double h_given_covariance(const struct energy_function_context * context,
+double h_given_covariance(const struct cross_entropy_context * context,
 	const struct cec_matrix * cov)
 {
     struct context_gc * cgc = (struct context_gc *) context->custom_context;
@@ -62,7 +62,7 @@ double h_given_covariance(const struct energy_function_context * context,
 	    + (1.0 / 2.0) * log(det);
 }
 
-double h_spherical(const struct energy_function_context * context,
+double h_spherical(const struct cross_entropy_context * context,
 	const struct cec_matrix * cov)
 {
     int n = context->n;
@@ -78,7 +78,7 @@ double h_spherical(const struct energy_function_context * context,
     return (n / 2.0) * log(2.0 * M_PI * M_E / n) + (n / 2.0) * log(trace);
 }
 
-double h_fixed_r(const struct energy_function_context * context,
+double h_fixed_r(const struct cross_entropy_context * context,
 	const struct cec_matrix * cov)
 {
     struct context_r * cr = (struct context_r *) context->custom_context;
@@ -89,7 +89,7 @@ double h_fixed_r(const struct energy_function_context * context,
 	    + (1.0 / (2.0 * r)) * cec_cov_trace(cov) + (n / 2.0) * log(r);
 }
 
-double h_diagonal(const struct energy_function_context * context,
+double h_diagonal(const struct cross_entropy_context * context,
 	const struct cec_matrix * cov)
 {
 
@@ -107,7 +107,7 @@ double h_diagonal(const struct energy_function_context * context,
 	    + (1.0 / 2.0) * log(diagonal_product);
 }
 
-double h_fixedeigenvalues(const struct energy_function_context * context,
+double h_fixedeigenvalues(const struct cross_entropy_context * context,
 	const struct cec_matrix * cov)
 {
     struct context_fe * cfe = (struct context_fe *) context->custom_context;
@@ -131,7 +131,7 @@ double h_fixedeigenvalues(const struct energy_function_context * context,
 
 }
 
-double h_all(const struct energy_function_context * context,
+double h_all(const struct cross_entropy_context * context,
 	const struct cec_matrix * cov)
 {
 

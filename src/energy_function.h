@@ -24,33 +24,33 @@ static inline double cluster_energy(const int m, const double hx,
 }
 
 /*
- * Cluster internal energy function (cross-entropy).
+ * Internal energy function (cross-entropy).
  */
-typedef double (*energy_function) (const struct energy_function_context *,
+typedef double (*cross_entropy_function) (const struct cross_entropy_context *,
 	const struct cec_matrix *);
 
-energy_function energy_function_for(enum density_family family);
+cross_entropy_function cross_entropy_for(enum density_family family);
 
 /*
  * Implementations of cross-entropy function with respect to 
  * the Gaussian density family.
  */
 double h_given_covariance
-(const struct energy_function_context * context, const struct cec_matrix * cov);
+(const struct cross_entropy_context * context, const struct cec_matrix * cov);
 
 double h_spherical
-(const struct energy_function_context * context, const struct cec_matrix * cov);
+(const struct cross_entropy_context * context, const struct cec_matrix * cov);
 
 double h_all
-(const struct energy_function_context * context, const struct cec_matrix * cov);
+(const struct cross_entropy_context * context, const struct cec_matrix * cov);
 
 double h_diagonal
-(const struct energy_function_context * context, const struct cec_matrix * cov);
+(const struct cross_entropy_context * context, const struct cec_matrix * cov);
 
 double h_fixed_r
-(const struct energy_function_context * context, const struct cec_matrix * cov);
+(const struct cross_entropy_context * context, const struct cec_matrix * cov);
 
 double h_fixedeigenvalues
-(const struct energy_function_context * context, const struct cec_matrix * cov);
+(const struct cross_entropy_context * context, const struct cec_matrix * cov);
 
 #endif	/* ENERGY_FUNCTIONS_H */

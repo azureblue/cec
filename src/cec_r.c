@@ -8,15 +8,15 @@
 #include "cec_r_utils.h"
 #include "cec.h"
 
-static void destroy_energy_function_contexts(
-	struct energy_function_context ** energy_contexts, int k);
+static void destroy_cross_entropy_contexts(
+	struct cross_entropy_context ** energy_contexts, int k);
 
-static void destroy_energy_functions(energy_function * energy_functions);
+static void destroy_cross_entropy_functions(cross_entropy_function * cross_entropy_functions);
 
-static struct energy_function_context ** create_energy_function_contexts(
+static struct cross_entropy_context ** create_cross_entropy_contexts(
 	SEXP type, SEXP params, int k, int n, int * last_error);
 
-static energy_function * create_energy_functions(SEXP type, int k);
+static cross_entropy_function * create_cross_entropy_functions(SEXP type, int k);
 
 static SEXP create_R_result(struct cec_context * cec_c,
 	struct cec_matrix * centers, int m, int k, int n);
@@ -42,18 +42,18 @@ SEXP cec_r(SEXP x, SEXP centers, SEXP iter_max, SEXP type, SEXP card_min,
 
     int last_error = 0;
 
-    struct energy_function_context ** energy_contexts =
-	    create_energy_function_contexts(type, params, k, n, &last_error);
+    struct cross_entropy_context ** cross_entropy_contexts =
+	    create_cross_entropy_contexts(type, params, k, n, &last_error);
 
-    energy_function * energy_functions = create_energy_functions(type, k);
+    cross_entropy_function * cross_entropy_functions = create_cross_entropy_functions(type, k);
 
-    struct cec_context * cec_c = create_cec_context(X, C, energy_contexts,
-	    energy_functions, iteration_max, card_min_int);
+    struct cec_context * cec_c = create_cec_context(X, C, cross_entropy_contexts,
+	    cross_entropy_functions, iteration_max, card_min_int);
 
-    if (energy_contexts == NULL || energy_functions == NULL || cec_c == NULL)
+    if (cross_entropy_contexts == NULL || cross_entropy_functions == NULL || cec_c == NULL)
     {
-	destroy_energy_function_contexts(energy_contexts, k);
-	destroy_energy_functions(energy_functions);
+	destroy_cross_entropy_contexts(cross_entropy_contexts, k);
+	destroy_cross_entropy_functions(cross_entropy_functions);
 	destroy_cec_context_results(cec_c);
 	cec_matrix_destroy(X);
 	cec_matrix_destroy(C);
@@ -65,8 +65,8 @@ SEXP cec_r(SEXP x, SEXP centers, SEXP iter_max, SEXP type, SEXP card_min,
      */
     int res = cec(cec_c);
 
-    destroy_energy_function_contexts(energy_contexts, k);
-    destroy_energy_functions(energy_functions);
+    destroy_cross_entropy_contexts(cross_entropy_contexts, k);
+    destroy_cross_entropy_functions(cross_entropy_functions);
 
     SEXP result = NULL;
     
@@ -163,74 +163,74 @@ static SEXP create_R_result(struct cec_context * cec_c,
     return ret_s;
 }
 
-static void destroy_energy_function_contexts(
-	struct energy_function_context ** energy_contexts, int k)
+static void destroy_cross_entropy_contexts(
+	struct cross_entropy_context ** energy_contexts, int k)
 {
     if (energy_contexts == NULL)
 	return;
 
     for (int i = 0; i < k; i++)
-	destroy_energy_function_context(energy_contexts[i]);
+	destroy_cross_entropy_context(energy_contexts[i]);
 
     m_free(energy_contexts);
 
 }
 
-static void destroy_energy_functions(energy_function * energy_functions)
+static void destroy_cross_entropy_functions(cross_entropy_function * cross_entropy_functions)
 {
-    m_free(energy_functions);
+    m_free(cross_entropy_functions);
 }
 
-static energy_function * create_energy_functions(SEXP type, int k)
+static cross_entropy_function * create_cross_entropy_functions(SEXP type, int k)
 {
-    energy_function * energy_functions = m_alloc(sizeof (energy_function) * k);
-    if (energy_functions == NULL)
+    cross_entropy_function * cross_entropy_functions = m_alloc(sizeof (cross_entropy_function) * k);
+    if (cross_entropy_functions == NULL)
 	return NULL;
 
     for (int i = 0; i < k; i++)
     {
 	enum density_family family = INTEGER(type)[i];
-	energy_functions[i] = energy_function_for(family);
+	cross_entropy_functions[i] = cross_entropy_for(family);
     }
 
-    return energy_functions;
+    return cross_entropy_functions;
 }
 
-static struct energy_function_context ** create_energy_function_contexts(
+static struct cross_entropy_context ** create_cross_entropy_contexts(
 	SEXP type, SEXP params, int k, int n, int * last_error)
 {
-    struct energy_function_context ** energy_contexts = m_alloc(
-	    sizeof (struct energy_function_context *) * k);
+    struct cross_entropy_context ** cross_entropy_contexts = m_alloc(
+	    sizeof (struct cross_entropy_context *) * k);
 
-    if (energy_contexts == NULL)
+    if (cross_entropy_contexts == NULL)
 	return NULL;
 
     for (int i = 0; i < k; i++)
     {
 	SEXP param = VECTOR_ELT(params, i);
 	enum density_family family = INTEGER(type)[i];
-	energy_contexts[i] = create_energy_function_context(family, n);
+	cross_entropy_contexts[i] = create_cross_entropy_context(family, n);
 	
-	if (energy_contexts[i] == NULL)
+	if (cross_entropy_contexts[i] == NULL)
 	{
-	    destroy_energy_function_contexts(energy_contexts, i + 1);
+	    destroy_cross_entropy_contexts(cross_entropy_contexts, i + 1);
 	    return NULL;
 	}
-	energy_contexts[i]->last_error = last_error;
+	cross_entropy_contexts[i]->last_error = last_error;
 
 	switch (family)
 	{
 	    case FIXED_R:
 	    {
 		struct context_r * c_r =
-			(struct context_r *) (energy_contexts[i]->custom_context);
+			(struct context_r *) (cross_entropy_contexts[i]->custom_context);
 		c_r->r = asReal(param);
 		break;
 	    }
 	    case GIVEN_COVARIANCE:
 	    {
 		struct context_gc * c_gc =
-			(struct context_gc *) energy_contexts[i]->custom_context;
+			(struct context_gc *) cross_entropy_contexts[i]->custom_context;
 		copy_from_R_matrix(VECTOR_ELT(param, 0), c_gc->given_cov);
 		copy_from_R_matrix(VECTOR_ELT(param, 1), c_gc->i_given_cov);		
 		break;
@@ -238,7 +238,7 @@ static struct energy_function_context ** create_energy_function_contexts(
 	    case FIXEDEIGENVALUES:
 	    {
 		struct context_fe * c_fe =
-			(struct context_fe *) energy_contexts[i]->custom_context;
+			(struct context_fe *) cross_entropy_contexts[i]->custom_context;
 
 		array_copy(REAL(param), c_fe->given_evals, n);
 		double e_prod = 1;
@@ -255,6 +255,6 @@ static struct energy_function_context ** create_energy_function_contexts(
 		break;
 	}
     }
-    return energy_contexts;
+    return cross_entropy_contexts;
 }
 
