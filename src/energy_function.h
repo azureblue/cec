@@ -14,6 +14,16 @@
 #endif
 
 /*
+ * Overall cluster energy (cost function).
+ */
+static inline double cluster_energy(const int m, const double hx,
+	const int card)
+{
+    double p = (card / (double) m);
+    return p * (-log(p) + hx);
+}
+
+/*
  * Cluster internal energy function (cross-entropy).
  */
 typedef double (*energy_function) (const struct energy_function_context *,

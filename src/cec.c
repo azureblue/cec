@@ -132,7 +132,7 @@ int cec(struct cec_context * context)
 	if (isnan(hx))
 	    return *(h_contexts[i]->last_error);
 
-	clusters_energy[i] = compute_energy(m, hx, card[i]);
+	clusters_energy[i] = cluster_energy(m, hx, card[i]);
 	
 	energy_sum += clusters_energy[i];
     }
@@ -212,7 +212,7 @@ int cec(struct cec_context * context)
 		if (isnan(n_l_hx))
 		    return *(h_contexts[l]->last_error);
 
-		n_l_energy = compute_energy(m, n_l_hx, card[l] - 1);
+		n_l_energy = cluster_energy(m, n_l_hx, card[l] - 1);
 
 		energy_gain = 0;
 
@@ -244,7 +244,7 @@ int cec(struct cec_context * context)
 		if (isnan(t_hx))
 		    return *(h_contexts[j]->last_error);
 
-		double t_energy = compute_energy(m, t_hx, card[j] + 1);
+		double t_energy = cluster_energy(m, t_hx, card[j] + 1);
 
 		if (removed[l] == 1)
 		{
