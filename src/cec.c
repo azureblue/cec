@@ -184,17 +184,17 @@ int cec(struct cec_context * context)
 	     * Initializing to NAN to get rid of compiler warning.
 	     */
 	    double n_l_energy = NAN;
+	    double n_l_mean[n];
 
 	    double energy_gain;
 
-	    double n_mean[n];
 	    if (!removed[l])
 	    {
 		/*
 		 * Compute mean of group 'l' after removing data point 'i' and store
 		 * its value in the n_mean.
 		 */
-		mean_remove_point(cec_matrix_row(C, l), n_mean,
+		mean_remove_point(cec_matrix_row(C, l), n_l_mean,
 			cec_matrix_row(X, i), card[l], n);
 
 		/*
@@ -223,7 +223,7 @@ int cec(struct cec_context * context)
 
 	    int idx = -1;
 
-	    double n_energy;
+	    double best_energy;
 
 	    for (int _j = 0; _j < _k; _j++)
 	    {
@@ -257,7 +257,7 @@ int cec(struct cec_context * context)
 		    {
 			idx = j;
 			energy_gain = gain;
-			n_energy = t_energy;
+			best_energy = t_energy;
 		    }
 		} else
 		{
@@ -267,7 +267,7 @@ int cec(struct cec_context * context)
 		    {
 			idx = j;
 			energy_gain = gain;
-			n_energy = t_energy;
+			best_energy = t_energy;
 		    }
 		}
 	    }
@@ -279,7 +279,7 @@ int cec(struct cec_context * context)
 	    {
 		cluster[i] = idx;
 		card[idx]++;
-		clusters_energy[idx] = n_energy;
+		clusters_energy[idx] = best_energy;
 		cec_matrix_copy_data(t_covariance_matrices[idx],
 			covariance_matrices[idx]);
 		array_copy(cec_matrix_row(t_mean_matrix, idx),
@@ -291,7 +291,7 @@ int cec(struct cec_context * context)
 			    covariance_matrices[l]);
 		    clusters_energy[l] = n_l_energy;
 		    card[l]--;
-		    array_copy(n_mean, cec_matrix_row(C, l), n);
+		    array_copy(n_l_mean, cec_matrix_row(C, l), n);
 
 		    if (card[l] < min_card)
 		    {

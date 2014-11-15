@@ -28,7 +28,7 @@ SEXP cec_r(SEXP x, SEXP centers, SEXP iter_max, SEXP type, SEXP card_min,
     int k = Rf_nrows(centers);
     int n = Rf_ncols(x);
     int iteration_max = Rf_asInteger(iter_max);
-    int _card_min = Rf_asInteger(card_min);
+    int card_min_int  = Rf_asInteger(card_min);
 
     struct cec_matrix * X = create_from_R_matrix(x);
     struct cec_matrix * C = create_from_R_matrix(centers);
@@ -48,7 +48,7 @@ SEXP cec_r(SEXP x, SEXP centers, SEXP iter_max, SEXP type, SEXP card_min,
     energy_function * energy_functions = create_energy_functions(type, k);
 
     struct cec_context * cec_c = create_cec_context(X, C, energy_contexts,
-	    energy_functions, iteration_max, _card_min);
+	    energy_functions, iteration_max, card_min_int);
 
     if (energy_contexts == NULL || energy_functions == NULL || cec_c == NULL)
     {
