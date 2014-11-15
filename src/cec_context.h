@@ -2,7 +2,7 @@
 #define	CEC_CONTEXT_H
 
 #include "matrix.h"
-#include "energy_function.h"
+#include "energy.h"
 
 struct cec_temp_data
 {

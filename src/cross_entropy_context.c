@@ -1,7 +1,7 @@
 #include <stdlib.h>
 
 #include "alloc.h"
-#include "energy_function_context.h"
+#include "cross_entropy_context.h"
 #include "matrix.h"
 
 static const int EIGENVALUES_WORKSPACE_BLOCK = 128;

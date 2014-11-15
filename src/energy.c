@@ -1,4 +1,4 @@
-#include "energy_function.h"
+#include "energy.h"
 #include "cov_utils.h"
 #include <float.h>
 

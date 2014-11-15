@@ -3,7 +3,7 @@
 
 #include "matrix.h"
 #include "errors.h"
-#include "energy_function_context.h"
+#include "cross_entropy_context.h"
 
 #ifndef M_PI
 #define M_PI 3.141592653589793238462643383279502884197169399375
