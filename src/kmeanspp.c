@@ -57,6 +57,7 @@ int kmeanspp(struct cec_matrix * X, struct cec_matrix * C)
 	double n_sum = r * sums[m - 1];
 	int idx = binary_search_d(n_sum, sums, m);
 	array_copy(cec_matrix_row(X, idx), cec_matrix_row(C, i), n);
+	
 	for (int j = 1; j < m; j++)
 	{
 	    double dist = dist2(cec_matrix_row(X, j), cec_matrix_row(C, i), n);

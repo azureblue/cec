@@ -10,8 +10,7 @@ void * m_alloc(size_t size)
     return R_alloc(size / sizeof (char), 1);
 #else
     return malloc(size);
-#endif
-    
+#endif    
 }
 
 void m_free(void * ptr)
