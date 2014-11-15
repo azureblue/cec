@@ -8,9 +8,7 @@ double cec_cov_trace(const struct cec_matrix * m)
 {
     double res = 0;
     for (int i = 0; i < m->n; i++)
-    {
 	res += cec_matrix_element(m, i, i);
-    }
     return res;
 }
 
