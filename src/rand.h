@@ -1,5 +1,5 @@
-#ifndef RANDOM_H
-#define	RANDOM_H
+#ifndef RAND_H
+#define	RAND_H
 
 /*
  * Abstraction over RNG.
@@ -10,5 +10,5 @@ void cec_rand_end();
 
 double cec_rand();
 
-#endif	/* RANDOM_H */
+#endif	/* RAND_H */
 

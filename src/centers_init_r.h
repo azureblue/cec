@@ -1,5 +1,5 @@
-#ifndef INIT_CENTERS_R_H
-#define	INIT_CENTERS_R_H
+#ifndef CENTERS_INIT_R_H
+#define	CENTERS_INIT_R_H
 
 #include <Rinternals.h>
 
@@ -10,5 +10,5 @@ SEXP init_kmeanspp_r(SEXP x, SEXP k);
 
 SEXP init_random_r(SEXP x, SEXP k);
 
-#endif	/* INIT_CENTERS_R_H */
+#endif	/* CENTERS_INIT_R_H */
 

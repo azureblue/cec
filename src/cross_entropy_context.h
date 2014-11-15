@@ -1,5 +1,5 @@
-#ifndef ENERGY_FUNCTION_CONTEXT_H
-#define	ENERGY_FUNCTION_CONTEXT_H
+#ifndef CROSS_ENTROPY_CONTEXT_H
+#define	CROSS_ENTROPY_CONTEXT_H
 
 enum density_family
 {
@@ -46,5 +46,5 @@ void destroy_cross_entropy_context(struct cross_entropy_context * context);
 struct cross_entropy_context * create_cross_entropy_context(
 	enum density_family family, int n);
 
-#endif	/* ENERGY_FUNCTION_CONTEXT_H */
+#endif	/* CROSS_ENTROPY_CONTEXT_H */
 

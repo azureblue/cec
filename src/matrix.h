@@ -1,5 +1,5 @@
-#ifndef MATRIX_DOUBLE_H
-#define	MATRIX_DOUBLE_H
+#ifndef MATRIX_H
+#define	MATRIX_H
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -62,5 +62,5 @@ void cec_vector_outer_product(const double *restrict vec,
 	struct cec_matrix *restrict output_matrix, int n);
 
 
-#endif	/* MATRIX_DOUBLE_H */
+#endif	/* MATRIX_H */
 

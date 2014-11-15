@@ -1,5 +1,5 @@
-#ifndef VECTOR_H
-#define	VECTOR_H
+#ifndef ARRAY_H
+#define	ARRAY_H
 
 /*
  * Simple operations on C arrays.
@@ -26,5 +26,5 @@ void mean_add_point(const double * mean, double * new_mean,
 void mean_remove_point(const double * mean, double * new_mean,
 	const double * point, const int card, const int n);
 
-#endif	/* VECTOR_H */
+#endif	/* ARRAY_H */
 

@@ -1,5 +1,5 @@
-#ifndef ENERGY_FUNCTIONS_H
-#define	ENERGY_FUNCTIONS_H
+#ifndef ENERGY_H
+#define	ENERGY_H
 
 #include "matrix.h"
 #include "errors.h"
@@ -53,4 +53,4 @@ double h_fixed_r
 double h_fixedeigenvalues
 (const struct cross_entropy_context * context, const struct cec_matrix * cov);
 
-#endif	/* ENERGY_FUNCTIONS_H */
+#endif	/* ENERGY_H */
