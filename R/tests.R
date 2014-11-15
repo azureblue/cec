@@ -129,6 +129,7 @@ cov.mle <- function(M)
   mat <- mat / nrow(M)
   mat
 }
+
 # R implementation of CEC internal cross-entropy functions.
 H.covariance <- function(cov, given.cov) 
 {
