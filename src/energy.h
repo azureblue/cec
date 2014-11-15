@@ -16,11 +16,11 @@
 /*
  * Overall cluster energy (cost function).
  */
-static inline double cluster_energy(const int m, const double hx,
+static inline double cluster_energy(const int m, const double cross_entropy,
 	const int card)
 {
     double p = (card / (double) m);
-    return p * (-log(p) + hx);
+    return p * (-log(p) + cross_entropy);
 }
 
 /*
