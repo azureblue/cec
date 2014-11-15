@@ -159,7 +159,7 @@ centers = initcenters(m, 3)
 Z = cec(m, centers, type="sp", iter.max = -1, card.min="5\%")
 plot(Z)
 ## Clustering result:
-Z = cec(m, centers, type="sp", iter.max = 100, nstart=3, card.min="5\%")
+Z = cec(m, centers, type="sp", iter.max = 100, nstart=4, card.min="5\%")
 plot(Z)
 # Result:
 Z
