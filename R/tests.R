@@ -1,8 +1,10 @@
-# I created "unit-test-like" thing. I didn't like RUnit much...
+# "Unit-test-like" thing. I didn't like RUnit.
 
 run.cec.tests <- function()
 {
   errors <- 0
+  
+  # test files
   tests <- list.files(system.file("cec_tests", package="CEC"))
   for (test in tests)
   {
@@ -16,22 +18,27 @@ run.cec.tests <- function()
           setup <- NULL
           },
         testenv
-        )
+        )      
       source(system.file("cec_tests", test, package="CEC"), local=testenv)
       errors <- errors + local(
         {
           local.errors <- 0
-          cat(paste("Test:",.testname, "\n"))
+          cat(paste("Test:",.testname, "\n"))        
           fs <- lsf.str()        
+          
+          # execute setup function if exists
           if ("setup" %in% fs) eval(expr=body(setup), envir=testenv)        
           for (fn in fs) 
           {
+            # test cases 
             if (grepl("test.", fn))
             {      
-              cat(paste("---- ", fn))
+              cat(paste("---- ", fn))              
               fbody = body(eval(parse(text=fn)))
+              
+              # evaluate test case function and catch (and count) errors
               local.errors <- local.errors + tryCatch(
-                {
+                {                  
                   eval(expr=fbody, envir=testenv)
                   cat(": OK\n")
                   0
@@ -60,7 +67,6 @@ printmsg <- function(msg)
     paste(msg, ":")
   else ""      
 }
-
 
 checkNumericVectorEquals <- function(ex, ac, msg=NULL, tolerance = .Machine$double.eps ^ 0.5)  
 {  
@@ -110,6 +116,7 @@ checkNumericMatrixEquals <- function(ex, ac, msg=NULL, tolerance = .Machine$doub
   
 }
 
+# Maximum likelihood estimate of covariance matrix.
 cov.mle <- function(M)
 {
   mean <- colMeans(M)
@@ -122,7 +129,7 @@ cov.mle <- function(M)
   mat <- mat / nrow(M)
   mat
 }
-
+# R implementation of CEC internal cross-entropy functions.
 H.covariance <- function(cov, given.cov) 
 {
   igiven.cov <- solve(given.cov)  

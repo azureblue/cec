@@ -10,8 +10,6 @@ int cec(struct cec_context * context)
     struct cec_matrix * X = context->points;
     struct cec_matrix * C = context->centers;
 
-    /* Init local variables     */
-
     const int m = X->m;
     const int k = C->m;
     const int n = X->n;
@@ -26,7 +24,6 @@ int cec(struct cec_context * context)
     int removed_clusters = 0;
     double energy_sum = 0;
 
-    /* Local arrays and matrices        */
     int * cluster = context->clustering_vector;
     int * clusters_number = context->clusters_number;
 
@@ -46,8 +43,9 @@ int cec(struct cec_context * context)
 	    context->temp_data->t_covariance_matrices;
 
     /*
-     * For each point find its closest center.
+     * Assign points to its closest clusters and calculate clusters means.
      */
+    
     for (int i = 0; i < m; i++)
     {
 	double dist = BIG_DOUBLE;
@@ -66,7 +64,7 @@ int cec(struct cec_context * context)
     if (max == -1)
     {
 	/*
-	 * Just return initial cluster assignment.
+	 * Just return the initial cluster assignment.
 	 */
 	context->iterations = -1;
 	return NO_ERROR;
@@ -74,9 +72,6 @@ int cec(struct cec_context * context)
 
     context->iterations = 0;
 
-    /* 
-     * Init local arrays
-     */
     for (int i = 0; i < k; i++)
     {
 	card[i] = 0;
@@ -84,65 +79,44 @@ int cec(struct cec_context * context)
 	cluster_map[i] = i;
     }
 
-    /*
-     *  Set centers matrix to 0.0.
-     */
     cec_matrix_set(C, 0.0);
 
-    /* 
-     * Set cardinality and center means.
-     */
     for (int i = 0; i < m; i++)
     {
 	int l = cluster[i];
-	card[l]++;
-	/*
-	 * Sum all data vectors that belong to the same cluster.
-	 */
+	card[l]++;	
 	array_add(cec_matrix_row(C, l), cec_matrix_row(X, i), n);
     }
     for (int i = 0; i < k; i++)
-    {
-	/*
-	 * Check if cardinality meets the remove condition.
-	 */
+    {	
 	if (card[i] < min_card)
 	{
 	    removed[i] = 1;
 	    array_fill(cec_matrix_row(C, i), NAN, n);
 	    removed_clusters++;
 	    continue;
-	}
-	/*
-	 * Set the center vector as a mean of all data points in the cluster.
-	 */
+	}	
 	array_mul(cec_matrix_row(C, i), 1.0 / card[i], n);
     }
 
     /* 
-     * Compute initial covariances of groups.
+     * Compute initial covariances using maximum likelihood estimator.
      */
-
-    /* 
-     * Init covariance matrices.
-     */
+   
     for (int i = 0; i < k; i++)
     {
 	cec_matrix_set(covariance_matrices[i], 0.0);
 	cec_matrix_set(t_covariance_matrices[i], 0.0);
     }
-
-    /* Compute covariances      */
+  
     for (int i = 0; i < m; i++)
     {
 	int l = cluster[i];
 	double t_vec[n];
 
-	/* Compute difference between the data point and the group mean.   */
 	array_copy(cec_matrix_row(X, i), t_vec, n);
 	array_sub(t_vec, cec_matrix_row(C, l), n);
 
-	/* Sum outer product of the differences. */
 	cec_vector_outer_product(t_vec, t_matrix_nn, n);
 	cec_matrix_add(covariance_matrices[l], t_matrix_nn);
     }
@@ -152,30 +126,20 @@ int cec(struct cec_context * context)
 	if (removed[i])
 	    continue;
 
-	/*
-	 * Compute covariances by dividing the sum differences of outer products 
-	   by the cardinality of each group.
-	 */
 	cec_matrix_mul(covariance_matrices[i], 1.0 / card[i]);
-
-	/*
-	 * Compute energy of each group.
-	 */
+	
 	double hx = energy_functions[i](h_contexts[i], covariance_matrices[i]);
 	if (isnan(hx))
 	    return *(h_contexts[i]->last_error);
 
 	clusters_energy[i] = compute_energy(m, hx, card[i]);
-
-	/*
-	 * The sum of energy of all groups.
-	 */
+	
 	energy_sum += clusters_energy[i];
     }
 
     /* 
      * Change cluster mapping for removed clusters.
-     */
+     */    
     for (int i = k; i > 0; i--)
     {
 	if (removed[i - 1])
@@ -190,60 +154,42 @@ int cec(struct cec_context * context)
 	return ALL_CLUSTERS_REMOVED_ERROR;
     }
 
-    /* Set number of clusters at "iteration zero".      */
     clusters_number[0] = _k;
 
     energy[0] = energy_sum;
 
     /*
-     * Special case when cluster was removed before first iteration.
+     * Special case when a cluster was removed before the first iteration.
      */
     int handle_removed_flag = (k == _k) ? 0 : 1;
 
     /*
      * Main loop.
      */
-
     for (int iter = (handle_removed_flag ? -1 : 0); iter < max; iter++)
-    {
-	/*
-	 *  Flag that indicates transfer of point.
-	 */
+    {	
 	int transfer_flag = 0;
 	int removed_last_iteration_flag = 0;
 
-	/* 
-	 * Iterate over data points.
-	 */
 	for (int i = 0; i < m; i++)
 	{
 
-	    /*
-	     * Group which the point is assigned to.
-	     */
 	    int l = cluster[i];
 
 	    if (handle_removed_flag && !removed[l])
 		continue;
 
 	    /*
-	     * Energy of group l after removing point i.
+	     * Energy and mean vector of cluster 'l' after removing point 'i'.
+	     * Initializing to NAN to get rid of compiler warning.
 	     */
 	    double n_l_energy = NAN;
 
-	    /*
-	     * Energy gain.
-	     */
 	    double energy_gain;
 
-	    /*
-	     * New mean of group l after removing point i.
-	     */
 	    double n_mean[n];
-
 	    if (!removed[l])
 	    {
-
 		/*
 		 * Compute mean of group 'l' after removing data point 'i' and store
 		 * its value in the n_mean.
@@ -275,49 +221,25 @@ int cec(struct cec_context * context)
 		energy_gain = INFINITY;
 	    }
 
-	    /*
-	     * Index of the best group (energy gain) for point 'i' to transfer.
-	     */
 	    int idx = -1;
 
-	    /*
-	     * Energy of the best group after adding point 'i'.
-	     */
 	    double n_energy;
 
-	    /*
-	     * Iterate over clusters that are not removed.
-	     */
 	    for (int _j = 0; _j < _k; _j++)
 	    {
-
-		/*
-		 * Get a cluster number from mapping array.
-		 */
 		int j = cluster_map[_j];
 
 		if ((j == l) || (removed[j] == 1))
 		    continue;
 
-		/*
-		 * Compute mean of group 'j' after adding data point 'i' and store
-		 * its value in the matrix of temporary means t_mean_matrix at 'j'-th row.
-		 */
 		mean_add_point(cec_matrix_row(C, j),
 			cec_matrix_row(t_mean_matrix, j), cec_matrix_row(X, i),
 			card[j], n);
 
-		/*
-		 * Compute covariance of group 'j' after adding data point 'i' and store
-		 * its value in the array of temporary covariance matrices at index 'j'.
-		 */
 		cec_cov_add_point(covariance_matrices[j],
 			t_covariance_matrices[j], cec_matrix_row(C, j),
 			cec_matrix_row(X, i), card[j], t_matrix_nn);
 
-		/*
-		 * Compute energy of group 'j' after adding data point 'i'.
-		 */
 		double t_hx = energy_functions[j](h_contexts[j], t_covariance_matrices[j]);
 		if (isnan(t_hx))
 		    return *(h_contexts[j]->last_error);
@@ -371,14 +293,12 @@ int cec(struct cec_context * context)
 		    card[l]--;
 		    array_copy(n_mean, cec_matrix_row(C, l), n);
 
-		    /*
-		     * Check if cluster 'l' needs to be removed.
-		     */
 		    if (card[l] < min_card)
 		    {
 			removed_last_iteration_flag = 1;
+			
 			/*
-			 * If cluster is being removed, subtract its energy from energy sum.
+			 * If the cluster is being removed, subtract its energy from the energy sum.
 			 */
 			energy_sum -= clusters_energy[l];
 			array_fill(cec_matrix_row(C, l), NAN, n);
@@ -386,13 +306,12 @@ int cec(struct cec_context * context)
 			removed[l] = 1;
 		    }
 		}
-
 		energy_sum += energy_gain;
 		transfer_flag = 1;
 	    }
 
 	    /*
-	     *  Change mapping and k for removed clusters.
+	     *  Change the mapping and _k for removed clusters.
 	     */
 	    for (int _j = _k; _j > 0; _j--)
 	    {
@@ -405,19 +324,15 @@ int cec(struct cec_context * context)
 	    }
 	}
 
-
 	energy[iter + 1] = energy_sum;
 	clusters_number[iter + 1] = _k;
 	context->iterations = iter + 1;
 
-	/*
-	 * If there was no transfer, finish execution.
-	 */
 	if (!transfer_flag)
 	    return NO_ERROR;
 
 	/*
-	 * If any cluster is removed in this iteration, we need to perform another iteration
+	 * If cluster was removed in this iteration, we need to perform another iteration
 	 * considering points that are not assigned. It will prevent energy dips.
 	 */
 
@@ -427,9 +342,7 @@ int cec(struct cec_context * context)
 	    iter--;
 	} else
 	    handle_removed_flag = 0;
-
     }
-
     return NO_ERROR;
 }
 

@@ -13,11 +13,18 @@
 #define M_E 2.7182818284590452354
 #endif
 
+/*
+ * Cluster internal energy function (cross-entropy).
+ */
 typedef double (*energy_function) (const struct energy_function_context *,
 	const struct cec_matrix *);
 
 energy_function energy_function_for(enum density_family family);
 
+/*
+ * Implementations of cross-entropy function with respect to 
+ * the Gaussian density family.
+ */
 double h_given_covariance
 (const struct energy_function_context * context, const struct cec_matrix * cov);
 

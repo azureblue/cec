@@ -6,6 +6,9 @@ enum density_family
     GIVEN_COVARIANCE = 0, FIXED_R = 1, SPHERICAL = 2, DIAGONAL = 3, FIXEDEIGENVALUES = 4, ALL = 5
 };
 
+/*
+ * Static context of all internal energy functions.
+ */
 struct energy_function_context
 {
     int n;
@@ -14,6 +17,10 @@ struct energy_function_context
     void * custom_context;
     enum density_family family;
 };
+
+/*
+ * Custom contexts for specific energy function implementations.
+ */
 
 struct context_gc
 {

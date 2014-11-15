@@ -26,9 +26,6 @@ double cec_cov_diagonal_product(const struct cec_matrix * m)
 void cec_cov_multiply(const struct cec_matrix * m1,
 	const struct cec_matrix * m2, struct cec_matrix * dest)
 {
-    /*
-     Simple matrix multiplication.
-     */
     int n = m1->n;
     cec_matrix_set(dest, 0.0);
     for (int i = 0; i < n; i++)
@@ -118,7 +115,6 @@ double cec_cov_cholesky_det(const struct cec_matrix * m,
     /*
      * Special case for 2x2 matrix.
      */
-
     if (m->n == 2)
     {
 	double det = m->data[0] * m->data[3] - m->data[1] * m->data[2];

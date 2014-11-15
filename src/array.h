@@ -1,6 +1,10 @@
 #ifndef VECTOR_H
 #define	VECTOR_H
 
+/*
+ * Simple operations on C arrays.
+ */
+
 void array_fill(double * x, const double val, const int n);
 
 void array_copy(const double * from, double * to, const int n);

@@ -60,12 +60,19 @@ SEXP cec_r(SEXP x, SEXP centers, SEXP iter_max, SEXP type, SEXP card_min,
 	error(MALLOC_ERROR_MSG);
     }
 
+    /*
+     * Perform the CEC algorithm.
+     */
     int res = cec(cec_c);
 
     destroy_energy_function_contexts(energy_contexts, k);
     destroy_energy_functions(energy_functions);
 
     SEXP result = NULL;
+    
+    /*
+     * Prepare the results for R.
+     */
     if (res == NO_ERROR)
 	PROTECT(result = create_R_result(cec_c, C, m, k, n));
 
@@ -248,7 +255,6 @@ static struct energy_function_context ** create_energy_function_contexts(
 		break;
 	}
     }
-
     return energy_contexts;
 }
 

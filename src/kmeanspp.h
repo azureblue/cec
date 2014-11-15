@@ -3,6 +3,9 @@
 
 #include "matrix.h"
 
-int kmeanspp(struct cec_matrix *, struct cec_matrix *);
+/*
+ * K-means++ algorithm.
+ */
+int kmeanspp(struct cec_matrix * X, struct cec_matrix * C);
 
 #endif	/* KMEANSPP_H */

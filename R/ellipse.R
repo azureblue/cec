@@ -1,3 +1,4 @@
+# draws ellipse for the given mean vector and covariance matrix
 ellipse <- function (mean, cov, npoints = 250) 
 {
   E <- eigen((cov))    

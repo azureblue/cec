@@ -12,6 +12,9 @@ static inline double compute_energy(const int m, const double hx,
     return p * (-log(p) + hx);
 }
 
+/*
+ * Performs the CEC algorithm on the cec_context structure.
+ */
 int cec(struct cec_context * cec_context);
 
 #endif	/* CEC_H */

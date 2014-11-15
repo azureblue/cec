@@ -17,7 +17,6 @@ struct cec_context
     /*
      * Input parameters.
      */
-
     struct cec_matrix * points;
     struct cec_matrix * centers;
     struct energy_function_context ** energy_function_contexts;
@@ -29,7 +28,6 @@ struct cec_context
      * CEC result (output parameters).
      * Memory must be allocated before performing the algorithm.
      */
-
     int * clustering_vector;
     int * clusters_number;
     int iterations;
@@ -41,7 +39,6 @@ struct cec_context
      * Temporary data. 
      * Memory must be allocated before performing the algorithm.
      */
-
     struct cec_temp_data * temp_data;
 };
 

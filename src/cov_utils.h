@@ -4,6 +4,10 @@
 
 #include "matrix.h"
 
+/*
+ * Set of functions operating on covariance matrix.
+ */
+
 double cec_cov_trace(const struct cec_matrix * m);
 
 double cec_cov_diagonal_product(const struct cec_matrix * m);

@@ -13,17 +13,14 @@ cec <- function(
   readline      = T
 )
 { 
-  ## checking arguments
-  
+  # check arguments  
   if (!hasArg(x)) stop("Missing requierd argument: 'x'.")
   if (!hasArg(centers)) stop("Missing requierd argument: 'centers'.")
   
   if (!is.matrix(x)) stop("Illegal argument: 'x' is not a matrix.")
   if (ncol(x) < 1) stop("Illegal argument: ncol(x) < 1.")
   if (nrow(x) < 1) stop("Illegal argument: nrow(x) < 1.")
-  
-  ## check for NAs
-  
+
   if (!all(complete.cases(x))) stop("Illegal argument: 'x' contains NA values.")
   if (!all(complete.cases(centers))) stop("Illegal argument: 'centers' contains NA values.")
   
@@ -59,14 +56,9 @@ cec <- function(
   if (var.centers && length(type) > 1)
     stop("Illegal argument: 'type' with length > 1 is not supported for variable number of centers ('centers' as a vector).")
   
-  ####################################################
-  
-  # run interactive mode if requested
-  
+  # run interactive mode if requested  
   if (interactive)
     return(cec_interactive(x, centers, type, iter.max, 1, param, centers.init, card.min, keep.removed, readline))
-  
-  ####################################################
   
   n = ncol(x)
   m = nrow(x)
@@ -81,12 +73,14 @@ cec <- function(
   else
     card.min = as.integer(card.min)
   
-  # card.min must be greater than the dimension of data
+  # card.min must be greater than the dimension of the data
   card.min = max(card.min, n + 1)
   
   tenergy = .Machine$integer.max
   Z <- NULL
   ok.flag <- F    
+  
+  # prepare input for C function cec_r
   if (!var.centers)
   {
     params <- create.cec.params(k, n, type, param)
@@ -97,16 +91,19 @@ cec <- function(
   
   startTime <- proc.time()     
   
+  # main loop
   for (start in 1:nstart) 
   {      
     if (var.centers)
     {
+      # prepare input for C function cec_r with regards to the variable number of centers
       k <- centers[start]        
       params <- create.cec.params(k, n, type, param)
       types <- as.integer(vapply(type, resolve.type, 0))
       if (length(types) == 1) 
         types <- rep(types, k)
     }
+    # generate initial centers or use provided centers matrix
     if (!centers.initilized) 
       centers.matrix <- initcenters(x, k, centers.init)     
     else
@@ -114,10 +111,12 @@ cec <- function(
     
     tryCatch(
       {
+        # perform the clustering by calling C function cec_r
         X <- .Call(cec_r, x, centers.matrix, iter.max, types, card.min, params)  
         ok.flag <- T
         if (X$iterations < 0 || X$energy[X$iterations + 1] < tenergy)
         {
+          # keep the clustering results with the lowest energy (cost function)
           tenergy = X$energy[X$iterations+1]
           Z <- X
           k.final <- k
@@ -133,6 +132,9 @@ cec <- function(
   {
     stop("All starts faild with error.")
   }    
+   
+  # prepare the results  
+  
   execution.time = as.vector((proc.time() - startTime))[1]
   
   Z$centers[is.nan(Z$centers)] <- NA
@@ -140,9 +142,9 @@ cec <- function(
   tab <- tabulate(Z$cluster)
   probability <- vapply(tab, function(c.card){c.card / m}, 0)
   
+  # change cluster assignment if keep.removed == F
   if (!keep.removed)
   {
-    #change cluster assignment
     cluster.map = 1:k.final
     na.rows = which(is.na(Z$centers[, 1]))
     if (length(na.rows) > 0)
@@ -153,7 +155,7 @@ cec <- function(
       
       Z$cluster  <- as.integer(vapply(Z$cluster,function(asgn) {as.integer(cluster.map[asgn])}, 0))
       
-      #in case of having single row - convert it to a matrix
+      # in case of having single row - convert it to a matrix
       Z$centers <- matrix(Z$centers[-na.rows,],,n)        
       Z$covariances <- Z$covariances[-na.rows]
       probability <- probability[-na.rows]
@@ -163,9 +165,11 @@ cec <- function(
   }
   covs = length(types.final)
   covariances.model = rep(list(NA), covs)
+  
+  # obtain the covariances of the model
   for(i in 1:covs)
     covariances.model[[i]] = model.covariance(types.final[[i]], Z$covariances[[i]], params.final[[i]])
-  
+
   structure(list(
     data                = x,
     cluster             = Z$cluster,
@@ -275,7 +279,6 @@ cec.plot.cost.function <- function(C, xlab="Iteration", ylab="Cost function", lw
   points(x = 1:(length(C$cost) - 1), y = C$cost[2:(length(C$cost))], lwd=lwd.points, pch=pch.points, col=col.points)
   title("Cost function at each iteraion")
 }
-
 
 cec_interactive <- function(
   x, 

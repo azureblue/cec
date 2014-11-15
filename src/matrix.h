@@ -8,6 +8,10 @@
 #include "errors.h"
 #include "array.h"
 
+/*
+ * Simple matrix structure used in CEC and basic set of matrix functions.
+ */
+
 struct cec_matrix
 {
     int m;
