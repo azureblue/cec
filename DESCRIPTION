@@ -1,6 +1,6 @@
 Package: CEC
 Title: Cross-Entropy Clustering
-Version: 0.9.2
+Version: 0.9.3
 Date: 2014-11-15
 Author: Konrad Kamieniecki [aut, cre], Przemyslaw Spurek [ctb]
 Maintainer: Konrad Kamieniecki <konrad.kamieniecki@uj.edu.pl>
