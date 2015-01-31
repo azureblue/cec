@@ -26,14 +26,13 @@ cec <- function(
   if (!all(complete.cases(centers))) stop("Illegal argument: 'centers' contains NA values.")
   
   var.centers <- F
+  var.starts  <- 1
   if (!is.matrix(centers))
   {
     if (length(centers) > 1)
-    {
+    {      
       var.centers <- T
-      if (hasArg(nstart) && nstart != length(centers))
-        stop("Illegal argument: 'nstart' != length(centers)")
-      nstart <- length(centers)
+      var.starts <- length(centers)
     }
     for (i in centers) 
       if (i < 1) stop("Illegal argument: 'centers' < 1")    
@@ -93,12 +92,13 @@ cec <- function(
   startTime <- proc.time()     
   
   # main loop
-  for (start in 1:nstart) 
+  for (var.start in 1:var.starts)
+  for (start     in 1:nstart) 
   {      
     if (var.centers)
     {
       # prepare input for C function cec_r with regards to the variable number of centers
-      k <- centers[start]        
+      k <- centers[var.start]        
       params <- create.cec.params(k, n, type, param)
       types <- as.integer(vapply(type, resolve.type, 0))
       if (length(types) == 1) 
@@ -115,7 +115,7 @@ cec <- function(
         # perform the clustering by calling C function cec_r
         X <- .Call(cec_r, x, centers.matrix, iter.max, types, card.min, params)  
         ok.flag <- T
-        if (start == 1 || X$energy[X$iterations + 1] < tenergy)
+        if ((var.start == 1 && start == 1) || X$energy[X$iterations + 1] < tenergy)
         {
           # keep the clustering results with the lowest energy (cost function)
           tenergy = X$energy[X$iterations+1]

@@ -24,25 +24,36 @@ Numeric matrix of data.
 
 \item{centers}{
 Either a matrix of initial centers or the number of initial centers (\code{k}, single 
-number or a vector of numbers for variable number of initial centers at each start). 
-In the latter case, initial centers will be generated using a method depending on
-the \code{centers.init} argument.
+number \code{cec(data, 4, ...)} or a vector of numbers for variable number of initial 
+centers \code{cec(data, 3:10, ...)}). 
+
+If \code{centers} is a vector, \code{length(centers)} clusterings will be performed for each
+start (\code{nstart} argument) and the total number of clusterings will be 
+\code{length(centers) * nstart}.
+
+If \code{centers} is a number or a vector, initial centers will be generated using a method
+depending on the \code{centers.init} argument.
 }
 
 \item{type}{
 Type (or types) of clustering (density family). This can be either a single value 
 or a vector of length equal to the number of centers. Possible values are: "covariance",
 "fixedr", "spherical", "diagonal", "eigenvalues", "all" (default).
+
+Currently, if the \code{centers} argument is a vector, only signle type can be used.
 }
 
 \item{iter.max}{
-Maximum number of iterations at each start.
+Maximum number of iterations at each clustering.
 }
 
 \item{nstart}{
-Number of clusterings to perform (with different initial centers). Only the best 
+The number of clusterings to perform (with different initial centers). Only the best 
 clustering (with the lowest cost) will be returned. Value grater then one is valid 
-only if the \code{centers} argument is a number.
+only if the \code{centers} argument is a number or a vector.
+
+If the \code{centers} argument is a vector, \code{length(centers)} clusterings will be performed
+for each start and the total number of clusterings will be \code{length(centers) * nstart}.
 }
 
 \item{centers.init}{
