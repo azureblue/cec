@@ -73,26 +73,6 @@ test.type.diagonal.spherical.mixture <- function()
   
   cls = CE$nclusters[CE$iterations + 1]  
   CEC:::checkNumericVectorEquals(3, cls, "Number of clusters")  
-  Hs <- list(CEC:::H.diagonal, CEC:::H.diagonal, CEC:::H.spherical)    
-  expected.energy <- 0
-  
-  for(i in 1:cls)
-  {
-    cdata = CE$data[which(CE$cluster == i),] 
-    cov <- cov.mle(cdata)
-    Hx <- Hs[[i]](cov)
-    p <- nrow(cdata) / nrow(B)    
-    expected.energy <- expected.energy + p * (-log(p) + Hx)
-  }  
-  CEC:::checkNumericVectorEquals(expected.energy, CE$cost[CE$iterations + 1], msg="Energy")
-}
-
-test.type.diagonal.spherical.mixture <- function()
-{  
-  CE <- cec(B, C, type=c("diag", "diag", "sp"))  
-  
-  cls = CE$nclusters[CE$iterations + 1]  
-  CEC:::checkNumericVectorEquals(3, cls, "Number of clusters")  
   Hs <- list(CEC:::H.diagonal, CEC:::H.diagonal, CEC:::H.spherical) 
   
   expected.energy <- 0
@@ -118,7 +98,7 @@ test.type.eigenvalues.all.fixedr.mixture <- function()
   
   CE <- cec(B, C4, type=c("all", "eigen", "fixedr", "eigen"), param=list(evals1, r, evals2))
   
-  cls = CE$nclusters[CE$iterations + 1]
+  cls = CE$final.nclusters
   CEC:::checkNumericVectorEquals(3, cls, "Number of clusters")
   Hs <- list(CEC:::H.all, CEC:::H.eigenvalues, CEC:::H.eigenvalues)  
   expected.energy <- 0
