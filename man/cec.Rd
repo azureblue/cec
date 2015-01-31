@@ -140,9 +140,6 @@ m = rbind(m1, m2, m3)
 centers = initcenters(m, 10)
 par(ask = TRUE)
 plot(m, cex = 0.5, pch = 16)
-## Initial centers:
-Z = cec(m, centers, type="sp", iter.max = -1, card.min="7\%")
-plot(Z)
 ## Clustering result:
 Z = cec(m, centers, type="sp", iter.max = 100, card.min="7\%")
 plot(Z)
@@ -155,9 +152,6 @@ m = mouseset(n=7000, r.head=2, r.left.ear=1.1, r.right.ear=1.1, left.ear.dist=2.
 right.ear.dist=2.5, dim=2)
 plot(m, cex = 0.5, pch = 16)
 centers = initcenters(m, 3)
-## Initial centers:
-Z = cec(m, centers, type="sp", iter.max = -1, card.min="5\%")
-plot(Z)
 ## Clustering result:
 Z = cec(m, centers, type="sp", iter.max = 100, nstart=4, card.min="5\%")
 plot(Z)
@@ -169,9 +163,6 @@ cec.plot.cost.function(Z)
 data(Tset)
 plot(Tset, cex = 0.5, pch = 16)
 centers = initcenters(Tset, 2)
-## Initial centers:
-Z <- cec(Tset, 5, type="eigenvalues", param=c(0.02,0.002), iter.max= -1)
-plot(Z)
 ## Clustering result:
 Z <- cec(Tset, 5, "eigenvalues", param=c(0.02,0.002), nstart=4)
 plot(Z)

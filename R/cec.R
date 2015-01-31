@@ -17,6 +17,7 @@ cec <- function(
   if (!hasArg(x)) stop("Missing requierd argument: 'x'.")
   if (!hasArg(centers)) stop("Missing requierd argument: 'centers'.")
   
+  if (iter.max < 0) stop("Illegal argument: iter.max < 0.")
   if (!is.matrix(x)) stop("Illegal argument: 'x' is not a matrix.")
   if (ncol(x) < 1) stop("Illegal argument: ncol(x) < 1.")
   if (nrow(x) < 1) stop("Illegal argument: nrow(x) < 1.")
@@ -114,7 +115,7 @@ cec <- function(
         # perform the clustering by calling C function cec_r
         X <- .Call(cec_r, x, centers.matrix, iter.max, types, card.min, params)  
         ok.flag <- T
-        if (X$iterations < 0 || X$energy[X$iterations + 1] < tenergy)
+        if (start == 1 || X$energy[X$iterations + 1] < tenergy)
         {
           # keep the clustering results with the lowest energy (cost function)
           tenergy = X$energy[X$iterations+1]
@@ -214,8 +215,7 @@ plot.cec <- function(x, col, cex = 0.5, pch = 16, cex.centers = 1, pch.centers =
   
   if(!hasArg(col)) col = x$cluster;
   plot(x$data, col=col, cex = cex, pch = pch,  xlab = xlab, ylab = ylab, ...)    
-  points(x$centers, cex = cex.centers, pch = pch.centers) 
-  if (x$iterations > -1)
+  points(x$centers, cex = cex.centers, pch = pch.centers)   
     if (ellipses)
     {    
       for (i in 1:nrow(x$centers))     
@@ -258,7 +258,7 @@ cec_interactive <- function(
   n = ncol(x)
   if (n != 2) 
     stop("interactive mode available only for 2-dimensional data")    
-  i <- -1    
+  i <- 0    
   if (!is.matrix(centers)) centers <- initcenters(x, centers, centers.init)
   if (readline)
   {
@@ -277,17 +277,12 @@ cec_interactive <- function(
       break
     
     desc = ""
-    if (i == -1)
-      desc = "(initial cluster centers and first assignment to groups)"
-    else if (i == 0)
+    if (i == 0)
       desc = "(position of center means before first iteration)"      
     
     cat("Iterations:", Z$iterations, desc, "cost function:", Z$cost[(Z$iterations + 1)]," \n ")
     
-    if (i == -1)
-      plot(Z, ellipses = FALSE)
-    else
-      plot(Z, ellipses = TRUE)
+    plot(Z, ellipses = TRUE)
     
     if (readline) 
     {
@@ -297,8 +292,8 @@ cec_interactive <- function(
       if (!is.na(lineint)) 
       {
         i = i + lineint - 1
-        if (i < -1) 
-          i = -2        
+        if (i < 0) 
+          i = -1        
       } 
       else if (line == "q" | line == "quit") {
         break

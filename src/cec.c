@@ -40,6 +40,8 @@ int cec(struct cec_context * context)
 	    context->temp_data->n_covariance_matrix;
     struct cec_matrix ** t_covariance_matrices =
 	    context->temp_data->t_covariance_matrices;
+    
+    context->iterations = 0;
 
     /*
      * Assign points to its closest clusters and calculate clusters means.
@@ -60,16 +62,6 @@ int cec(struct cec_context * context)
 	}
     }
 
-    if (max == -1)
-    {
-	/*
-	 * Just return the initial cluster assignment.
-	 */
-	context->iterations = -1;
-	return NO_ERROR;
-    }
-
-    context->iterations = 0;
 
     for (int i = 0; i < k; i++)
     {
@@ -86,6 +78,7 @@ int cec(struct cec_context * context)
 	card[l]++;	
 	array_add(cec_matrix_row(C, l), cec_matrix_row(X, i), n);
     }
+    
     for (int i = 0; i < k; i++)
     {	
 	if (card[i] < min_card)
