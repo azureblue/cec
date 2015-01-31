@@ -1,5 +1,5 @@
-\name{initcenters}
-\alias{initcenters}
+\name{init.centers}
+\alias{init.centers}
 \title{
 Center initialization
 }
@@ -8,7 +8,7 @@ Creates a matrix of \code{k} points (centers) based on a given matrix of points.
 One of two method can be used: Kmeans++ centers initialization method or a random choice of data points.
 }
 \usage{
-initcenters(x, k, method = c("kmeans++", "random"))
+init.centers(x, k, method = c("kmeans++", "random"))
 }
 \arguments{
 
@@ -32,7 +32,7 @@ Matrix points (centers) with \code{k} rows.
 
 \examples{
 m = matrix(runif(3000), 1000, 3)
-initcenters(m, 3, method = "km")
+init.centers(m, 3, method = "km")
 }
 
 \keyword{ ~centers }

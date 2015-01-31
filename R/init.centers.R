@@ -1,9 +1,9 @@
-initcenters <- function(x, k, method = c("kmeans++", "random"))
+init.centers <- function(x, k, method = c("kmeans++", "random"))
 {
   method.int <- switch ( match.arg(method), "kmeans++" = 0, "random" = 1)
   
-  if (! is.matrix(x)) stop("initcenters: x is not a matrix")
-  if (k < 0) stop("initcenters: k < 0")
+  if (! is.matrix(x)) stop("init.centers: x is not a matrix")
+  if (k < 0) stop("init.centers: k < 0")
   
   n <- ncol(x)
   m <- nrow(x)

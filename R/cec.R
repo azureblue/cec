@@ -106,7 +106,7 @@ cec <- function(
     }
     # generate initial centers or use provided centers matrix
     if (!centers.initilized) 
-      centers.matrix <- initcenters(x, k, centers.init)     
+      centers.matrix <- init.centers(x, k, centers.init)     
     else
       centers.matrix <- centers      
     
@@ -259,7 +259,7 @@ cec.interactive <- function(
   if (n != 2) 
     stop("interactive mode available only for 2-dimensional data")    
   i <- 0    
-  if (!is.matrix(centers)) centers <- initcenters(x, centers, centers.init)
+  if (!is.matrix(centers)) centers <- init.centers(x, centers, centers.init)
   if (readline)
   {
     ignore = readline(prompt="After each iteration you may:\n - press <Enter> for next iteration \n - write number <n> (may be negative one) and press <Enter> for next <n> iterations \n - write 'q' and abort execution.\n Press <Return>.\n")        

@@ -1,5 +1,5 @@
 export(cec)
-export(initcenters)
+export(init.centers)
 export(mouseset)
 export(ball)
 export(cec.plot.cost.function)
