@@ -59,7 +59,7 @@ cec <- function(
   
   # run interactive mode if requested  
   if (interactive)
-    return(cec_interactive(x, centers, type, iter.max, 1, param, centers.init, card.min, keep.removed, readline))
+    return(cec.interactive(x, centers, type, iter.max, 1, param, centers.init, card.min, keep.removed, readline))
   
   n = ncol(x)
   m = nrow(x)
@@ -239,7 +239,7 @@ plot.cec <- function(x, col, cex = 0.5, pch = 16, cex.centers = 1, pch.centers =
     }  
 }
 
-cec_interactive <- function(
+cec.interactive <- function(
   x, 
   centers,   
   type          = c("covariance", "fixedr", "spherical", "diagonal", "eigenvalues", "all"),  
