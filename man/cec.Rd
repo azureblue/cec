@@ -24,7 +24,7 @@ Numeric matrix of data.
 
 \item{centers}{
 Either a matrix of initial centers or the number of initial centers (\code{k}, single 
-number \code{cec(data, 4, ...)} or a vector of numbers for variable number of initial 
+number \code{cec(data, 4, ...)} or a vector for variable number of 
 centers \code{cec(data, 3:10, ...)}). 
 
 If \code{centers} is a vector, \code{length(centers)} clusterings will be performed for each
