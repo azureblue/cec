@@ -1,3 +1,7 @@
+importFrom("graphics", "lines", "par", "plot", "points", "title")
+importFrom("methods", "hasArg")
+importFrom("stats", "complete.cases", "runif")
+importFrom("utils", "lsf.str")
 export(cec)
 export(init.centers)
 export(mouseset)
