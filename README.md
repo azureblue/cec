@@ -46,3 +46,65 @@ The initial cluster membership function can be chosen by the use of <tt>centers.
 Two more parameters are important in the initialization. The first <tt>iter.max = 100</tt> equals the maximum number of iterations in one CEC start and the second  <tt>card.min = "5\%"</tt> is the percentage of the minimal size of each cluster. The second parameter specifies the minimal possible number points in each cluster (clusters which contains less points are removed). Since each cluster is described by a covariance matrix, the number of elements in the cluster must be larger than the dimension of the data.
 
 One of the most important properties of the CEC algorithm is that it can be applied for various Gaussian models. Therefore, the <b>CEC</b> package includes the implementation of six Gaussian models, which can be specified by the parameter <tt>type</tt>.
+
+General Gaussian distributions
+===
+
+The family containing all Gaussian distributions is considered first. 
+The results of the general Gaussian CEC algorithm give similar results to those obtained  by the Gaussian Mixture Models. 
+However, the authors' method does not use the EM (Expectation Maximization) approach for minimization but a simple iteration process (Hartigan method). Consequently,  larger datasets can be processed in shorter time.
+
+The clustering will have the tendency to divide
+the data into clusters in the shape of ellipses
+(ellipsoids in higher dimensions). 
+ 
+```R
+library("CEC")
+data("fourGaussians")
+cec <- cec(fourGaussians, centers = 10, type = "all", nstart = 20)
+plot(cec, xlim = c(0, 1), ylim = c(0, 1), asp = 1)
+cec.plot.cost.function(cec)
+```
+
+General Gaussian distributions
+===
+
+```R
+cec <- cec(x = Tset, centers = 10, type = "spherical")
+plot(cec, xlim = c(0, 1), ylim = c(0, 1), asp = 1)
+```
+
+Spherical CEC with fixed radius
+===
+
+```R
+cec <- cec(x = Tset, centers = 10, type = "fixedr", param = 0.01)
+plot(cec, xlim = c(0, 1), ylim = c(0, 1), asp = 1)
+```
+
+Diagonal CEC
+===
+
+```R
+cec <- cec(x = Tset, centers = 10, type = "diagonal")
+plot(cec, xlim = c(0, 1), ylim = c(0, 1), asp = 1)
+```
+ 
+Fixed covariance CEC
+===
+
+```R
+cec <- cec(x = Tset, centers = 10, type = "covariance",  param = matrix(c(0.04, 0, 0, 0.01), 2))
+plot(cec, xlim = c(0, 1), ylim = c(0, 1), asp = 1)
+```
+
+Fixed eigenvalue CEC
+===
+
+```R
+cec <- cec(x = Tset, centers = 10, type = "eigenvalues", param=c(0.01, 0.001))
+plot(cec, xlim = c(0, 1), ylim = c(0, 1), asp = 1)
+```
+
+
+
