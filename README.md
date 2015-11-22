@@ -118,10 +118,10 @@ The next model contains Gaussians with an arbitrary fixed covariance matrix  e.g
 cec(x = ..., centers = ..., type = "covariances", param = ...)
 ```
 In this example <br />
-<prev>
-0.04  0
-0     0.01
-</prev>
+<tt>
+0.04  0 <br />
+0     0.01 <br />
+</tt>
 is used, which means that the data is covered by fixed ellipses.
 
 ```R
@@ -143,5 +143,21 @@ cec <- cec(x = Tset, centers = 10, type = "eigenvalues", param=c(0.01, 0.001))
 plot(cec, xlim = c(0, 1), ylim = c(0, 1), asp = 1)
 ```
 
+A mix of the Gaussian models
+===
+
+One of the most powerful properties of the CEC algorithm is the possibility of mixing models. More precisely, the mixed models can be specified by giving a list of cluster types 
+
+```R
+R> cec(x = ..., centers = ..., type = c("all", ...), param = ...).
+```
+
+```R
+library("CEC")
+data("mixShapes")
+cec <- cec(mixShapes, 7, type = c("fixedr", "fixedr", "eigen", "eigen",  "eigen", "eigen", "eigen"), 
+  param = list(350, 350, c(9000, 8), c(9000, 8), c(9000, 8), c(9000, 8), c(9000, 8)), nstart = 100)
+plot(cec, asp = 1)
+```
 
 
