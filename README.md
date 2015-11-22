@@ -118,8 +118,10 @@ The next model contains Gaussians with an arbitrary fixed covariance matrix  e.g
 cec(x = ..., centers = ..., type = "covariances", param = ...)
 ```
 In this example <br />
-0.04  0 <br />
-0  0.01 <br />
+<prev>
+0.04  0
+0     0.01
+</prev>
 is used, which means that the data is covered by fixed ellipses.
 
 ```R
@@ -129,6 +131,12 @@ plot(cec, xlim = c(0, 1), ylim = c(0, 1), asp = 1)
 
 Fixed eigenvalue CEC
 ===
+
+The last model is based on Gaussians with arbitrary fixed eigenvalues  
+```R
+cec(x = ..., centers = ..., type = "eigenvalues", param = ...) 
+```
+In this example <tt>lambda_1=0.01</tt>, <tt>lambda_2=0.001</tt> are used, which means that the set is covered by ellipses with fixed semi axes (which correspond to the eigenvalues). 
 
 ```R
 cec <- cec(x = Tset, centers = 10, type = "eigenvalues", param=c(0.01, 0.001))
