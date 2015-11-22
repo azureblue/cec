@@ -66,8 +66,15 @@ plot(cec, xlim = c(0, 1), ylim = c(0, 1), asp = 1)
 cec.plot.cost.function(cec)
 ```
 
-General Gaussian distributions
+Spherical CEC
 ===
+
+The second family discussed contains spherical Gaussian distributions $\G_{(\cdot I)}$ which 
+can be accessed by
+```R
+\code{cec(x = ..., centers = ..., type = "spherical")}
+```
+The original distribution will be estimated by spherical (radial) densities, which will result with splitting the data into circle-like clusters of arbitrary sizes (balls in higher dimensions). 
 
 ```R
 cec <- cec(x = Tset, centers = 10, type = "spherical")
@@ -77,6 +84,12 @@ plot(cec, xlim = c(0, 1), ylim = c(0, 1), asp = 1)
 Spherical CEC with fixed radius
 ===
 
+The next model implemented in the <b>CEC</b> package is a spherical model with a fixed covariance: 
+```R
+cec(x = ..., centers = ..., type = "fixedr", param = ...)
+```
+Similarly to the general spherical model, the dataset will be divided into clusters resembling full circles, but with the radius determined by <tt>param</tt>.
+
 ```R
 cec <- cec(x = Tset, centers = 10, type = "fixedr", param = 0.01)
 plot(cec, xlim = c(0, 1), ylim = c(0, 1), asp = 1)
@@ -85,6 +98,13 @@ plot(cec, xlim = c(0, 1), ylim = c(0, 1), asp = 1)
 Diagonal CEC
 ===
 
+The fourth model is based on diagonal Gaussian densities 
+```R
+cec(x = ..., centers = ..., type = "diagonal") 
+```
+
+In this case, the data will be described by ellipses for which the main semi-major axes are parallel to the axes of the coordinate system. 
+
 ```R
 cec <- cec(x = Tset, centers = 10, type = "diagonal")
 plot(cec, xlim = c(0, 1), ylim = c(0, 1), asp = 1)
@@ -92,6 +112,15 @@ plot(cec, xlim = c(0, 1), ylim = c(0, 1), asp = 1)
  
 Fixed covariance CEC
 ===
+
+The next model contains Gaussians with an arbitrary fixed covariance matrix  e.g \newline
+```R
+cec(x = ..., centers = ..., type = "covariances", param = ...)
+```
+In this example <br />
+0.04  0 <br />
+0  0.01 <br />
+is used, which means that the data is covered by fixed ellipses.
 
 ```R
 cec <- cec(x = Tset, centers = 10, type = "covariance",  param = matrix(c(0.04, 0, 0, 0.01), 2))
