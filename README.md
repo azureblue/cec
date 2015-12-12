@@ -3,13 +3,13 @@ CEC
 
 The R Package CEC performs clustering based on the cross–entropy clustering (CEC) method, which was recently developed with the use of information theory. The main advantage of CEC is that it combines the speed and simplicity of k-means with the ability to use various Gaussian mixture models and reduce unnecessary clusters.
 
-In the basic use of this package the input dataset <tt>data</tt> and the initial number <tt>centers</tt> of clusters: <br />
+The basic usage comes down to the function `cec` with two required arguments: an input data (`x`) and the initial number centers (`centers`):
 
 ```R
 cec(x = ..., centers = ...)
 ```
-have to be specified. Below, a simple session with <b>R</b> is presented, where the component
-(waiting) of the Old Faithful dataset is split into two clusters.
+Below, a simple session with **R** is presented, where the component
+(waiting) of the Old Faithful dataset is split into two clusters:
 
 ```R
 library("CEC")
@@ -18,17 +18,16 @@ cec <- cec(matrix(faithful$waiting), 2)
 print(cec)
 ```
 
-As its main outcome <b>CEC</b> returns data cluster membership <tt>cec\$cluster</tt>. The following parameters of 
-clusters are obtained as well:
-<ul>
-<li> a list of means <tt>cec\$centers</tt>, </li>
-<li> a list of covariances <tt>cec\$covariances.model</tt> </li>
-<li> a list of probabilities <tt>cec\$probability</tt>. </li>
-</ul>
+As the main result, **CEC** returns data cluster membership `cec$cluster`. The following parameters of 
+clusters can be obtained as well:
 
-Some additional information concerning the number of iterations, cost (energy) function and the number of clusters during the following iterations is also obtained.
+- means (`cec$centers`)
+- covariances (`cec$covariances.model`)
+- probabilities (`cec$probability`)
 
-Below, a session of \proglang{R} is presented which shows how to use the above parameters for plotting the data and the Gaussian models corresponding to the clusters.
+Additional information concerning the number of iterations, cost (energy) function and the number of clusters at each iteration are also available.
+
+Below, a session of **R** is presented which shows how to use the above parameters for plotting the data and the Gaussian models corresponding to the clusters.
 
 ```R
 hist(faithful$waiting, prob = TRUE, main = "Histogram of Time between Old Faithful eruptions", xlab = "Minutes", ylim = c(0, 0.05));
@@ -37,126 +36,125 @@ for(i in c(1:2)){
 }
 ```
 
-As it was said, the discussed method, analogously to k-means, depends on the initial clusters memberships. Therefore, the initialization should be started a few times, which can be obtained with the use of parameter <tt>nstart</tt> 
+The CEC method, analogously to k-means, depends on the initial clusters memberships. Therefore, the initialization should be started a few times, which can be achieved using the `nstart` parameter.
 ```R
 cec <- cec(x = ...,  centers = ..., nstart = ...)
 ```
-The initial cluster membership function can be chosen by the use of <tt>centers.init</tt> either randomly, <tt>"random"</tt>, or with the method given by the k-means++ algorithm <tt>"kmeans++"</tt>. 
+The initial locations of the centers can be chosen either **randomly** or using the **k-means++** method and it's driven by the `centers.init` parameter which can take one of the two values: `"random"` or `"kmeans++"`.
 
-Two more parameters are important in the initialization. The first <tt>iter.max = 100</tt> equals the maximum number of iterations in one CEC start and the second  <tt>card.min = "5\%"</tt> is the percentage of the minimal size of each cluster. The second parameter specifies the minimal possible number points in each cluster (clusters which contains less points are removed). Since each cluster is described by a covariance matrix, the number of elements in the cluster must be larger than the dimension of the data.
+In the context multiple starts, it is worth to mention about the parameter `iter.max` which limits the number of iterations in each start.
 
-One of the most important properties of the CEC algorithm is that it can be applied for various Gaussian models. Therefore, the <b>CEC</b> package includes the implementation of six Gaussian models, which can be specified by the parameter <tt>type</tt>.
+An essential parameter, in the context of **CEC** method, is `card.min` which expresses minimal cluster size - the number of points, below which, the cluster is removed. Since each cluster is described by a covariance matrix, the number of elements in the cluster must be larger than the dimension of the data.
 
-General Gaussian distributions
-===
+One of the most important properties of the CEC algorithm is that it can be applied to various Gaussian models. The <b>CEC</b> package includes the implementation of six Gaussian models, which can be specified by the parameter `type`.
 
-The family containing all Gaussian distributions is considered first. 
-The results of the general Gaussian CEC algorithm give similar results to those obtained  by the Gaussian Mixture Models. 
-However, the authors' method does not use the EM (Expectation Maximization) approach for minimization but a simple iteration process (Hartigan method). Consequently,  larger datasets can be processed in shorter time.
+Implemented Gaussian models (families)
+--------------------------------------
 
-The clustering will have the tendency to divide
-the data into clusters in the shape of ellipses
-(ellipsoids in higher dimensions). 
+### General Gaussian distributions
+**`type = "all"`**
+
+The results of the general Gaussian CEC algorithm give similar results to those obtained by the Gaussian Mixture Models. However, the CEC does not use the EM (Expectation Maximization) approach for minimization but a simple iteration process (Hartigan method). Consequently, larger datasets can be processed in shorter time.
+
+The clustering will have a tendency to divide the data into clusters in the shape of ellipses (ellipsoids in higher dimensions). 
  
 ```R
-library("CEC")
 data("fourGaussians")
+
 cec <- cec(fourGaussians, centers = 10, type = "all", nstart = 20)
+
 plot(cec, xlim = c(0, 1), ylim = c(0, 1), asp = 1)
 cec.plot.cost.function(cec)
 ```
 
-Spherical CEC
-===
+### Spherical CEC 
+**`type = "spherical"`**
 
-The second family discussed contains spherical Gaussian distributions $\G_{(\cdot I)}$ which 
-can be accessed by
-```R
-\code{cec(x = ..., centers = ..., type = "spherical")}
-```
 The original distribution will be estimated by spherical (radial) densities, which will result with splitting the data into circle-like clusters of arbitrary sizes (balls in higher dimensions). 
 
 ```R
+data("Tset")
+
 cec <- cec(x = Tset, centers = 10, type = "spherical")
+
 plot(cec, xlim = c(0, 1), ylim = c(0, 1), asp = 1)
 ```
 
-Spherical CEC with fixed radius
-===
+### Spherical CEC with fixed radius
+**`type = "fixedr"`**
 
-The next model implemented in the <b>CEC</b> package is a spherical model with a fixed covariance: 
-```R
-cec(x = ..., centers = ..., type = "fixedr", param = ...)
-```
-Similarly to the general spherical model, the dataset will be divided into clusters resembling full circles, but with the radius determined by <tt>param</tt>.
+Similarly to the general spherical model, the dataset will be divided into clusters resembling full circles, but with the radius determined by the `param` argument.
 
 ```R
+data("Tset")
+
 cec <- cec(x = Tset, centers = 10, type = "fixedr", param = 0.01)
+
 plot(cec, xlim = c(0, 1), ylim = c(0, 1), asp = 1)
 ```
 
-Diagonal CEC
-===
-
-The fourth model is based on diagonal Gaussian densities 
-```R
-cec(x = ..., centers = ..., type = "diagonal") 
-```
+### Diagonal CEC
+**`type = "diagonal"`**
 
 In this case, the data will be described by ellipses for which the main semi-major axes are parallel to the axes of the coordinate system. 
 
 ```R
+data("Tset")
+
 cec <- cec(x = Tset, centers = 10, type = "diagonal")
+
 plot(cec, xlim = c(0, 1), ylim = c(0, 1), asp = 1)
 ```
  
-Fixed covariance CEC
-===
+### Fixed covariance CEC
+**`type = "covariance"`**
 
-The next model contains Gaussians with an arbitrary fixed covariance matrix  e.g \newline
-```R
-cec(x = ..., centers = ..., type = "covariances", param = ...)
-```
-In this example <br />
-<tt>
-0.04  0 <br />
-0     0.01 <br />
-</tt>
-is used, which means that the data is covered by fixed ellipses.
+This model contains Gaussians with an arbitrary fixed covariance matrix.
 
 ```R
+data("Tset")
+
 cec <- cec(x = Tset, centers = 10, type = "covariance",  param = matrix(c(0.04, 0, 0, 0.01), 2))
+
 plot(cec, xlim = c(0, 1), ylim = c(0, 1), asp = 1)
 ```
-
-Fixed eigenvalue CEC
-===
-
-The last model is based on Gaussians with arbitrary fixed eigenvalues  
-```R
-cec(x = ..., centers = ..., type = "eigenvalues", param = ...) 
+In the above example, the following covariance matrix has been used, which results in covering the data by fixed ellipses:
 ```
-In this example <tt>lambda_1=0.01</tt>, <tt>lambda_2=0.001</tt> are used, which means that the set is covered by ellipses with fixed semi axes (which correspond to the eigenvalues). 
+0.04  0.00
+0.00  0.01      
+```
+
+### Fixed eigenvalue CEC
+**`type = "eigenvalues"`**
+
+The last model is based on Gaussians with arbitrary fixed eigenvalues.
 
 ```R
+data("Tset")
+
 cec <- cec(x = Tset, centers = 10, type = "eigenvalues", param=c(0.01, 0.001))
+
 plot(cec, xlim = c(0, 1), ylim = c(0, 1), asp = 1)
 ```
+
+In the above example, two eigenvalues: **λ₁=0.01** and **λ₂=2=0.001** are used, which results in covering the data by ellipses with fixed semi axes (corresponding to the eigenvalues). 
 
 A mix of the Gaussian models
-===
+----------------------------
 
-One of the most powerful properties of the CEC algorithm is the possibility of mixing models. More precisely, the mixed models can be specified by giving a list of cluster types 
+One of the most powerful properties of the CEC algorithm is the possibility of mixing models. More precisely, the mixed models can be specified by giving a list of cluster types (and a list of parameters if needed).
 
 ```R
-R> cec(x = ..., centers = ..., type = c("all", ...), param = ...).
+R> cec(x = ..., centers = ..., type = c("all", "diagonal", '''), param = ...).
 ```
 
 ```R
-library("CEC")
 data("mixShapes")
-cec <- cec(mixShapes, 7, type = c("fixedr", "fixedr", "eigen", "eigen",  "eigen", "eigen", "eigen"), 
+
+cec <- cec(mixShapes, 7, 
+  type = c("fixedr", "fixedr", "eigen", "eigen",  "eigen", "eigen", "eigen"),  
   param = list(350, 350, c(9000, 8), c(9000, 8), c(9000, 8), c(9000, 8), c(9000, 8)), nstart = 100)
+
 plot(cec, asp = 1)
 ```
 
