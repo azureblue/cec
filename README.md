@@ -120,8 +120,8 @@ plot(cec, xlim = c(0, 1), ylim = c(0, 1), asp = 1)
 ```
 In the above example, the following covariance matrix has been used, which results in covering the data by fixed ellipses:
 ```
-|0.04  0   |
-|0     0.01|
+0.04  0.00
+0.00  0.01      
 ```
 
 ### Fixed eigenvalue CEC
@@ -137,7 +137,7 @@ cec <- cec(x = Tset, centers = 10, type = "eigenvalues", param=c(0.01, 0.001))
 plot(cec, xlim = c(0, 1), ylim = c(0, 1), asp = 1)
 ```
 
-In the above example *λ₁=0.01*, *λ₂=2=0.001* are used, which results in covering the data by ellipses with fixed semi axes (corresponding to the eigenvalues). 
+In the above example, two eigenvalues: **λ₁=0.01** and **λ₂=2=0.001** are used, which results in covering the data by ellipses with fixed semi axes (corresponding to the eigenvalues). 
 
 A mix of the Gaussian models
 ----------------------------
