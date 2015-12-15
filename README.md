@@ -30,10 +30,13 @@ Additional information concerning the number of iterations, cost (energy) functi
 Below, a session of **R** is presented which shows how to use the above parameters for plotting the data and the Gaussian models corresponding to the clusters.
 
 ```R
-hist(faithful$waiting, prob = TRUE, main = "Histogram of Time between Old Faithful eruptions", xlab = "Minutes", ylim = c(0, 0.05));
-for(i in c(1:2)){
-  curve(cec$probability[i] * dnorm(x, mean = cec$centers[i], sd = sqrt(cec$covariances[[i]][1])), add = T, col = i + 1)  
-}
+hist(faithful$waiting, prob = T, main = "Time between Old Faithful eruptions", xlab = "Minutes", 
+  col = "lightgray", border = 0, ylim = c(0, 0.05))
+  
+for(i in c(1:2))
+  curve(cec$probability[i] * dnorm(x, mean = cec$centers[i], sd = sqrt(cec$covariances[[i]][1])),
+    add = T, col = i + 1, lwd = 2)  
+
 ```
 
 The CEC method, analogously to k-means, depends on the initial clusters memberships. Therefore, the initialization should be started a few times, which can be achieved using the `nstart` parameter.
