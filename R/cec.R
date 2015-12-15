@@ -208,13 +208,28 @@ print.cec <- function(x, ...)
     print(c("data", "cluster", "probabilities", "centers", "cost.function", "nclusters", "final.cost.function", "final.nclusters", "iterations", "covariances", "covariances.model", "time" ))
 }
 
-plot.cec <- function(x, col, cex = 0.5, pch = 16, cex.centers = 1, pch.centers = 8, ellipses.lwd = 4, ellipses = TRUE, model = T, xlab = "x", ylab= "y", ...)
+plot.cec <- function(x, col, cex = 0.5, pch = 16, cex.centers = 1, pch.centers = 8, ellipses.lwd = 4, ellipses = TRUE, model = T, xlab, ylab, ...)
 {
     if (ncol (x $ data) != 2 )
         stop("plotting available only for 2-dimensional data")
     
-    if(!hasArg(col)) col = x$cluster;
-    plot(x$data, col=col, cex = cex, pch = pch,  xlab = xlab, ylab = ylab, ...)    
+    if (!hasArg(col)) col = x$cluster
+    
+    if (!is.null(colnames(x$data))) 
+    {
+        xl <- colnames(x$data)[1]
+        yl <- colnames(x$data)[2]
+    } 
+    else 
+    {
+        xl <- "x"
+        yl <- "y"
+    }
+    
+    if (hasArg(xlab)) xl <- xlab
+    if (hasArg(ylab)) yl <- ylab
+    
+    plot(x$data, col=col, cex = cex, pch = pch, xlab = xl, ylab = yl, ...)    
     points(x$centers, cex = cex.centers, pch = pch.centers)   
     if (ellipses)
     {    
@@ -232,8 +247,6 @@ plot.cec <- function(x, col, cex = 0.5, pch = 16, cex.centers = 1, pch.centers =
                         pts <- ellipse(x$centers[i, ], cov)
                         lines(pts, lwd = ellipses.lwd)
                     },
-                    #   warning = function(e) {warning("some ellipses will not be drawn (probably not positive-definite covariance matrix)")},
-                    #   error = function(e) {warning("some ellipses will not be drawn (probably not positive-definite covariance matrix)")}, 
                     finally = {})     
             }
     }  
