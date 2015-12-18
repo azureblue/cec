@@ -3,6 +3,13 @@ CEC
 
 The R Package CEC performs clustering based on the cross–entropy clustering (CEC) method, which was recently developed with the use of information theory. The main advantage of CEC is that it combines the speed and simplicity of k-means with the ability to use various Gaussian mixture models and reduce unnecessary clusters.
 
+The R package CEC is a part of CRAN repozytory. Therefore, you can install this package by simple commend:
+
+```R
+install.packages("CEC")
+library("CEC")
+```
+
 The basic usage comes down to the function `cec` with two required arguments: an input data (`x`) and the initial number centers (`centers`):
 
 ```R
