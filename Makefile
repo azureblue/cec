@@ -1,4 +1,4 @@
-CC = clang
+CC = gcc
 CC_FLAGS = -Wall -O0 -fPIC -g -std=c99 -pipe -I/usr/share/R/include 
 #CC_FLAGS = -w -std=c11 -fPIC -S -save-temps -fverbose-asm -masm=intel -I/usr/share/R/include
 
