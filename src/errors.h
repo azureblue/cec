@@ -16,8 +16,7 @@ enum error_code
     MALLOC_ERROR = 1,
     INVALID_COVARIANCE_ERROR = 2,
     ALL_CLUSTERS_REMOVED_ERROR = 3,
-    UNKNOWN_ERROR = 4	    
+    UNKNOWN_ERROR = 4
 };
 
 #endif	/* ERRORS_H */
-

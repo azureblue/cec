@@ -17,7 +17,7 @@
  * Overall cluster energy (cost function).
  */
 static inline double cluster_energy(const int m, const double cross_entropy,
-	const int card)
+        const int card)
 {
     double p = (card / (double) m);
     return p * (-log(p) + cross_entropy);
@@ -27,7 +27,7 @@ static inline double cluster_energy(const int m, const double cross_entropy,
  * Internal energy function (cross-entropy).
  */
 typedef double (*cross_entropy_function) (const struct cross_entropy_context *,
-	const struct cec_matrix *);
+        const struct cec_matrix *);
 
 cross_entropy_function cross_entropy_for(enum density_family family);
 

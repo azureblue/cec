@@ -23,14 +23,14 @@ void cec_matrix_sub(struct cec_matrix * m1, const struct cec_matrix * m2)
 }
 
 void cec_matrix_sum_multiplied(const struct cec_matrix * m1,
-	const struct cec_matrix * m2, struct cec_matrix * dest, double a1,
-	double a2)
+        const struct cec_matrix * m2, struct cec_matrix * dest, double a1,
+        double a2)
 {
     array_sum_multiplied(dest->data, m1->data, a1, m2->data, a2, m1->m * m1->n);
 }
 
 void cec_matrix_copy_data(const struct cec_matrix * from,
-	struct cec_matrix * to)
+        struct cec_matrix * to)
 {
     array_copy(from->data, to->data, from->m * from->n);
 }
@@ -38,9 +38,9 @@ void cec_matrix_copy_data(const struct cec_matrix * from,
 struct cec_matrix * cec_matrix_create(int m, int n)
 {
     struct cec_matrix * mat = (struct cec_matrix *) m_alloc(
-	    sizeof (struct cec_matrix) + sizeof (double) * m * n);
+            sizeof (struct cec_matrix) + sizeof (double) * m * n);
     if (mat == NULL)
-	return NULL;
+        return NULL;
     mat->data = (double *) (mat + 1);
     mat->m = m;
     mat->n = n;
@@ -53,9 +53,9 @@ void cec_matrix_destroy(struct cec_matrix * m)
 }
 
 void cec_vector_outer_product(const double * vec,
-	struct cec_matrix * output_matrix, int n)
+        struct cec_matrix * output_matrix, int n)
 {
     for (int j = 0; j < n; j++)
-	for (int k = 0; k < n; k++)
-	    cec_matrix_set_element(output_matrix, j, k, vec[j] * vec[k]);
+        for (int k = 0; k < n; k++)
+            cec_matrix_set_element(output_matrix, j, k, vec[j] * vec[k]);
 }

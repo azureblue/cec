@@ -9,55 +9,55 @@
 #include "cec.h"
 
 static void destroy_cross_entropy_contexts(
-	struct cross_entropy_context ** energy_contexts, int k);
+        struct cross_entropy_context ** energy_contexts, int k);
 
 static void destroy_cross_entropy_functions(cross_entropy_function * cross_entropy_functions);
 
 static struct cross_entropy_context ** create_cross_entropy_contexts(
-	SEXP type, SEXP params, int k, int n, int * last_error);
+        SEXP type, SEXP params, int k, int n, int * last_error);
 
 static cross_entropy_function * create_cross_entropy_functions(SEXP type, int k);
 
 static SEXP create_R_result(struct cec_context * cec_c,
-	struct cec_matrix * centers, int m, int k, int n);
+        struct cec_matrix * centers, int m, int k, int n);
 
 SEXP cec_r(SEXP x, SEXP centers, SEXP iter_max, SEXP type, SEXP card_min,
-	SEXP params)
+        SEXP params)
 {
     int m = Rf_nrows(x);
     int k = Rf_nrows(centers);
     int n = Rf_ncols(x);
     int iteration_max = Rf_asInteger(iter_max);
-    int card_min_int  = Rf_asInteger(card_min);
+    int card_min_int = Rf_asInteger(card_min);
 
     struct cec_matrix * X = create_from_R_matrix(x);
     struct cec_matrix * C = create_from_R_matrix(centers);
 
     if (X == NULL || C == NULL)
     {
-	cec_matrix_destroy(X);
-	cec_matrix_destroy(C);
-	error(MALLOC_ERROR_MSG);
+        cec_matrix_destroy(X);
+        cec_matrix_destroy(C);
+        error(MALLOC_ERROR_MSG);
     }
 
     int last_error = 0;
 
     struct cross_entropy_context ** cross_entropy_contexts =
-	    create_cross_entropy_contexts(type, params, k, n, &last_error);
+            create_cross_entropy_contexts(type, params, k, n, &last_error);
 
     cross_entropy_function * cross_entropy_functions = create_cross_entropy_functions(type, k);
 
     struct cec_context * cec_c = create_cec_context(X, C, cross_entropy_contexts,
-	    cross_entropy_functions, iteration_max, card_min_int);
+            cross_entropy_functions, iteration_max, card_min_int);
 
     if (cross_entropy_contexts == NULL || cross_entropy_functions == NULL || cec_c == NULL)
     {
-	destroy_cross_entropy_contexts(cross_entropy_contexts, k);
-	destroy_cross_entropy_functions(cross_entropy_functions);
-	destroy_cec_context_results(cec_c);
-	cec_matrix_destroy(X);
-	cec_matrix_destroy(C);
-	error(MALLOC_ERROR_MSG);
+        destroy_cross_entropy_contexts(cross_entropy_contexts, k);
+        destroy_cross_entropy_functions(cross_entropy_functions);
+        destroy_cec_context_results(cec_c);
+        cec_matrix_destroy(X);
+        cec_matrix_destroy(C);
+        error(MALLOC_ERROR_MSG);
     }
 
     /*
@@ -69,12 +69,12 @@ SEXP cec_r(SEXP x, SEXP centers, SEXP iter_max, SEXP type, SEXP card_min,
     destroy_cross_entropy_functions(cross_entropy_functions);
 
     SEXP result = NULL;
-    
+
     /*
      * Prepare the results for R.
      */
     if (res == NO_ERROR)
-	PROTECT(result = create_R_result(cec_c, C, m, k, n));
+        PROTECT(result = create_R_result(cec_c, C, m, k, n));
 
     destroy_cec_context_results(cec_c);
 
@@ -83,25 +83,25 @@ SEXP cec_r(SEXP x, SEXP centers, SEXP iter_max, SEXP type, SEXP card_min,
 
     if (res == NO_ERROR)
     {
-	UNPROTECT(1);
-	return result;
+        UNPROTECT(1);
+        return result;
     } else
     {
-	switch (res)
-	{
-	    case INVALID_COVARIANCE_ERROR:
-		error(INVALID_COVARIANCE_ERROR_MSG);
-	    case ALL_CLUSTERS_REMOVED_ERROR:
-		error(ALL_CLUSTERS_REMOVED_MSG);
-	    default:
-		error(UNKNOWN_ERROR_MSG);
-	}
+        switch (res)
+        {
+            case INVALID_COVARIANCE_ERROR:
+                error(INVALID_COVARIANCE_ERROR_MSG);
+            case ALL_CLUSTERS_REMOVED_ERROR:
+                error(ALL_CLUSTERS_REMOVED_MSG);
+            default:
+                error(UNKNOWN_ERROR_MSG);
+        }
     }
     return NULL;
 }
 
 static SEXP create_R_result(struct cec_context * cec_c,
-	struct cec_matrix * centers, int m, int k, int n)
+        struct cec_matrix * centers, int m, int k, int n)
 {
     int iters = cec_c->iterations;
     int output_size = iters + 1;
@@ -123,20 +123,20 @@ static SEXP create_R_result(struct cec_context * cec_c,
 
     for (int i = 0; i < output_size; i++)
     {
-	REAL(energy_vector)[i] = cec_c->energy[i];
-	INTEGER(clusters_number_vector)[i] = cec_c->clusters_number[i];
+        REAL(energy_vector)[i] = cec_c->energy[i];
+        INTEGER(clusters_number_vector)[i] = cec_c->clusters_number[i];
     }
 
     for (int i = 0; i < m; i++)
     {
-	INTEGER(assignment_vector)[i] = cec_c->clustering_vector[i] + 1;
+        INTEGER(assignment_vector)[i] = cec_c->clustering_vector[i] + 1;
     }
 
     for (int i = 0; i < k; i++)
     {
-	SEXP covariance;
-	PROTECT(covariance = create_R_matrix(cec_c->covriances[i]));
-	SET_VECTOR_ELT(covariance_list, i, covariance);
+        SEXP covariance;
+        PROTECT(covariance = create_R_matrix(cec_c->covriances[i]));
+        SET_VECTOR_ELT(covariance_list, i, covariance);
     }
 
     SEXP ret;
@@ -164,13 +164,13 @@ static SEXP create_R_result(struct cec_context * cec_c,
 }
 
 static void destroy_cross_entropy_contexts(
-	struct cross_entropy_context ** energy_contexts, int k)
+        struct cross_entropy_context ** energy_contexts, int k)
 {
     if (energy_contexts == NULL)
-	return;
+        return;
 
     for (int i = 0; i < k; i++)
-	destroy_cross_entropy_context(energy_contexts[i]);
+        destroy_cross_entropy_context(energy_contexts[i]);
 
     m_free(energy_contexts);
 
@@ -185,76 +185,75 @@ static cross_entropy_function * create_cross_entropy_functions(SEXP type, int k)
 {
     cross_entropy_function * cross_entropy_functions = m_alloc(sizeof (cross_entropy_function) * k);
     if (cross_entropy_functions == NULL)
-	return NULL;
+        return NULL;
 
     for (int i = 0; i < k; i++)
     {
-	enum density_family family = INTEGER(type)[i];
-	cross_entropy_functions[i] = cross_entropy_for(family);
+        enum density_family family = INTEGER(type)[i];
+        cross_entropy_functions[i] = cross_entropy_for(family);
     }
 
     return cross_entropy_functions;
 }
 
 static struct cross_entropy_context ** create_cross_entropy_contexts(
-	SEXP type, SEXP params, int k, int n, int * last_error)
+        SEXP type, SEXP params, int k, int n, int * last_error)
 {
     struct cross_entropy_context ** cross_entropy_contexts = m_alloc(
-	    sizeof (struct cross_entropy_context *) * k);
+            sizeof (struct cross_entropy_context *) * k);
 
     if (cross_entropy_contexts == NULL)
-	return NULL;
+        return NULL;
 
     for (int i = 0; i < k; i++)
     {
-	SEXP param = VECTOR_ELT(params, i);
-	enum density_family family = INTEGER(type)[i];
-	cross_entropy_contexts[i] = create_cross_entropy_context(family, n);
-	
-	if (cross_entropy_contexts[i] == NULL)
-	{
-	    destroy_cross_entropy_contexts(cross_entropy_contexts, i + 1);
-	    return NULL;
-	}
-	cross_entropy_contexts[i]->last_error = last_error;
+        SEXP param = VECTOR_ELT(params, i);
+        enum density_family family = INTEGER(type)[i];
+        cross_entropy_contexts[i] = create_cross_entropy_context(family, n);
 
-	switch (family)
-	{
-	    case FIXED_R:
-	    {
-		struct context_r * c_r =
-			(struct context_r *) (cross_entropy_contexts[i]->custom_context);
-		c_r->r = asReal(param);
-		break;
-	    }
-	    case GIVEN_COVARIANCE:
-	    {
-		struct context_gc * c_gc =
-			(struct context_gc *) cross_entropy_contexts[i]->custom_context;
-		copy_from_R_matrix(VECTOR_ELT(param, 0), c_gc->given_cov);
-		copy_from_R_matrix(VECTOR_ELT(param, 1), c_gc->i_given_cov);		
-		break;
-	    }
-	    case FIXEDEIGENVALUES:
-	    {
-		struct context_fe * c_fe =
-			(struct context_fe *) cross_entropy_contexts[i]->custom_context;
+        if (cross_entropy_contexts[i] == NULL)
+        {
+            destroy_cross_entropy_contexts(cross_entropy_contexts, i + 1);
+            return NULL;
+        }
+        cross_entropy_contexts[i]->last_error = last_error;
 
-		array_copy(REAL(param), c_fe->given_evals, n);
-		double e_prod = 1;
-		for (int i = 0; i < n; i++)
-		{
-		    e_prod *= c_fe->given_evals[i];
-		}
-		c_fe->given_evals_product = e_prod;
+        switch (family)
+        {
+            case FIXED_R:
+            {
+                struct context_r * c_r =
+                        (struct context_r *) (cross_entropy_contexts[i]->custom_context);
+                c_r->r = asReal(param);
+                break;
+            }
+            case GIVEN_COVARIANCE:
+            {
+                struct context_gc * c_gc =
+                        (struct context_gc *) cross_entropy_contexts[i]->custom_context;
+                copy_from_R_matrix(VECTOR_ELT(param, 0), c_gc->given_cov);
+                copy_from_R_matrix(VECTOR_ELT(param, 1), c_gc->i_given_cov);
+                break;
+            }
+            case FIXEDEIGENVALUES:
+            {
+                struct context_fe * c_fe =
+                        (struct context_fe *) cross_entropy_contexts[i]->custom_context;
 
-	    }
-	    case SPHERICAL:
-	    case ALL:
-	    case DIAGONAL:
-		break;
-	}
+                array_copy(REAL(param), c_fe->given_evals, n);
+                double e_prod = 1;
+                for (int i = 0; i < n; i++)
+                {
+                    e_prod *= c_fe->given_evals[i];
+                }
+                c_fe->given_evals_product = e_prod;
+
+            }
+            case SPHERICAL:
+            case ALL:
+            case DIAGONAL:
+                break;
+        }
     }
     return cross_entropy_contexts;
 }
-

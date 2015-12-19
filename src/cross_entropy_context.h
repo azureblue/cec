@@ -44,7 +44,6 @@ struct context_r
 void destroy_cross_entropy_context(struct cross_entropy_context * context);
 
 struct cross_entropy_context * create_cross_entropy_context(
-	enum density_family family, int n);
+        enum density_family family, int n);
 
 #endif	/* CROSS_ENTROPY_CONTEXT_H */
-

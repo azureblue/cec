@@ -10,4 +10,3 @@ void * m_alloc(size_t size);
 void m_free(void * ptr);
 
 #endif	/* ALLOC_H */
-
