@@ -150,7 +150,7 @@ m3[,2] = m3[,2] - 5
 m = rbind(m1, m2, m3)
 centers = init.centers(m, 10)
 par(ask = TRUE)
-plot(m, cex = 0.5, pch = 16)
+plot(m, cex = 0.5, pch = 19)
 ## Clustering result:
 Z = cec(m, centers, type="sp", iter.max = 100, card.min="7\%")
 plot(Z)
@@ -161,7 +161,7 @@ cec.plot.cost.function(Z)
 ## Example of clustering mouse-like set.
 m = mouseset(n=7000, r.head=2, r.left.ear=1.1, r.right.ear=1.1, left.ear.dist=2.5,
 right.ear.dist=2.5, dim=2)
-plot(m, cex = 0.5, pch = 16)
+plot(m, cex = 0.5, pch = 19)
 centers = init.centers(m, 3)
 ## Clustering result:
 Z = cec(m, centers, type="sp", iter.max = 100, nstart=4, card.min="5\%")
@@ -172,7 +172,7 @@ Z
 cec.plot.cost.function(Z)
 ## Example of clustering data set "Tset" using "eigenvalues" clustering type.
 data(Tset)
-plot(Tset, cex = 0.5, pch = 16)
+plot(Tset, cex = 0.5, pch = 19)
 centers = init.centers(Tset, 2)
 ## Clustering result:
 Z <- cec(Tset, 5, "eigenvalues", param=c(0.02,0.002), nstart=4)

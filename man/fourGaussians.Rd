@@ -11,6 +11,6 @@ Matrix of 2-dimensional points of four Gaussians.
 
 \examples{
 data(fourGaussians)
-plot(fourGaussians, cex = 0.5, pch = 16);
+plot(fourGaussians, cex = 0.5, pch = 19);
 }
 \keyword{datasets}

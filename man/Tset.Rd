@@ -11,6 +11,6 @@ Matrix of 2-dimensional points that form T letter.
 
 \examples{
 data(Tset)
-plot(Tset, cex = 0.5, pch = 16);
+plot(Tset, cex = 0.5, pch = 19);
 }
 \keyword{datasets}
