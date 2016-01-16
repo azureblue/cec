@@ -11,6 +11,6 @@ Matrix of 2-dimensional points that form circular and elliptical patterns.
 
 \examples{
 data(mixShapes)
-plot(mixShapes, cex = 0.5, pch = 16);
+plot(mixShapes, cex = 0.5, pch = 19);
 }
 \keyword{datasets}
