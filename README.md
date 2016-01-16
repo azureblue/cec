@@ -45,6 +45,7 @@ for(i in c(1:2))
     add = T, col = i + 1, lwd = 2)  
 
 ```
+![](https://azureblue.github.io/cec/static/faithful.png)
 
 The CEC method, analogously to k-means, depends on the initial clusters memberships. Therefore, the initialization should be started a few times, which can be achieved using the `nstart` parameter.
 ```R
@@ -73,9 +74,10 @@ data("fourGaussians")
 
 cec <- cec(fourGaussians, centers = 10, type = "all", nstart = 20)
 
-plot(cec, xlim = c(0, 1), ylim = c(0, 1), asp = 1)
+plot(cec, asp = 1)
 cec.plot.cost.function(cec)
 ```
+![](https://azureblue.github.io/cec/static/all.png)
 
 ### Spherical CEC 
 **`type = "spherical"`**
@@ -85,10 +87,11 @@ The original distribution will be estimated by spherical (radial) densities, whi
 ```R
 data("Tset")
 
-cec <- cec(x = Tset, centers = 10, type = "spherical")
+cec <- cec(x = Tset, centers = 10, type = "spherical", nstart=5)
 
-plot(cec, xlim = c(0, 1), ylim = c(0, 1), asp = 1)
+plot(cec, asp = 1)
 ```
+![](https://azureblue.github.io/cec/static/spherical.png)
 
 ### Spherical CEC with fixed radius
 **`type = "fixedr"`**
@@ -98,10 +101,11 @@ Similarly to the general spherical model, the dataset will be divided into clust
 ```R
 data("Tset")
 
-cec <- cec(x = Tset, centers = 10, type = "fixedr", param = 0.01)
+cec <- cec(x = Tset, centers = 10, type = "fixedr", param = 0.01, nstart=20)
 
-plot(cec, xlim = c(0, 1), ylim = c(0, 1), asp = 1)
+plot(cec, asp = 1)
 ```
+![](https://azureblue.github.io/cec/static/fixedr.png)
 
 ### Diagonal CEC
 **`type = "diagonal"`**
@@ -111,11 +115,12 @@ In this case, the data will be described by ellipses for which the main semi-maj
 ```R
 data("Tset")
 
-cec <- cec(x = Tset, centers = 10, type = "diagonal")
+cec <- cec(x = Tset, centers = 10, type = "diagonal", nstart=5)
 
-plot(cec, xlim = c(0, 1), ylim = c(0, 1), asp = 1)
+plot(cec, asp = 1)
 ```
- 
+![](https://azureblue.github.io/cec/static/diagonal.png) 
+
 ### Fixed covariance CEC
 **`type = "covariance"`**
 
@@ -124,10 +129,13 @@ This model contains Gaussians with an arbitrary fixed covariance matrix.
 ```R
 data("Tset")
 
-cec <- cec(x = Tset, centers = 10, type = "covariance",  param = matrix(c(0.04, 0, 0, 0.01), 2))
+cec <- cec(x = Tset, centers = 10, card.min='10%', type = "covariance",  
+  param = matrix(c(0.04, 0, 0, 0.01), 2))
 
-plot(cec, xlim = c(0, 1), ylim = c(0, 1), asp = 1)
+plot(cec, asp = 1)
 ```
+![](https://azureblue.github.io/cec/static/cov.png)
+
 In the above example, the following covariance matrix has been used, which results in covering the data by fixed ellipses:
 ```
 0.04  0.00
@@ -142,10 +150,11 @@ The last model is based on Gaussians with arbitrary fixed eigenvalues.
 ```R
 data("Tset")
 
-cec <- cec(x = Tset, centers = 10, type = "eigenvalues", param=c(0.01, 0.001))
+cec <- cec(x = Tset, centers = 10, type = "eigenvalues", param=c(0.01, 0.001), nstart = 5)
 
-plot(cec, xlim = c(0, 1), ylim = c(0, 1), asp = 1)
+plot(cec, asp = 1)
 ```
+![](https://azureblue.github.io/cec/static/eigen.png)
 
 In the above example, two eigenvalues: **λ₁=0.01** and **λ₂=2=0.001** are used, which results in covering the data by ellipses with fixed semi axes (corresponding to the eigenvalues). 
 
@@ -161,11 +170,11 @@ R> cec(x = ..., centers = ..., type = c("all", "diagonal", '''), param = ...).
 ```R
 data("mixShapes")
 
-cec <- cec(mixShapes, 7, 
+cec <- cec(mixShapes, 7, iter.max=3, 
   type = c("fixedr", "fixedr", "eigen", "eigen",  "eigen", "eigen", "eigen"),  
-  param = list(350, 350, c(9000, 8), c(9000, 8), c(9000, 8), c(9000, 8), c(9000, 8)), nstart = 100)
+  param = list(350, 350, c(9000, 8), c(9000, 8), c(9000, 8), c(9000, 8), c(9000, 8)), nstart = 500)
 
 plot(cec, asp = 1)
 ```
-
+![](https://azureblue.github.io/cec/static/mix.png)
 
