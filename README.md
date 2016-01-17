@@ -77,7 +77,7 @@ cec <- cec(fourGaussians, centers = 10, type = "all", nstart = 20)
 plot(cec, asp = 1)
 cec.plot.cost.function(cec)
 ```
-![](https://azureblue.github.io/cec/static/all.png)
+![](https://azureblue.github.io/cec/static/all.png)![](https://azureblue.github.io/cec/static/allcost.png)
 
 ### Spherical CEC 
 **`type = "spherical"`**
