@@ -3,14 +3,14 @@ CEC
 
 The R Package CEC performs clustering based on the cross–entropy clustering (CEC) method, which was recently developed with the use of information theory. The main advantage of CEC is that it combines the speed and simplicity of k-means with the ability to use various Gaussian mixture models and reduce unnecessary clusters.
 
-The R package CEC is a part of CRAN repository and it can be installed by the following commend:
+The R package CEC is a part of CRAN repository and it can be installed by the following command:
 
 ```R
 install.packages("CEC")
 library("CEC")
 ```
 
-The basic usage comes down to the function `cec` with two required arguments: an input data (`x`) and the initial number centers (`centers`):
+The basic usage comes down to the function `cec` with two required arguments: an input data (`x`) and the initial number of centers (`centers`):
 
 ```R
 cec(x = ..., centers = ...)
@@ -53,7 +53,7 @@ cec <- cec(x = ...,  centers = ..., nstart = ...)
 ```
 The initial locations of the centers can be chosen either **randomly** or using the **k-means++** method and it's driven by the `centers.init` parameter which can take one of the two values: `"random"` or `"kmeans++"`.
 
-In the context multiple starts, it is worth to mention about the parameter `iter.max` which limits the number of iterations in each start.
+In the context multiple starts, it is worth to mention the `iter.max` parameter which limits the number of iterations in each start.
 
 An essential parameter, in the context of **CEC** method, is `card.min` which expresses minimal cluster size - the number of points, below which, the cluster is removed. Since each cluster is described by a covariance matrix, the number of elements in the cluster must be larger than the dimension of the data.
 
@@ -82,7 +82,7 @@ cec.plot.cost.function(cec)
 ### Spherical CEC 
 **`type = "spherical"`**
 
-The original distribution will be estimated by spherical (radial) densities, which will result with splitting the data into circle-like clusters of arbitrary sizes (balls in higher dimensions). 
+The original distribution will be estimated by spherical (radial) densities, which will result in splitting the data into circle-like clusters of arbitrary sizes (balls in higher dimensions). 
 
 ```R
 data("Tset")
@@ -136,7 +136,7 @@ plot(cec, asp = 1)
 ```
 ![](https://azureblue.github.io/cec/static/cov.png)
 
-In the above example, the following covariance matrix has been used, which results in covering the data by fixed ellipses:
+In the above example, the following covariance matrix has been used, which results in covering the data by fixed shape ellipses:
 ```
 0.04  0.00
 0.00  0.01      
@@ -156,7 +156,7 @@ plot(cec, asp = 1)
 ```
 ![](https://azureblue.github.io/cec/static/eigen.png)
 
-In the above example, two eigenvalues: **λ₁=0.01** and **λ₂=2=0.001** are used, which results in covering the data by ellipses with fixed semi axes (corresponding to the eigenvalues). 
+In the above example, two eigenvalues: **λ₁=0.01** and **λ₂=2=0.001** are used, which results in covering the data with ellipses having fixed semi axes (corresponding to the eigenvalues). 
 
 A mix of the Gaussian models
 ----------------------------
