@@ -28,28 +28,34 @@ int kmeanspp(struct cec_matrix * X, struct cec_matrix * C)
     int k = C->m;
     int n = X->n;
 
-    double * dists = m_alloc(sizeof (double) * m);
-    double * sums = m_alloc(sizeof (double) * m);
+    double * dists_m = m_alloc(sizeof (double) * (m + 1));
+    double * sums_m = m_alloc(sizeof (double) * (m + 1));
 
-    if (dists == NULL || sums == NULL)
+    if (dists_m == NULL || sums_m == NULL)
     {
-        m_free(dists);
-        m_free(sums);
+        m_free(dists_m);
+        m_free(sums_m);
         return MALLOC_ERROR;
     }
+    
+    cec_rand_init();
+    
+    int first_center = (int) (cec_rand() * m);
+    
+    array_copy(cec_matrix_row(X, first_center), cec_matrix_row(C, 0), n);
+    dists_m[0] = 0.0;
+    sums_m[0] = 0.0;
+    
+    double * dists = dists_m + 1;
+    double * sums = sums_m + 1;
 
-    array_copy(cec_matrix_row(X, 0), cec_matrix_row(C, 0), n);
-    dists[0] = 0.0;
-    sums[0] = 0.0;
-
-    for (int i = 1; i < m; i++)
+    for (int i = 0; i < m; i++)
     {
         double dist = dist2(cec_matrix_row(X, i), cec_matrix_row(C, 0), n);
         dists[i] = dist;
         sums[i] = sums[i - 1] + dist;
     }
 
-    cec_rand_init();
 
     for (int i = 1; i < k; i++)
     {
@@ -71,7 +77,7 @@ int kmeanspp(struct cec_matrix * X, struct cec_matrix * C)
 
     cec_rand_end();
 
-    m_free(dists);
-    m_free(sums);
+    m_free(dists_m);
+    m_free(sums_m);
     return 0;
 }
