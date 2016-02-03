@@ -87,7 +87,7 @@ The original distribution will be estimated by spherical (radial) densities, whi
 ```R
 data("Tset")
 
-cec <- cec(x = Tset, centers = 10, type = "spherical", nstart=5)
+cec <- cec(x = Tset, centers = 10, type = "spherical", nstart = 5)
 
 plot(cec, asp = 1)
 ```
@@ -101,7 +101,7 @@ Similarly to the general spherical model, the dataset will be divided into clust
 ```R
 data("Tset")
 
-cec <- cec(x = Tset, centers = 10, type = "fixedr", param = 0.01, nstart=20)
+cec <- cec(x = Tset, centers = 10, type = "fixedr", param = 0.01, nstart = 20)
 
 plot(cec, asp = 1)
 ```
@@ -115,7 +115,7 @@ In this case, the data will be described by ellipses for which the main semi-maj
 ```R
 data("Tset")
 
-cec <- cec(x = Tset, centers = 10, type = "diagonal", nstart=5)
+cec <- cec(x = Tset, centers = 10, type = "diagonal", nstart = 5)
 
 plot(cec, asp = 1)
 ```
@@ -129,7 +129,7 @@ This model contains Gaussians with an arbitrary fixed covariance matrix.
 ```R
 data("Tset")
 
-cec <- cec(x = Tset, centers = 10, card.min='10%', type = "covariance",  
+cec <- cec(x = Tset, centers = 10, card.min = '10%', type = "covariance",  
   param = matrix(c(0.04, 0, 0, 0.01), 2))
 
 plot(cec, asp = 1)
@@ -150,13 +150,13 @@ The last model is based on Gaussians with arbitrary fixed eigenvalues.
 ```R
 data("Tset")
 
-cec <- cec(x = Tset, centers = 10, type = "eigenvalues", param=c(0.01, 0.001), nstart = 5)
+cec <- cec(x = Tset, centers = 10, type = "eigenvalues", param = c(0.01, 0.001), nstart = 5)
 
 plot(cec, asp = 1)
 ```
 ![](https://azureblue.github.io/cec/static/eigen.png)
 
-In the above example, two eigenvalues: **λ₁=0.01** and **λ₂=2=0.001** are used, which results in covering the data with ellipses having fixed semi axes (corresponding to the eigenvalues). 
+In the above example, two eigenvalues: **λ₁=0.01** and **λ₂=0.001** are used, which results in covering the data with ellipses having fixed semi axes (corresponding to the eigenvalues). 
 
 A mix of the Gaussian models
 ----------------------------
