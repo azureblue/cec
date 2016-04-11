@@ -16,7 +16,7 @@ struct cec_matrix
 {
     int m;
     int n;
-    double * data;
+    double data[];
 };
 
 struct cec_matrix * cec_matrix_create(int m, int n);
@@ -37,7 +37,7 @@ static inline double cec_matrix_element(const struct cec_matrix *restrict m,
     return m->data[m->n * a + b];
 }
 
-static inline double * cec_matrix_row(const struct cec_matrix *restrict matrix,
+static inline double * cec_matrix_row(struct cec_matrix *restrict matrix,
         int m)
 {
     return matrix->data + (m * matrix->n);

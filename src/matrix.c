@@ -37,11 +37,12 @@ void cec_matrix_copy_data(const struct cec_matrix * from,
 
 struct cec_matrix * cec_matrix_create(int m, int n)
 {
-    struct cec_matrix * mat = (struct cec_matrix *) m_alloc(
-            sizeof (struct cec_matrix) + sizeof (double) * m * n);
+    struct cec_matrix * mat = 
+        m_alloc(sizeof (struct cec_matrix) + sizeof (double) * m * n);
+    
     if (mat == NULL)
-        return NULL;
-    mat->data = (double *) (mat + 1);
+        return NULL;    
+    
     mat->m = m;
     mat->n = n;
     return mat;

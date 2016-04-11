@@ -6,7 +6,6 @@
 
 int cec(struct cec_context * context)
 {
-
     struct cec_matrix * X = context->points;
     struct cec_matrix * C = context->centers;
 
