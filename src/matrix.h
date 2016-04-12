@@ -21,6 +21,8 @@ struct cec_matrix
 
 struct cec_matrix * cec_matrix_create(int m, int n);
 
+struct cec_matrix * cec_matrix_create_copy(const struct cec_matrix * mat);
+
 void cec_matrix_destroy(struct cec_matrix *restrict m);
 
 void cec_matrix_set(struct cec_matrix *restrict m, double val);

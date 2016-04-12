@@ -28,7 +28,7 @@ int kmeanspp(struct cec_matrix * X, struct cec_matrix * C)
     double * dists_m = m_alloc(sizeof (double) * (m + 1));
     double * sums_m = m_alloc(sizeof (double) * (m + 1));
     
-    if (dists_m == NULL || sums_m == NULL)
+    if (!dists_m || !sums_m)
     {
         m_free(dists_m);
         m_free(sums_m);

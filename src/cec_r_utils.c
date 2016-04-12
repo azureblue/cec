@@ -7,7 +7,7 @@ struct cec_matrix * create_from_R_matrix(SEXP R_ma)
 
     struct cec_matrix * ma = cec_matrix_create(m, n);
 
-    if (ma == NULL)
+    if (!ma)
         return NULL;
 
     for (int i = 0; i < m; i++)

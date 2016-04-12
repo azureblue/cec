@@ -3,6 +3,7 @@
 #include <math.h>
 #include "cec.h"
 #include "cov_utils.h"
+#include "model.h"
 
 int cec(struct cec_context * context)
 {
@@ -15,8 +16,7 @@ int cec(struct cec_context * context)
     const int max = context->max_iterations;
     const int min_card = context->min_card;
 
-    cross_entropy_function * cross_entropy_functions = context->cross_entropy_functions;
-    struct cross_entropy_context ** cross_entropy_contexts = context->cross_entropy_contexts;
+    struct cec_model ** models = context->models;
 
     int _k = k;
     int removed_clusters = 0;
@@ -119,11 +119,12 @@ int cec(struct cec_context * context)
 
         cec_matrix_mul(covariance_matrices[i], 1.0 / card[i]);
 
-        double hx = cross_entropy_functions[i](cross_entropy_contexts[i], covariance_matrices[i]);
-        if (isnan(hx))
-            return *(cross_entropy_contexts[i]->last_error);
+        double energy = cluster_energy(models[i], covariance_matrices[i], card[i], m);
+        
+        if (isnan(energy))
+            return cluster_energy_get_last_error(models[i]);
 
-        clusters_energy[i] = cluster_energy(m, hx, card[i]);
+        clusters_energy[i] = energy;
 
         energy_sum += clusters_energy[i];
     }
@@ -199,11 +200,13 @@ int cec(struct cec_context * context)
                 /*
                  * Compute energy of group 'l' after removing data point 'i'.
                  */
-                double n_l_hx = cross_entropy_functions[l](cross_entropy_contexts[l], n_covariance_matrix);
-                if (isnan(n_l_hx))
-                    return *(cross_entropy_contexts[l]->last_error);
-
-                n_l_energy = cluster_energy(m, n_l_hx, card[l] - 1);
+                
+                double energy = cluster_energy(models[l], n_covariance_matrix, card[l] - 1, m);
+        
+                if (isnan(energy))
+                    return cluster_energy_get_last_error(models[l]);
+                
+                n_l_energy = energy;
 
                 energy_gain = 0;
             } else
@@ -230,11 +233,12 @@ int cec(struct cec_context * context)
                         t_covariance_matrices[j], cec_matrix_row(C, j),
                         cec_matrix_row(X, i), card[j], t_matrix_nn);
 
-                double t_hx = cross_entropy_functions[j](cross_entropy_contexts[j], t_covariance_matrices[j]);
-                if (isnan(t_hx))
-                    return *(cross_entropy_contexts[j]->last_error);
-
-                double t_energy = cluster_energy(m, t_hx, card[j] + 1);
+                double energy = cluster_energy(models[j], t_covariance_matrices[j], card[j] + 1, m);
+        
+                if (isnan(energy))
+                    return cluster_energy_get_last_error(models[j]);
+                 
+                double t_energy = energy;
 
                 if (removed[l] == 1)
                 {

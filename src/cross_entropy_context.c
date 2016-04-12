@@ -3,131 +3,139 @@
 #include "alloc.h"
 #include "cross_entropy_context.h"
 #include "matrix.h"
+#include "model.h"
+#include "checked_allocator.h"
 
 static const int EIGENVALUES_WORKSPACE_BLOCK = 128;
-
-void destroy_cross_entropy_context(struct cross_entropy_context * context)
+ 
+struct cross_entropy_context * create_cross_entropy_context_all(int n)
 {
-    if (context == NULL)
-        return;
+    checked_allocation;
+    
+    struct cross_entropy_context * context = check(m_alloc(sizeof (struct cross_entropy_context)));
+    struct context_all * c_all = check(m_alloc(sizeof (struct context_all)));
+    c_all->temp_matrix = check(cec_matrix_create(n, n));
+    
+    context->specific_context = c_all;
+    
+    return context;
+}
 
-    cec_matrix_destroy(context->temp_matrix);
-    switch (context->family)
-    {
-        case FIXED_R:
-            m_free(context->custom_context);
-            break;
-        case GIVEN_COVARIANCE:
-        {
-            struct context_gc * c_gc = (struct context_gc *) context->custom_context;
-            if (context->custom_context == NULL)
-                break;
+struct cross_entropy_context * create_cross_entropy_context_spherical(int n)
+{
+  return m_alloc(sizeof (struct cross_entropy_context));
+}
 
-            cec_matrix_destroy(c_gc->given_cov);
-            cec_matrix_destroy(c_gc->i_given_cov);
-            m_free(context->custom_context);
-            break;
-        }
-        case FIXEDEIGENVALUES:
-        {
-            if (context->custom_context == NULL)
-                break;
+struct cross_entropy_context * create_cross_entropy_context_diagonal(int n)
+{
+    return m_alloc(sizeof (struct cross_entropy_context));
+}
 
-            struct context_fe * c_fe = (struct context_fe *) context->custom_context;
-            m_free(c_fe->evals);
-            m_free(c_fe->given_evals);
-            cec_matrix_destroy(c_fe->workspace);
-            m_free(context->custom_context);
-            break;
+struct cross_entropy_context * create_cross_entropy_context_fixedr(int n, double r)
+{
+    checked_allocation;
+    
+    struct cross_entropy_context * context = check(m_alloc(sizeof (struct cross_entropy_context)));
+    struct context_r * c_r =  check(m_alloc(sizeof (struct context_r)));
+    c_r->r = r;
+    
+    context->specific_context = c_r;
+    
+    return context;
+}
 
-        }
-        case ALL:
-        case SPHERICAL:
-        case DIAGONAL:
-            break;
-    }
+struct cross_entropy_context * create_cross_entropy_context_covariance(int n, const struct cec_matrix * cov, const struct cec_matrix * cov_i)
+{
+    checked_allocation;
+    
+    struct cross_entropy_context * context = check(m_alloc(sizeof (struct cross_entropy_context)));
+    struct context_gc * c_gc =  check(m_alloc(sizeof (struct context_gc)));
+    c_gc->given_cov = check(cec_matrix_create_copy(cov));
+    c_gc->i_given_cov = check(cec_matrix_create_copy(cov_i));
+    c_gc->temp_matrix = check(cec_matrix_create(n, n));
+    
+    context->specific_context = c_gc;
+    
+    return context;
+}
 
+struct cross_entropy_context * create_cross_entropy_context_eigenvalues(int n, const double * given_evals)
+{
+    checked_allocation;
+    
+    struct cross_entropy_context * context = check(m_alloc(sizeof (struct cross_entropy_context)));
+     
+    struct context_fe * c_fe =  check(m_alloc(sizeof (struct context_fe)));
+    
+    c_fe->evals_given = check(m_alloc(sizeof (double) * n));
+    array_copy(given_evals, c_fe->evals_given, n);
+    
+    c_fe->evals_temp = check(m_alloc(sizeof (double) * n));
+    c_fe->workspace = check(cec_matrix_create(EIGENVALUES_WORKSPACE_BLOCK, 1));
+    c_fe->temp_matrix = check(cec_matrix_create(n, n));
+    
+    
+    double p = 1;
+    for (int i = 0; i < n; i++)
+        p *= given_evals[i];
+    
+    c_fe->given_evals_product = p;
+    
+    context->specific_context = c_fe;    
+    
+    return context;
+}
+
+void destroy_cross_entropy_context_eigenvalues(struct cross_entropy_context * context)
+{
+    if (!context) return;
+    
+    struct context_fe * specific_context = (struct context_fe *) context->specific_context;
+    m_free(specific_context->evals_given);
+    m_free(specific_context->evals_temp);
+    m_free(specific_context->temp_matrix);
+    m_free(specific_context->workspace);
+    m_free(specific_context);
     m_free(context);
 }
 
-struct cross_entropy_context * create_cross_entropy_context(
-        enum density_family family, int n)
+void destroy_cross_entropy_context_covariance(struct cross_entropy_context * context)
 {
-    struct cross_entropy_context * context = m_alloc(
-            sizeof (struct cross_entropy_context));
-    if (context == NULL)
-        return NULL;
+    if (!context) return;
+    
+    struct context_gc * specific_context = (struct context_gc *) context->specific_context;
+    m_free(specific_context->given_cov);
+    m_free(specific_context->i_given_cov);
+    m_free(specific_context->temp_matrix);
+    m_free(specific_context);
+    m_free(context);
+}
 
-    context->n = n;
-    context->custom_context = NULL;
-    context->temp_matrix = cec_matrix_create(n, n);
-    context->family = family;
+void destroy_cross_entropy_context_fixedr(struct cross_entropy_context * context)
+{
+    if (!context) return;
+    
+    struct context_r * specific_context = (struct context_r *) context->specific_context;
+    m_free(specific_context);
+    m_free(context);
+}
 
-    if (context->temp_matrix == NULL)
-    {
-        destroy_cross_entropy_context(context);
-        return NULL;
-    }
+void destroy_cross_entropy_context_all(struct cross_entropy_context * context)
+{
+    if (!context) return;
+    
+    struct context_all * specific_context = (struct context_all *) context->specific_context;
+    m_free(specific_context->temp_matrix);
+    m_free(specific_context);
+    m_free(context);
+}
 
-    switch (family)
-    {
-        case FIXED_R:
-        {
-            struct context_r * c_r = m_alloc(sizeof (struct context_r));
-            if (c_r == NULL)
-            {
-                destroy_cross_entropy_context(context);
-                return NULL;
-            }
-            context->custom_context = c_r;
-            break;
-        }
-        case GIVEN_COVARIANCE:
-        {
-            struct context_gc * context_gc = m_alloc(sizeof (struct context_gc));
-            if (context_gc == NULL)
-            {
-                destroy_cross_entropy_context(context);
-                return NULL;
-            }
-            context->custom_context = context_gc;
+void destroy_cross_entropy_context_diagonal(struct cross_entropy_context * context)
+{   
+    m_free(context);
+}
 
-            context_gc->given_cov = cec_matrix_create(n, n);
-            context_gc->i_given_cov = cec_matrix_create(n, n);
-            if (context_gc->given_cov == NULL || context_gc->i_given_cov == NULL)
-            {
-                destroy_cross_entropy_context(context);
-                return NULL;
-            }
-            break;
-        }
-        case FIXEDEIGENVALUES:
-        {
-            struct context_fe * context_fe = m_alloc(sizeof (struct context_fe));
-            if (context_fe == NULL)
-            {
-                destroy_cross_entropy_context(context);
-                return NULL;
-            }
-            context->custom_context = context_fe;
-
-            context_fe->evals = m_alloc(sizeof (double) * n);
-            context_fe->given_evals = m_alloc(sizeof (double) * n);
-            context_fe->workspace = cec_matrix_create((EIGENVALUES_WORKSPACE_BLOCK + 2) * n, 1);
-
-            if (context_fe->evals == NULL || context_fe->given_evals == NULL || context_fe->workspace == NULL)
-            {
-                destroy_cross_entropy_context(context);
-                return NULL;
-            }
-            break;
-        }
-
-        case ALL:
-        case SPHERICAL:
-        case DIAGONAL:
-            break;
-    }
-
-    return context;
+void destroy_cross_entropy_context_spherical(struct cross_entropy_context * context)
+{  
+    m_free(context);
 }

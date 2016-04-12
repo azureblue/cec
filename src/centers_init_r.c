@@ -9,12 +9,12 @@ SEXP init_kmeanspp_r(SEXP x, SEXP k)
 {
     struct cec_matrix * ma_x = create_from_R_matrix(x);
 
-    if (ma_x == NULL)
+    if (!ma_x)
         error(MALLOC_ERROR_MSG);
 
     struct cec_matrix * ma_c = cec_matrix_create(asInteger(k), ma_x->n);
 
-    if (ma_c == NULL)
+    if (!ma_c)
     {
         cec_matrix_destroy(ma_x);
         error(MALLOC_ERROR_MSG);
@@ -50,12 +50,12 @@ SEXP init_random_r(SEXP x, SEXP rk)
 
     struct cec_matrix * ma_x = create_from_R_matrix(x);
 
-    if (ma_x == NULL)
+    if (!ma_x)
         error(MALLOC_ERROR_MSG);
 
     struct cec_matrix * ma_c = cec_matrix_create(k, ma_x->n);
 
-    if (ma_c == NULL)
+    if (!ma_c)
     {
         cec_matrix_destroy(ma_x);
         error(MALLOC_ERROR_MSG);

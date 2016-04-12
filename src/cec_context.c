@@ -3,7 +3,7 @@
 
 void destroy_cec_matrix_array(struct cec_matrix ** matrix_array, int l)
 {
-    if (matrix_array == NULL)
+    if (!matrix_array)
         return;
 
     for (int i = 0; i < l; i++)
@@ -14,7 +14,7 @@ void destroy_cec_matrix_array(struct cec_matrix ** matrix_array, int l)
 
 static void destroy_cec_temp_data(struct cec_temp_data * data, int k)
 {
-    if (data == NULL)
+    if (!data)
         return;
 
     cec_matrix_destroy(data->n_covariance_matrix);
@@ -28,7 +28,7 @@ static void destroy_cec_temp_data(struct cec_temp_data * data, int k)
 
 void destroy_cec_context_results(struct cec_context * context)
 {
-    if (context == NULL)
+    if (!context)
         return;
 
     int k = context->centers->m;
@@ -46,7 +46,7 @@ struct cec_matrix ** create_cec_matrix_array(int l, int m, int n)
 {
     struct cec_matrix ** matrix_array = m_alloc(
             sizeof (struct cec_matrix *) * l);
-    if (matrix_array == NULL)
+    if (!matrix_array)
         return NULL;
 
     int m_alloc_error_flag = 0;
@@ -54,7 +54,7 @@ struct cec_matrix ** create_cec_matrix_array(int l, int m, int n)
     for (int i = 0; i < l; i++)
     {
         matrix_array[i] = cec_matrix_create(m, n);
-        if (matrix_array[i] == NULL)
+        if (!matrix_array[i])
             m_alloc_error_flag = 1;
     }
 
@@ -70,7 +70,7 @@ struct cec_matrix ** create_cec_matrix_array(int l, int m, int n)
 static struct cec_temp_data * create_temp_data(int k, int n)
 {
     struct cec_temp_data * data = m_alloc(sizeof (struct cec_temp_data));
-    if (data == NULL)
+    if (!data)
         return NULL;
 
     data->n_covariance_matrix = cec_matrix_create(n, n);
@@ -78,9 +78,8 @@ static struct cec_temp_data * create_temp_data(int k, int n)
     data->t_mean_matrix = cec_matrix_create(k, n);
     data->t_covariance_matrices = create_cec_matrix_array(k, n, n);
 
-    if (data->n_covariance_matrix == NULL || data->t_matrix_nn == NULL
-            || data->t_mean_matrix == NULL
-            || data->t_covariance_matrices == NULL)
+    if (!data->n_covariance_matrix || !data->t_matrix_nn || !data->t_mean_matrix
+            || !data->t_covariance_matrices)
     {
         destroy_cec_temp_data(data, k);
         return NULL;
@@ -91,12 +90,11 @@ static struct cec_temp_data * create_temp_data(int k, int n)
 
 struct cec_context *
 create_cec_context(struct cec_matrix * points, struct cec_matrix * centers,
-        struct cross_entropy_context ** cross_entropy_contexts,
-        cross_entropy_function * cross_entropy_functions, int max_iterations, int min_card)
+        struct cec_model ** models, int max_iterations, int min_card)
 {
     struct cec_context * context = m_alloc(sizeof (struct cec_context));
 
-    if (context == NULL)
+    if (!context)
         return NULL;
 
     int m = points->m;
@@ -105,8 +103,7 @@ create_cec_context(struct cec_matrix * points, struct cec_matrix * centers,
 
     context->points = points;
     context->centers = centers;
-    context->cross_entropy_contexts = cross_entropy_contexts;
-    context->cross_entropy_functions = cross_entropy_functions;
+    context->models = models;
     context->max_iterations = max_iterations;
     context->min_card = min_card;
     context->error = NO_ERROR;
@@ -118,11 +115,8 @@ create_cec_context(struct cec_matrix * points, struct cec_matrix * centers,
     context->covriances = create_cec_matrix_array(k, n, n);
     context->temp_data = create_temp_data(k, n);
 
-    if (context->clustering_vector == NULL
-            || (context->energy == NULL && max_iterations >= 0)
-            || (context->clusters_number == NULL && max_iterations >= 0)
-            || context->covriances == NULL
-            || context->temp_data == NULL)
+    if (!context->clustering_vector || !context->energy || !context->clusters_number
+            || !context->covriances || !context->temp_data)
     {
         destroy_cec_context_results(context);
         return NULL;
