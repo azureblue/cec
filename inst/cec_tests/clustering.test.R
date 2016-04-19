@@ -1,5 +1,4 @@
-#source("tests")
-.testname <- "Clustering"
+testname <- "Clustering"
 setup <- function()
 {
     M <- as.matrix(read.table(system.file("cec_tests", "mouse1.data", package="CEC")))

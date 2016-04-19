@@ -1,1 +1,1 @@
-CEC::run.cec.tests()
+CEC:::run.cec.tests()

@@ -1,5 +1,4 @@
 # "Unit-test-like" thing. I didn't like RUnit.
-
 run.cec.tests <- function()
 {
     errors <- 0
@@ -14,7 +13,7 @@ run.cec.tests <- function()
             local(
                 {
                     # just to trick R CMD check...
-                    .testname <- NULL
+                    testname <- NULL
                     setup <- NULL
                 },
                 testenv
@@ -23,7 +22,7 @@ run.cec.tests <- function()
             errors <- errors + local(
                 {
                     local.errors <- 0
-                    cat(paste("Test:",.testname, "\n"))        
+                    cat(paste("Test:",testname, "\n"))        
                     fs <- lsf.str()        
                     
                     # execute setup function if exists

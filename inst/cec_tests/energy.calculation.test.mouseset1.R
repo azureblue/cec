@@ -1,5 +1,4 @@
-.testname <- "Energy calculation (mouseset1)"
-
+testname <- "Energy calculation (mouseset1)"
 setup <- function()
 {
     B <- as.matrix(read.table(system.file("cec_tests", "mouse1.data", package="CEC")))

@@ -1,5 +1,4 @@
-.testname <- "Energy calculation and covariances (mouseset3d)"
-
+testname <- "Energy calculation and covariances (mouseset3d)"
 setup <- function()
 {
     B <- as.matrix(read.table(system.file("cec_tests", "mouse3d.data", package="CEC")))
