@@ -1,3 +1,9 @@
+v0.9.4
+------
+- adding README.md
+- lots of refactoring
+- small fixes
+
 v0.9.3
 ------
 - giving up support of -1 iterations (fixing memcheck problems)

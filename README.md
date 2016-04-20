@@ -163,7 +163,7 @@ A mix of the Gaussian models
 One of the most powerful properties of the CEC algorithm is the possibility of mixing models. More precisely, the mixed models can be specified by giving a list of cluster types (and a list of parameters if needed).
 
 ```R
-R> cec(x = ..., centers = ..., type = c("all", "diagonal", ...), param = ...).
+cec(x = ..., centers = ..., type = c("all", "diagonal", ...), param = ...).
 ```
 
 ```R
