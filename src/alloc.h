@@ -8,5 +8,6 @@
 
 void * m_alloc(size_t size);
 void m_free(void * ptr);
+void m_free_ptrs(void ** ptrs, int n);
 
 #endif	/* ALLOC_H */
