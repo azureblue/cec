@@ -67,7 +67,7 @@ SEXP init_random_r(SEXP x, SEXP rk)
     {
         double r = cec_rand();
         int p = (int) (r * ma_x->m);
-        array_copy(cec_matrix_row(ma_x, p), cec_matrix_row(ma_c, i), ma_x->n);
+        array_copy(cec_matrix_const_row(ma_x, p), cec_matrix_row(ma_c, i), ma_x->n);
     }
 
     cec_rand_end();

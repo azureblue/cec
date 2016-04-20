@@ -39,8 +39,13 @@ static inline double cec_matrix_element(const struct cec_matrix *restrict m,
     return m->data[m->n * a + b];
 }
 
-static inline double * cec_matrix_row(struct cec_matrix *restrict matrix,
+static inline const double * cec_matrix_const_row(const struct cec_matrix *restrict matrix,
         int m)
+{
+    return matrix->data + (m * matrix->n);
+}
+
+static inline double * cec_matrix_row(struct cec_matrix *restrict matrix, int m)
 {
     return matrix->data + (m * matrix->n);
 }

@@ -3,6 +3,7 @@
 
 #include "matrix.h"
 #include "energy.h"
+#include "model.h"
 
 struct cec_temp_data
 {
@@ -12,27 +13,38 @@ struct cec_temp_data
     struct cec_matrix ** t_covariance_matrices;
 };
 
-struct cec_context
+struct cec_input
 {
-    /*
-     * Input parameters.
-     */
-    struct cec_matrix * points;
-    struct cec_matrix * centers;
+    const struct cec_matrix * points;
+    const struct cec_matrix * centers;
     struct cec_model ** models;
     int max_iterations;
     int min_card;
+};
 
-    /*
-     * CEC result (output parameters).
-     * Memory must be allocated before performing the algorithm.
-     */
+struct cec_results
+{
+    struct cec_matrix * centers;
     int * clustering_vector;
     int * clusters_number;
     int iterations;
     double * energy;
     struct cec_matrix ** covriances;
     int error;
+};
+
+struct cec_context
+{
+    /*
+     * Input parameters.
+     */
+    struct cec_input * input;
+
+    /*
+     * CEC result (output parameters).
+     * Memory must be allocated before performing the algorithm.
+     */
+    struct cec_results * results;
 
     /*
      * Temporary data. 
@@ -44,8 +56,8 @@ struct cec_context
 struct cec_matrix ** create_cec_matrix_array(int m, int n, int l);
 
 struct cec_context * create_cec_context(
-        struct cec_matrix * points,
-        struct cec_matrix * centers,
+        const struct cec_matrix * points,
+        const struct cec_matrix * centers,
         struct cec_model **,
         int max_iterations,
         int min_card

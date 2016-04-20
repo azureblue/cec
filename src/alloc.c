@@ -1,4 +1,5 @@
 #include "alloc.h"
+#include <stdlib.h>
 
 #ifdef R_ALLOC
 #include <Rinternals.h>

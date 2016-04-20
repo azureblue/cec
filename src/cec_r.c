@@ -8,6 +8,7 @@
 #include "cec_r_utils.h"
 #include "cec.h"
 #include "model.h"
+#include "rand.h"
 
 static void destroy_cec_models(struct cec_model ** cec_models, int k);
 
@@ -17,8 +18,7 @@ static struct cec_model ** create_cec_models(
 struct cec_model * create_model_from_R_params(enum density_family family, SEXP param, 
         int n);
 
-static SEXP create_R_result(struct cec_context * cec_c,
-        struct cec_matrix * centers, int m, int k, int n);
+static SEXP create_R_result(struct cec_context * cec_c, int m, int k, int n);
 
 void destroy_model(struct cec_model * model);
 
@@ -67,7 +67,7 @@ SEXP cec_r(SEXP x, SEXP centers, SEXP iter_max, SEXP type, SEXP card_min,
      * Prepare the results for R.
      */
     if (res == NO_ERROR)
-        PROTECT(result = create_R_result(cec_c, C, m, k, n));
+        PROTECT(result = create_R_result(cec_c, m, k, n));
 
     destroy_cec_models(cec_models, k);
     destroy_cec_context_results(cec_c);
@@ -79,7 +79,8 @@ SEXP cec_r(SEXP x, SEXP centers, SEXP iter_max, SEXP type, SEXP card_min,
     {
         UNPROTECT(1);
         return result;
-    } else
+    } 
+    else
     {
         switch (res)
         {
@@ -94,10 +95,9 @@ SEXP cec_r(SEXP x, SEXP centers, SEXP iter_max, SEXP type, SEXP card_min,
     return NULL;
 }
 
-static SEXP create_R_result(struct cec_context * cec_c,
-        struct cec_matrix * centers, int m, int k, int n)
+static SEXP create_R_result(struct cec_context * cec_c, int m, int k, int n)
 {
-    int iters = cec_c->iterations;
+    int iters = cec_c->results->iterations;
     int output_size = iters + 1;
     SEXP energy_vector;
     SEXP clusters_number_vector;
@@ -111,25 +111,25 @@ static SEXP create_R_result(struct cec_context * cec_c,
     PROTECT(assignment_vector = allocVector(INTSXP, m));
     PROTECT(covariance_list = allocVector(VECSXP, k));
     PROTECT(iterations = allocVector(INTSXP, 1));
-    PROTECT(centers_matrix = create_R_matrix(centers));
+    PROTECT(centers_matrix = create_R_matrix(cec_c->results->centers));
 
     INTEGER(iterations)[0] = iters;
 
     for (int i = 0; i < output_size; i++)
     {
-        REAL(energy_vector)[i] = cec_c->energy[i];
-        INTEGER(clusters_number_vector)[i] = cec_c->clusters_number[i];
+        REAL(energy_vector)[i] = cec_c->results->energy[i];
+        INTEGER(clusters_number_vector)[i] = cec_c->results->clusters_number[i];
     }
 
     for (int i = 0; i < m; i++)
     {
-        INTEGER(assignment_vector)[i] = cec_c->clustering_vector[i] + 1;
+        INTEGER(assignment_vector)[i] = cec_c->results->clustering_vector[i] + 1;
     }
 
     for (int i = 0; i < k; i++)
     {
         SEXP covariance;
-        PROTECT(covariance = create_R_matrix(cec_c->covriances[i]));
+        PROTECT(covariance = create_R_matrix(cec_c->results->covriances[i]));
         SET_VECTOR_ELT(covariance_list, i, covariance);
     }
 
