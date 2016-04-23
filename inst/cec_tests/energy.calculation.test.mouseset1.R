@@ -6,11 +6,9 @@ setup <- function()
 
 test.type.covariance <- function()
 {
-    cov <- cov.mle(B)
     given.cov = matrix(c(2,1,1,3), 2,2)
-    igiven.cov <- solve(given.cov)
     
-    expected.energy <- CEC:::H.covariance(cov, given.cov)  
+    expected.energy <- 3.540174056 
     
     CE <- cec(B, centers=1, type="cov", param = given.cov, iter.max=0)
     
@@ -19,10 +17,9 @@ test.type.covariance <- function()
 
 test.type.fixedr <- function()
 {
-    cov <- cov.mle(B)
     r <- 1.5
     
-    expected.energy <- CEC:::H.fixedr(cov, r)
+    expected.energy <- 3.416637007
     
     CE <- cec(B, centers=1, type="fix", param = 1.5, iter.max=0)
     
@@ -31,9 +28,7 @@ test.type.fixedr <- function()
 
 test.type.spherical <- function()
 {
-    bcov <- cov.mle(B)
-    Hx <- log(2 * pi * 2.718281828 / 2) + log (sum(diag(bcov)))
-    expected.energy <- Hx  
+    expected.energy <- 3.403158062  
     
     CE <- cec(B, centers=1, type="sp", iter.max=0)
     
@@ -43,9 +38,7 @@ test.type.spherical <- function()
 
 test.type.diagonal <- function()
 {
-    cov <- cov.mle(B)  
-    
-    expected.energy <- CEC:::H.diagonal(cov)
+    expected.energy <- 3.396500695
     
     CE <- cec(B, centers=1, type="diag", iter.max=0)
     
@@ -54,9 +47,7 @@ test.type.diagonal <- function()
 
 test.type.all <- function()
 {
-    cov <- cov.mle(B)
-    
-    expected.energy <- CEC:::H.all(cov)
+    expected.energy <- 3.396472329
     
     CE <- cec(B, centers=1, type="all", iter.max=0)
     

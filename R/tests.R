@@ -1,4 +1,3 @@
-# "Unit-test-like" thing. I didn't like RUnit.
 run.cec.tests <- function()
 {
     errors <- 0
@@ -128,39 +127,3 @@ cov.mle <- function(M)
     mat <- mat / nrow(M)
     mat
 }
-
-# R implementation of CEC internal cross-entropy functions.
-H.covariance <- function(cov, given.cov) 
-{
-    igiven.cov <- solve(given.cov)  
-    ncol(cov) / 2 * log(2 * pi) + 1/2 * sum(diag(igiven.cov %*% cov)) + 1 / 2 * log (det(given.cov))    
-}
-
-H.fixedr <- function(cov, r) 
-{  
-    ncol(cov) / 2 * log(2 * pi) + 1 / (2*r) * sum(diag(cov)) + ncol(cov) / 2 * log (r)      
-}
-
-H.spherical <- function(cov) 
-{
-    ncol(cov) / 2 * log(2 * pi * 2.718281828 / ncol(cov)) + ncol(cov) / 2 * log (sum(diag(cov))) 
-}
-
-H.diagonal <- function(cov) 
-{
-    ncol(cov) / 2 * log(2 * pi * 2.718281828) + log(prod(diag(cov))) / 2
-}
-
-H.all <- function(cov) 
-{
-    ncol(cov) / 2 * log(2 * pi * 2.718281828) + log(det(cov)) / 2    
-}
-
-H.eigenvalues <- function(cov, evals) 
-{  
-    c.evals = sort(eigen(cov)$val)
-    evals = sort(evals)
-    ncol(cov) / 2 * log(2 * pi) + 1 / 2 * sum(c.evals / evals) + 1 / 2 * log (prod(evals))    
-}
-
-

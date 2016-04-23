@@ -8,10 +8,9 @@ setup <- function()
 
 test.type.covariance <- function()
 {
-    cov <- CEC:::cov.mle(B)
     given.cov = matrix(c(2,1,1,3), 2,2)  
     
-    expected.energy <- - log(1) + CEC:::H.covariance(cov, given.cov)
+    expected.energy <- 2.766927173
     
     CE <- cec(B, centers=1, type="cov", param = given.cov, iter.max=0)
     
@@ -20,10 +19,9 @@ test.type.covariance <- function()
 
 test.type.fixedr <- function()
 {
-    cov <- cov.mle(B)
     r <- 1.5
     
-    expected.energy <- - log(1) + CEC:::H.fixedr(cov, r) 
+    expected.energy <- 2.410818718
     
     CE <- cec(B, centers=1, type="fix", param = 1.5, iter.max=0)
     
@@ -32,9 +30,7 @@ test.type.fixedr <- function()
 
 test.type.spherical <- function()
 {
-    cov <- cov.mle(B)
-    
-    expected.energy <- - log(1) + CEC:::H.spherical(cov)
+    expected.energy <- 1.456430201
     
     CE <- cec(B, centers=1, type="sp", iter.max=0)
     
@@ -46,7 +42,7 @@ test.type.diagonal <- function()
 {
     cov <- cov.mle(B)
     
-    expected.energy <- - log(1) + CEC:::H.diagonal(cov)
+    expected.energy <- 1.45637452
     
     CE <- cec(B, centers=1, type="diag", iter.max=0)
     
@@ -55,21 +51,9 @@ test.type.diagonal <- function()
 
 test.type.eigenvalues <- function()
 {
-    cov <- cov.mle(B)
     evals <- c(0.1, 0.22)
     
-    expected.energy <- CEC:::H.eigenvalues(cov, evals)
-    
-    CE <- cec(B, centers=1, type="eigen", param=evals, iter.max=0)
-    
-    CEC:::checkNumericVectorEquals(expected.energy, CE$cost[1], msg="Energy")
-}
-
-test.type.eigenvalues <- function()
-{
-    cov <- cov.mle(B)
-    evals <- c(0.1, 0.22)
-    expected.energy <- - log(1) + CEC:::H.eigenvalues(cov, evals)
+    expected.energy <- 1.734310397
     
     CE <- cec(B, centers=1, type="eigen", param=evals, iter.max=0)
     
@@ -78,9 +62,7 @@ test.type.eigenvalues <- function()
 
 test.type.all <- function()
 {
-    cov <- cov.mle(B)
-    
-    expected.energy <- CEC:::H.all(cov)
+    expected.energy <- 1.455903678
     
     CE <- cec(B, centers=1, type="all", iter.max=0)
     
@@ -91,9 +73,7 @@ test.type.all <- function()
 
 test.type.spherical.cluster.removing <- function()
 {
-    cov <- cov.mle(B)
-    
-    expected.energy <- CEC:::H.spherical(cov)
+    expected.energy <- 1.456430201
     
     CE <- cec(B, C, type="sp", iter.max=20)
     
