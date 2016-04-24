@@ -41,7 +41,7 @@ hist(faithful$waiting, prob = T, main = "Time between Old Faithful eruptions", x
   col = "lightgray", border = 0, ylim = c(0, 0.05))
   
 for(i in c(1:2))
-  curve(cec$probability[i] * dnorm(x, mean = cec$centers[i], sd = sqrt(cec$covariances[[i]][1])),
+  curve(cec$probability[i] * dnorm(x, mean = cec$centers[i], sd = sqrt(cec$covariances.model[[i]][1])),
     add = T, col = i + 1, lwd = 2)  
 ```
 ![](https://azureblue.github.io/cec/static/old.png)
