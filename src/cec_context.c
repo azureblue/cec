@@ -1,6 +1,6 @@
-#include "cec_context.h"
 #include "alloc.h"
-#include "checked_allocator.h"
+#include "alloc_check.h"
+#include "cec_context.h"
 
 void destroy_cec_matrix_array(struct cec_matrix ** matrix_array, int l)
 {
@@ -74,15 +74,16 @@ struct cec_matrix ** create_cec_matrix_array(int l, int m, int n)
 
 static struct cec_temp_data * create_temp_data(int k, int n)
 {
-    checked_allocation;
-    struct cec_temp_data * data = check(m_alloc(sizeof (struct cec_temp_data)));
+    checked_allocation(4);
+    
+    struct cec_temp_data * data = check_alloc(sizeof (struct cec_temp_data));
 
-    data->n_covariance_matrix = check(cec_matrix_create(n, n));
-    data->t_matrix_nn = check(cec_matrix_create(n, n));
-    data->t_mean_matrix = check(cec_matrix_create(k, n));
+    data->n_covariance_matrix = check_ptr(cec_matrix_create(n, n));
+    data->t_matrix_nn = check_ptr(cec_matrix_create(n, n));
+    data->t_mean_matrix = check_ptr(cec_matrix_create(k, n));
     if (!(data->t_covariance_matrices = create_cec_matrix_array(k, n, n)))
     {
-        free_checked_pointers();
+        free_checked_ptrs();
         return NULL;
     }
 
@@ -93,10 +94,11 @@ struct cec_context *
 create_cec_context(const struct cec_matrix * points, const struct cec_matrix * centers,
         struct cec_model ** models, int max_iterations, int min_card)
 {
-    checked_allocation;
-    struct cec_context * context = check(m_alloc(sizeof (struct cec_context)));
-    context->input = check(m_alloc(sizeof (struct cec_input)));
-    context->results = check(m_alloc(sizeof (struct cec_results)));
+    checked_allocation(7);
+    
+    struct cec_context * context = check_alloc(sizeof (struct cec_context));
+    context->input = check_alloc(sizeof (struct cec_input));
+    context->results = check_alloc(sizeof (struct cec_results));
     
     int m = points->m;
     int k = centers->m;
@@ -109,21 +111,21 @@ create_cec_context(const struct cec_matrix * points, const struct cec_matrix * c
     context->input->min_card = min_card;
     
     context->results->error = NO_ERROR;
-    context->results->clustering_vector = check(m_alloc(sizeof (int) * (m)));
-    context->results->centers = check(cec_matrix_create(k, n));
-    context->results->clusters_number = check(m_alloc(sizeof (int) * (max_iterations + 1)));
-    context->results->energy = check(m_alloc(sizeof (double) * (max_iterations + 1)));
+    context->results->clustering_vector = check_alloc(sizeof (int) * (m));
+    context->results->centers = check_ptr(cec_matrix_create(k, n));
+    context->results->clusters_number = check_alloc(sizeof (int) * (max_iterations + 1));
+    context->results->energy = check_alloc(sizeof (double) * (max_iterations + 1));
 
     if (!(context->results->covriances = create_cec_matrix_array(k, n, n)))
     {
-        free_checked_pointers();
+        free_checked_ptrs();
         return NULL;
     }
     
     if (!(context->temp_data = create_temp_data(k, n)))
     {
         destroy_cec_matrix_array(context->results->covriances, k);
-        free_checked_pointers();
+        free_checked_ptrs();
         return NULL;
     }
     
