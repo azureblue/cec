@@ -12,18 +12,15 @@
 
 static void destroy_cec_models(struct cec_model ** cec_models, int k);
 
-static struct cec_model ** create_cec_models(
-        SEXP type, SEXP params, int m, int k, int n, int * last_error);
+static struct cec_model ** create_cec_models(SEXP type, SEXP params, int m, int k, int n);
 
-struct cec_model * create_model_from_R_params(enum density_family family, SEXP param, 
-        int n);
+static struct cec_model * create_model_from_R_params(enum density_family family, SEXP param, int n);
 
-static SEXP create_R_result(struct cec_context * cec_c, int m, int k, int n);
+static SEXP create_R_result(struct cec_context * cec_c, int m, int k);
 
-void destroy_model(struct cec_model * model);
+static void destroy_model(struct cec_model * model);
 
-SEXP cec_r(SEXP x, SEXP centers, SEXP iter_max, SEXP type, SEXP card_min,
-        SEXP params)
+SEXP cec_r(SEXP x, SEXP centers, SEXP iter_max, SEXP type, SEXP card_min, SEXP params)
 {
     int m = Rf_nrows(x);
     int k = Rf_nrows(centers);
@@ -41,16 +38,14 @@ SEXP cec_r(SEXP x, SEXP centers, SEXP iter_max, SEXP type, SEXP card_min,
         error(MALLOC_ERROR_MSG);
     }
 
-    int last_error = 0;
+    struct cec_model ** cec_models = create_cec_models(type, params, m, k, n);
 
-    struct cec_model ** cec_models = create_cec_models(type, params, m, k, n, &last_error);
+    struct cec_context * cec_ctx = create_cec_context(X, C, cec_models, iteration_max, card_min_int);
 
-    struct cec_context * cec_c = create_cec_context(X, C, cec_models, iteration_max, card_min_int);
-
-    if (!cec_models || !cec_c)
+    if (!cec_models || !cec_ctx)
     {
         destroy_cec_models(cec_models, k);
-        destroy_cec_context_results(cec_c);
+        destroy_cec_context_results(cec_ctx);
         cec_matrix_destroy(X);
         cec_matrix_destroy(C);
         error(MALLOC_ERROR_MSG);
@@ -59,7 +54,7 @@ SEXP cec_r(SEXP x, SEXP centers, SEXP iter_max, SEXP type, SEXP card_min,
     /*
      * Perform the CEC algorithm.
      */
-    int res = cec(cec_c);
+    int res = cec(cec_ctx);
 
     SEXP result = NULL;
 
@@ -67,10 +62,10 @@ SEXP cec_r(SEXP x, SEXP centers, SEXP iter_max, SEXP type, SEXP card_min,
      * Prepare the results for R.
      */
     if (res == NO_ERROR)
-        PROTECT(result = create_R_result(cec_c, m, k, n));
+        PROTECT(result = create_R_result(cec_ctx, m, k));
 
     destroy_cec_models(cec_models, k);
-    destroy_cec_context_results(cec_c);
+    destroy_cec_context_results(cec_ctx);
 
     cec_matrix_destroy(X);
     cec_matrix_destroy(C);
@@ -95,7 +90,7 @@ SEXP cec_r(SEXP x, SEXP centers, SEXP iter_max, SEXP type, SEXP card_min,
     return NULL;
 }
 
-static SEXP create_R_result(struct cec_context * cec_c, int m, int k, int n)
+static SEXP create_R_result(struct cec_context * cec_c, int m, int k)
 {
     int iters = cec_c->results->iterations;
     int output_size = iters + 1;
@@ -122,9 +117,7 @@ static SEXP create_R_result(struct cec_context * cec_c, int m, int k, int n)
     }
 
     for (int i = 0; i < m; i++)
-    {
         INTEGER(assignment_vector)[i] = cec_c->results->clustering_vector[i] + 1;
-    }
 
     for (int i = 0; i < k; i++)
     {
@@ -135,7 +128,9 @@ static SEXP create_R_result(struct cec_context * cec_c, int m, int k, int n)
 
     SEXP ret;
     PROTECT(ret = allocList(6));
+    
     SEXP ret_s = ret;
+    
     SETCAR(ret, assignment_vector);
     SET_TAG(ret, install("cluster"));
     ret = CDR(ret);
@@ -153,7 +148,9 @@ static SEXP create_R_result(struct cec_context * cec_c, int m, int k, int n)
     ret = CDR(ret);
     SETCAR(ret, iterations);
     SET_TAG(ret, install("iterations"));
+    
     UNPROTECT(k + 7);
+    
     return ret_s;
 }
 
@@ -172,14 +169,11 @@ static void destroy_cec_models(struct cec_model ** cec_models, int k)
     }
 
     m_free(cec_models);
-
 }
 
-static struct cec_model ** create_cec_models(SEXP type, SEXP params, 
-        int m, int k, int n, int * last_error)
+static struct cec_model ** create_cec_models(SEXP type, SEXP params, int m, int k, int n)
 {
-    struct cec_model ** cec_models = m_alloc(
-            sizeof (struct cec_model *) * k);
+    struct cec_model ** cec_models = m_alloc(sizeof (struct cec_model *) * k);
 
     if (!cec_models)
         return NULL;
@@ -191,6 +185,7 @@ static struct cec_model ** create_cec_models(SEXP type, SEXP params,
         cec_models[i] = create_model_from_R_params(family, param, n);   
         if (!cec_models[i]) return (destroy_cec_models(cec_models, i + 1), NULL);
     }
+    
     return cec_models;
 }
 
@@ -222,10 +217,10 @@ void destroy_model(struct cec_model * model)
         }
 }
 
-struct cec_model * create_model_from_R_params(enum density_family family, SEXP param, 
-        int n)
+struct cec_model * create_model_from_R_params(enum density_family family, SEXP param, int n)
 {
     struct cec_model * model = m_alloc(sizeof (struct cec_model));
+    
     if (!model) 
         return NULL;
     
@@ -239,15 +234,15 @@ struct cec_model * create_model_from_R_params(enum density_family family, SEXP p
                 break;
             case SPHERICAL:
                 model->cross_entropy = h_spherical;
-                model->cross_entropy_context = create_cross_entropy_context_spherical(n);
+                model->cross_entropy_context = create_cross_entropy_context_spherical();
                 break;
             case DIAGONAL:
                 model->cross_entropy = h_diagonal;
-                model->cross_entropy_context = create_cross_entropy_context_diagonal(n);
+                model->cross_entropy_context = create_cross_entropy_context_diagonal();
                 break;
             case FIXED_R:
                 model->cross_entropy = h_fixed_r;
-                model->cross_entropy_context = create_cross_entropy_context_fixedr(n, asReal(param));
+                model->cross_entropy_context = create_cross_entropy_context_fixedr(asReal(param));
                 break;
             case GIVEN_COVARIANCE:
             {
@@ -264,5 +259,6 @@ struct cec_model * create_model_from_R_params(enum density_family family, SEXP p
                 model->cross_entropy = h_fixedeigenvalues;
                 model->cross_entropy_context = create_cross_entropy_context_eigenvalues(n, REAL(param));                
         }
+        
         return !model->cross_entropy_context ? (m_free(model), NULL) : model;
 }

@@ -16,8 +16,7 @@
 /*
  * Cross-entropy function.
  */
-typedef double (*cross_entropy_function) (struct cross_entropy_context *,
-        const struct cec_matrix *);
+typedef double (*cross_entropy_function) (struct cross_entropy_context *, const struct cec_matrix *);
 
 /*
  * Implementations of cross-entropy function with respect to 

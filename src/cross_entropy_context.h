@@ -46,10 +46,11 @@ struct context_r
 };
 
 struct cross_entropy_context * create_cross_entropy_context_all(int n);
-struct cross_entropy_context * create_cross_entropy_context_spherical(int n);
-struct cross_entropy_context * create_cross_entropy_context_diagonal(int n);
-struct cross_entropy_context * create_cross_entropy_context_fixedr(int n, double r);
-struct cross_entropy_context * create_cross_entropy_context_covariance(int n, const struct cec_matrix * cov, const struct cec_matrix * cov_i);
+struct cross_entropy_context * create_cross_entropy_context_spherical();
+struct cross_entropy_context * create_cross_entropy_context_diagonal();
+struct cross_entropy_context * create_cross_entropy_context_fixedr(double r);
+struct cross_entropy_context * create_cross_entropy_context_covariance(int n, const struct cec_matrix * cov,
+        const struct cec_matrix * cov_i);
 struct cross_entropy_context * create_cross_entropy_context_eigenvalues(int n, const double * given_evals);
 
 void destroy_cross_entropy_context_all(struct cross_entropy_context * context);

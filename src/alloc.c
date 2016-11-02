@@ -1,5 +1,4 @@
 #include "alloc.h"
-#include <stdlib.h>
 
 #ifdef R_ALLOC
 #include <Rinternals.h>
@@ -28,4 +27,3 @@ void m_free_ptrs(void ** ptrs, int n)
     for (int i = 0; i < n; i++)
         m_free(ptrs[i]);
 }
-

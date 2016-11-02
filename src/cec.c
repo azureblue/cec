@@ -34,10 +34,8 @@ int cec(struct cec_context * context)
     double clusters_energy[k];
 
     struct cec_matrix * t_matrix_nn = context->temp_data->t_matrix_nn;
-    struct cec_matrix * n_covariance_matrix =
-            context->temp_data->n_covariance_matrix;
-    struct cec_matrix ** t_covariance_matrices =
-            context->temp_data->t_covariance_matrices;
+    struct cec_matrix * n_covariance_matrix = context->temp_data->n_covariance_matrix;
+    struct cec_matrix ** t_covariance_matrices = context->temp_data->t_covariance_matrices;
 
     context->results->iterations = 0;
 
@@ -184,13 +182,13 @@ int cec(struct cec_context * context)
                  * Compute mean of group 'l' after removing data point 'i' and store
                  * its value in the n_mean.
                  */
-                mean_remove_point(cec_matrix_const_row(C, l), n_l_mean, cec_matrix_const_row(X, i), card[l], n);
+                mean_remove_point(n_l_mean, cec_matrix_const_row(C, l), cec_matrix_const_row(X, i), card[l], n);
 
                 /*
                  * Compute covariance of group 'l' after removing data point 'i' and store
                  * its value in n_covariance_matrix.
                  */
-                cec_cov_remove_point(covariance_matrices[l], n_covariance_matrix, cec_matrix_const_row(C, l),
+                cec_cov_remove_point(n_covariance_matrix, covariance_matrices[l], cec_matrix_const_row(C, l),
                         cec_matrix_const_row(X, i), card[l], t_matrix_nn);
 
                 /*
@@ -222,10 +220,10 @@ int cec(struct cec_context * context)
                 if ((j == l) || (removed[j] == 1))
                     continue;
 
-                mean_add_point(cec_matrix_row(C, j), cec_matrix_row(t_mean_matrix, j), cec_matrix_const_row(X, i),
+                mean_add_point(cec_matrix_row(t_mean_matrix, j), cec_matrix_row(C, j), cec_matrix_const_row(X, i),
                         card[j], n);
 
-                cec_cov_add_point(covariance_matrices[j], t_covariance_matrices[j], cec_matrix_const_row(C, j),
+                cec_cov_add_point(t_covariance_matrices[j], covariance_matrices[j], cec_matrix_const_row(C, j),
                         cec_matrix_const_row(X, i), card[j], t_matrix_nn);
 
                 double energy = cluster_energy(models[j], t_covariance_matrices[j], card[j] + 1, m);
@@ -331,4 +329,3 @@ int cec(struct cec_context * context)
     }
     return NO_ERROR;
 }
-

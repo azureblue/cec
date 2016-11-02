@@ -16,11 +16,9 @@ static inline double handle_cholesky_nan(double d)
     if (isnan(d))
         return handle_zero(0);
     return handle_zero(d);
-
 }
 
-double h_given_covariance(struct cross_entropy_context * context,
-        const struct cec_matrix * cov)
+double h_given_covariance(struct cross_entropy_context * context, const struct cec_matrix * cov)
 {
     struct context_gc * cgc = (struct context_gc *) context->specific_context;
     struct cec_matrix * temp_matrix = cgc->temp_matrix;
@@ -36,13 +34,11 @@ double h_given_covariance(struct cross_entropy_context * context,
         context->last_error = INVALID_COVARIANCE_ERROR;
         return NAN;
     }
-
     return (n / 2.0) * log(2.0 * M_PI) + (1.0 / 2.0) * trace
             + (1.0 / 2.0) * log(det);
 }
 
-double h_spherical(struct cross_entropy_context * context,
-        const struct cec_matrix * cov)
+double h_spherical(struct cross_entropy_context * context, const struct cec_matrix * cov)
 {
     int n = cov->n;
 
@@ -53,12 +49,10 @@ double h_spherical(struct cross_entropy_context * context,
         context->last_error = INVALID_COVARIANCE_ERROR;
         return NAN;
     }
-
     return (n / 2.0) * log(2.0 * M_PI * M_E / n) + (n / 2.0) * log(trace);
 }
 
-double h_fixed_r(struct cross_entropy_context * context,
-        const struct cec_matrix * cov)
+double h_fixed_r(struct cross_entropy_context * context, const struct cec_matrix * cov)
 {
     struct context_r * cr = (struct context_r *) context->specific_context;
     int n = cov->n;
@@ -68,10 +62,8 @@ double h_fixed_r(struct cross_entropy_context * context,
             + (1.0 / (2.0 * r)) * cec_cov_trace(cov) + (n / 2.0) * log(r);
 }
 
-double h_diagonal(struct cross_entropy_context * context,
-        const struct cec_matrix * cov)
+double h_diagonal(struct cross_entropy_context * context, const struct cec_matrix * cov)
 {
-
     int n = cov->n;
 
     double diagonal_product = cec_cov_diagonal_product(cov);
@@ -81,13 +73,11 @@ double h_diagonal(struct cross_entropy_context * context,
         context->last_error = INVALID_COVARIANCE_ERROR;
         return NAN;
     }
-
     return (n / 2.0) * log(2.0 * M_PI * M_E)
             + (1.0 / 2.0) * log(diagonal_product);
 }
 
-double h_fixedeigenvalues(struct cross_entropy_context * context,
-        const struct cec_matrix * cov)
+double h_fixedeigenvalues(struct cross_entropy_context * context, const struct cec_matrix * cov)
 {
     struct context_fe * cfe = (struct context_fe *) context->specific_context;
     struct cec_matrix * temp_matrix = cfe->temp_matrix;
@@ -109,8 +99,7 @@ double h_fixedeigenvalues(struct cross_entropy_context * context,
     return (n / 2.0) * log(2.0 * M_PI) + (1.0 / 2.0) * e_sum + (1.0 / 2.0) * log(cfe->given_evals_product);
 }
 
-double h_all(struct cross_entropy_context * context,
-        const struct cec_matrix * cov)
+double h_all(struct cross_entropy_context * context, const struct cec_matrix * cov)
 {
 
     struct cec_matrix * temp_matrix = ((struct context_all *)context->specific_context)->temp_matrix;
@@ -123,6 +112,6 @@ double h_all(struct cross_entropy_context * context,
     {
         context->last_error = INVALID_COVARIANCE_ERROR;
         return NAN;
-    }
+    }    
     return (n / 2.0) * log(2.0 * M_PI * M_E) + (1.0 / 2.0) * log(det);
 }
