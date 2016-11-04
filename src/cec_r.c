@@ -7,6 +7,7 @@
 #include "cec_r.h"
 #include "cec_r_utils.h"
 #include "cec.h"
+#include "error_r.h"
 #include "model.h"
 #include "rand.h"
 
@@ -35,7 +36,7 @@ SEXP cec_r(SEXP x, SEXP centers, SEXP iter_max, SEXP type, SEXP card_min, SEXP p
     {
         cec_matrix_destroy(X);
         cec_matrix_destroy(C);
-        error(MALLOC_ERROR_MSG);
+        error_r(MALLOC_ERROR);
     }
 
     struct cec_model ** cec_models = create_cec_models(type, params, m, k, n);
@@ -48,7 +49,7 @@ SEXP cec_r(SEXP x, SEXP centers, SEXP iter_max, SEXP type, SEXP card_min, SEXP p
         destroy_cec_context_results(cec_ctx);
         cec_matrix_destroy(X);
         cec_matrix_destroy(C);
-        error(MALLOC_ERROR_MSG);
+        error_r(MALLOC_ERROR);
     }
 
     /*
@@ -76,17 +77,8 @@ SEXP cec_r(SEXP x, SEXP centers, SEXP iter_max, SEXP type, SEXP card_min, SEXP p
         return result;
     } 
     else
-    {
-        switch (res)
-        {
-            case INVALID_COVARIANCE_ERROR:
-                error(INVALID_COVARIANCE_ERROR_MSG);
-            case ALL_CLUSTERS_REMOVED_ERROR:
-                error(ALL_CLUSTERS_REMOVED_MSG);
-            default:
-                error(UNKNOWN_ERROR_MSG);
-        }
-    }
+        error_r(res);
+    
     return NULL;
 }
 
