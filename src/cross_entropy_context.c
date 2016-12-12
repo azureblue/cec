@@ -8,10 +8,10 @@ static const int EIGENVALUES_WORKSPACE_BLOCK = 128;
  
 struct cross_entropy_context * create_cross_entropy_context_all(int n)
 {
-    checked_allocation(3);
+    checked_alloc(3);
     
-    struct cross_entropy_context * context = check_alloc(sizeof (struct cross_entropy_context));
-    struct context_all * c_all = check_alloc(sizeof (struct context_all));
+    struct cross_entropy_context * context = check_alloc(struct cross_entropy_context);
+    struct context_all * c_all = check_alloc(struct context_all);
     
     c_all->temp_matrix = check_ptr(cec_matrix_create(n, n));
     
@@ -32,10 +32,10 @@ struct cross_entropy_context * create_cross_entropy_context_diagonal()
 
 struct cross_entropy_context * create_cross_entropy_context_fixedr(double r)
 {
-    checked_allocation(2);
+    checked_alloc(2);
     
-    struct cross_entropy_context * context = check_alloc(sizeof (struct cross_entropy_context));
-    struct context_r * c_r =  check_alloc(sizeof (struct context_r));
+    struct cross_entropy_context * context = check_alloc(struct cross_entropy_context);
+    struct context_r * c_r =  check_alloc(struct context_r);
     
     c_r->r = r;
     
@@ -46,10 +46,10 @@ struct cross_entropy_context * create_cross_entropy_context_fixedr(double r)
 
 struct cross_entropy_context * create_cross_entropy_context_covariance(int n, const struct cec_matrix * cov, const struct cec_matrix * cov_i)
 {
-    checked_allocation(5);
+    checked_alloc(5);
     
-    struct cross_entropy_context * context = check_alloc(sizeof (struct cross_entropy_context));
-    struct context_gc * c_gc =  check_alloc(sizeof (struct context_gc));
+    struct cross_entropy_context * context = check_alloc(struct cross_entropy_context);
+    struct context_gc * c_gc =  check_alloc(struct context_gc);
     
     c_gc->given_cov = check_ptr(cec_matrix_create_copy(cov));
     c_gc->i_given_cov = check_ptr(cec_matrix_create_copy(cov_i));
@@ -62,15 +62,15 @@ struct cross_entropy_context * create_cross_entropy_context_covariance(int n, co
 
 struct cross_entropy_context * create_cross_entropy_context_eigenvalues(int n, const double * given_evals)
 {
-    checked_allocation(6);
+    checked_alloc(6);
     
-    struct cross_entropy_context * context = check_alloc(sizeof (struct cross_entropy_context));     
-    struct context_fe * c_fe =  check_alloc(sizeof (struct context_fe));
+    struct cross_entropy_context * context = check_alloc(struct cross_entropy_context);     
+    struct context_fe * c_fe =  check_alloc(struct context_fe);
     
-    c_fe->evals_given = check_alloc(sizeof (double) * n);
+    c_fe->evals_given = check_alloc_n(double, n);
     array_copy(given_evals, c_fe->evals_given, n);
     
-    c_fe->evals_temp = check_alloc(sizeof (double) * n);
+    c_fe->evals_temp = check_alloc_n(double, n);
     c_fe->workspace = check_ptr(cec_matrix_create(EIGENVALUES_WORKSPACE_BLOCK, 1));
     c_fe->temp_matrix = check_ptr(cec_matrix_create(n, n));
     

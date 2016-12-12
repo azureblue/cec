@@ -4,13 +4,19 @@
 #include "matrix.h"
 #include "energy.h"
 #include "model.h"
+#include "alloc.h"
+
+struct cec_matrix_array {
+    int l;
+    struct cec_matrix * mats[];
+};
 
 struct cec_temp_data
 {
     struct cec_matrix * t_mean_matrix;
     struct cec_matrix * t_matrix_nn;
     struct cec_matrix * n_covariance_matrix;
-    struct cec_matrix ** t_covariance_matrices;
+    struct cec_matrix_array  * t_covariance_matrices;
 };
 
 struct cec_input
@@ -29,31 +35,18 @@ struct cec_results
     int * clusters_number;
     int iterations;
     double * energy;
-    struct cec_matrix ** covriances;
+    struct cec_matrix_array * covriances;
     int error;
 };
 
 struct cec_context
 {
-    /*
-     * Input parameters.
-     */
     struct cec_input * input;
-
-    /*
-     * CEC result (output parameters).
-     * Memory must be allocated before performing the algorithm.
-     */
     struct cec_results * results;
-
-    /*
-     * Temporary data. 
-     * Memory must be allocated before performing the algorithm.
-     */
     struct cec_temp_data * temp_data;
 };
 
-struct cec_matrix ** create_cec_matrix_array(int m, int n, int l);
+struct cec_matrix_array * create_cec_matrix_array(int l, int m, int n);
 
 struct cec_context * create_cec_context(
         const struct cec_matrix * points,
@@ -63,9 +56,8 @@ struct cec_context * create_cec_context(
         int min_card
         );
 
-void destroy_cec_matrix_array(struct cec_matrix ** matrix_array, int l);
+void destroy_cec_matrix_array(memptr_t matrix_array);
 
 void destroy_cec_context_results(struct cec_context * context);
 
 #endif	/* CEC_CONTEXT_H */
-

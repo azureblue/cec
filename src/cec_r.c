@@ -114,7 +114,7 @@ static SEXP create_R_result(struct cec_context * cec_c, int m, int k)
     for (int i = 0; i < k; i++)
     {
         SEXP covariance;
-        PROTECT(covariance = create_R_matrix(cec_c->results->covriances[i]));
+        PROTECT(covariance = create_R_matrix(cec_c->results->covriances->mats[i]));
         SET_VECTOR_ELT(covariance_list, i, covariance);
     }
 

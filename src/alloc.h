@@ -6,8 +6,10 @@
  * Abstraction over memory allocation.
  */
 
-void * m_alloc(size_t size);
-void m_free(void * ptr);
-void m_free_ptrs(void ** ptrs, int n);
+typedef void* memptr_t;
+
+memptr_t m_alloc(size_t size);
+void m_free(memptr_t ptr);
+void m_free_ptrs(memptr_t * ptrs, int n);
 
 #endif	/* ALLOC_H */

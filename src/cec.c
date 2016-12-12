@@ -19,7 +19,7 @@ int cec(struct cec_context * context)
 
     int * cluster = context->results->clustering_vector;
     int * clusters_number = context->results->clusters_number;
-    struct cec_matrix ** covariance_matrices = context->results->covriances;
+    struct cec_matrix ** covariance_matrices = context->results->covriances->mats;
     double * energy = context->results->energy;
     
     struct cec_matrix * C = context->results->centers;
@@ -35,7 +35,7 @@ int cec(struct cec_context * context)
 
     struct cec_matrix * t_matrix_nn = context->temp_data->t_matrix_nn;
     struct cec_matrix * n_covariance_matrix = context->temp_data->n_covariance_matrix;
-    struct cec_matrix ** t_covariance_matrices = context->temp_data->t_covariance_matrices;
+    struct cec_matrix ** t_covariance_matrices = context->temp_data->t_covariance_matrices->mats;
 
     context->results->iterations = 0;
 

@@ -1,29 +1,40 @@
 #include "alloc_check.h"
 
-void alloc_check_longjmp_clean(struct alloc_check_context * context)
+void alloc_check_longjmp_clean(struct alloc_check_context * ctx)
 {
-    longjmp(context->jmpbuf, 1);
+    longjmp(ctx->jmpbuf, 1);
 }
 
-void alloc_check_idx_within_range(struct alloc_check_context * context)
+void alloc_check_assert_range(struct alloc_check_context * ctx)
 {
-    if (context->idx >= context->size)
-        alloc_check_longjmp_clean(context);
+    if (ctx->idx >= ctx->size)
+        alloc_check_longjmp_clean(ctx);
 }
 
-void * alloc_check_ptr(struct alloc_check_context * context, void * ptr)
+memptr_t alloc_check_ptr(struct alloc_check_context * ctx, memptr_t ptr, destructor_function_t dstr)
 {
-    context->ptrs[context->idx++] = (intptr_t) ptr;
     if (!ptr)
-        alloc_check_longjmp_clean(context);
+        alloc_check_longjmp_clean(ctx);
+    
+    ctx->ptrs[ctx->idx] = (intptr_t) ptr;
+    ctx->dstrs[ctx->idx] = dstr;
+    
+    ctx->idx++;
     
     return ptr;
 }
 
-void alloc_check_free_ptrs(struct alloc_check_context * context)
+void alloc_check_free_ptrs(struct alloc_check_context * ctx)
 {
-    for (int i = 0; i < context->idx; i++)
-        alloc_check_mem_free((void *) context->ptrs[i]);
-
-    context->idx = 0;
+    for (int i = 0; i < ctx->idx; i++)
+    {
+        destructor_function_t dstr = ctx->dstrs[i];
+        memptr_t ptr = (memptr_t) ctx->ptrs[i];
+        
+        if (dstr != NULL)
+            dstr(ptr);
+        else
+            alloc_check_mem_free(ptr);
+    }
+    ctx->idx = 0;
 }

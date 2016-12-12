@@ -2,9 +2,11 @@
 
 #ifdef R_ALLOC
 #include <Rinternals.h>
+#else
+#include <stdlib.h>
 #endif
 
-void * m_alloc(size_t size)
+memptr_t m_alloc(size_t size)
 {
 #ifdef R_ALLOC
     return R_alloc(size, 1);
@@ -13,7 +15,7 @@ void * m_alloc(size_t size)
 #endif    
 }
 
-void m_free(void * ptr)
+void m_free(memptr_t ptr)
 {
 #ifdef R_ALLOC
     return;
@@ -22,7 +24,7 @@ void m_free(void * ptr)
 #endif
 }
 
-void m_free_ptrs(void ** ptrs, int n)
+void m_free_ptrs(memptr_t * ptrs, int n)
 {
     for (int i = 0; i < n; i++)
         m_free(ptrs[i]);

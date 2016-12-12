@@ -2,19 +2,25 @@
 #include "alloc_check.h"
 #include "cec_context.h"
 
-void destroy_cec_matrix_array(struct cec_matrix ** matrix_array, int l)
+void destroy_cec_matrix_array(memptr_t matrix_array_ptr)
 {
+    struct cec_matrix_array * matrix_array = matrix_array_ptr;
+    
     if (!matrix_array)
         return;
 
+    int l = matrix_array->l;
+    
     for (int i = 0; i < l; i++)
-        cec_matrix_destroy(matrix_array[i]);
+        cec_matrix_destroy(matrix_array->mats[i]);
 
     m_free(matrix_array);
 }
 
-static void destroy_cec_temp_data(struct cec_temp_data * data, int k)
+static void destroy_cec_temp_data(memptr_t data_ptr)
 {
+    struct cec_temp_data * data = data_ptr;
+    
     if (!data)
         return;
 
@@ -22,7 +28,7 @@ static void destroy_cec_temp_data(struct cec_temp_data * data, int k)
     cec_matrix_destroy(data->t_matrix_nn);
     cec_matrix_destroy(data->t_mean_matrix);
 
-    destroy_cec_matrix_array(data->t_covariance_matrices, k);
+    destroy_cec_matrix_array(data->t_covariance_matrices);
 
     m_free(data);
 }
@@ -32,10 +38,8 @@ void destroy_cec_context_results(struct cec_context * context)
     if (!context)
         return;
 
-    int k = context->input->centers->m;
-
-    destroy_cec_matrix_array(context->results->covriances, k);
-    destroy_cec_temp_data(context->temp_data, k);
+    destroy_cec_matrix_array(context->results->covriances);
+    destroy_cec_temp_data(context->temp_data);
 
     m_free(context->results->clustering_vector);
     m_free(context->results->clusters_number);
@@ -46,46 +50,39 @@ void destroy_cec_context_results(struct cec_context * context)
     m_free(context);
 }
 
-struct cec_matrix ** create_cec_matrix_array(int l, int m, int n)
+struct cec_matrix_array * create_cec_matrix_array(int l, int m, int n)
 {
-    struct cec_matrix ** matrix_array = m_alloc(
-            sizeof (struct cec_matrix *) * l);
+    struct cec_matrix_array * matrix_array = m_alloc(
+            sizeof (struct cec_matrix_array) + sizeof (struct cec_matrix *) * l);
     
     if (!matrix_array)
         return NULL;
-
-    int m_alloc_error_flag = 0;
-
+    
+    matrix_array->l = l;
+    
     for (int i = 0; i < l; i++)
-    {
-        matrix_array[i] = cec_matrix_create(m, n);
-        if (!matrix_array[i])
-            m_alloc_error_flag = 1;
-    }
-
-    if (m_alloc_error_flag)
-    {
-        destroy_cec_matrix_array(matrix_array, l);
-        return NULL;
-    }
+        matrix_array->mats[i] = NULL;
+    
+    for (int i = 0; i < l; i++)
+        if (!(matrix_array->mats[i] = cec_matrix_create(m, n)))
+        {
+            destroy_cec_matrix_array(matrix_array);
+            return NULL;
+        }
 
     return matrix_array;
 }
 
 static struct cec_temp_data * create_temp_data(int k, int n)
 {
-    checked_allocation(4);
+    checked_alloc(5);
     
-    struct cec_temp_data * data = check_alloc(sizeof (struct cec_temp_data));
+    struct cec_temp_data * data = check_alloc(struct cec_temp_data);
 
     data->n_covariance_matrix = check_ptr(cec_matrix_create(n, n));
     data->t_matrix_nn = check_ptr(cec_matrix_create(n, n));
     data->t_mean_matrix = check_ptr(cec_matrix_create(k, n));
-    if (!(data->t_covariance_matrices = create_cec_matrix_array(k, n, n)))
-    {
-        free_checked_ptrs();
-        return NULL;
-    }
+    data->t_covariance_matrices = check_ptr_dstr(create_cec_matrix_array(k, n, n), destroy_cec_matrix_array);
 
     return data;
 }
@@ -94,11 +91,11 @@ struct cec_context *
 create_cec_context(const struct cec_matrix * points, const struct cec_matrix * centers,
         struct cec_model ** models, int max_iterations, int min_card)
 {
-    checked_allocation(7);
+    checked_alloc(9);
     
-    struct cec_context * context = check_alloc(sizeof (struct cec_context));
-    context->input = check_alloc(sizeof (struct cec_input));
-    context->results = check_alloc(sizeof (struct cec_results));
+    struct cec_context * context = check_alloc(struct cec_context);
+    context->input = check_alloc(struct cec_input);
+    context->results = check_alloc(struct cec_results);
     
     int m = points->m;
     int k = centers->m;
@@ -111,23 +108,13 @@ create_cec_context(const struct cec_matrix * points, const struct cec_matrix * c
     context->input->min_card = min_card;
     
     context->results->error = NO_ERROR;
-    context->results->clustering_vector = check_alloc(sizeof (int) * (m));
+    context->results->clustering_vector = check_alloc_n(int, m);
     context->results->centers = check_ptr(cec_matrix_create(k, n));
-    context->results->clusters_number = check_alloc(sizeof (int) * (max_iterations + 1));
-    context->results->energy = check_alloc(sizeof (double) * (max_iterations + 1));
-
-    if (!(context->results->covriances = create_cec_matrix_array(k, n, n)))
-    {
-        free_checked_ptrs();
-        return NULL;
-    }
+    context->results->clusters_number = check_alloc_n(int, max_iterations + 1);
+    context->results->energy = check_alloc_n(double, max_iterations + 1);
+    context->results->covriances = check_ptr_dstr(create_cec_matrix_array(k, n, n), destroy_cec_matrix_array);
     
-    if (!(context->temp_data = create_temp_data(k, n)))
-    {
-        destroy_cec_matrix_array(context->results->covriances, k);
-        free_checked_ptrs();
-        return NULL;
-    }
+    context->temp_data = check_ptr_dstr(create_temp_data(k, n), destroy_cec_temp_data);
     
     return context;
 }
