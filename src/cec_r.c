@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <R.h>
 #include <Rdefines.h>
-
 #include "alloc.h"
 #include "cec_r.h"
 #include "cec_r_utils.h"
@@ -165,7 +164,7 @@ static void destroy_cec_models(struct cec_model ** cec_models, int k)
 
 static struct cec_model ** create_cec_models(SEXP type, SEXP params, int m, int k, int n)
 {
-    struct cec_model ** cec_models = m_alloc(sizeof (struct cec_model *) * k);
+    struct cec_model ** cec_models = alloc_n(struct cec_model *, k);
 
     if (!cec_models)
         return NULL;
@@ -211,7 +210,7 @@ void destroy_model(struct cec_model * model)
 
 struct cec_model * create_model_from_R_params(enum density_family family, SEXP param, int n)
 {
-    struct cec_model * model = m_alloc(sizeof (struct cec_model));
+    struct cec_model * model = alloc(struct cec_model);
     
     if (!model) 
         return NULL;

@@ -65,9 +65,8 @@ double cec_cov_cholesky_det(const struct cec_matrix * m, struct cec_matrix * tem
         return det;
 
     } else if (cec_cov_cholesky(m, temp) != NO_ERROR)
-    {
         return NAN;
-    }
+    
     double prod = cec_cov_diagonal_product(temp);
     return prod * prod;
 }

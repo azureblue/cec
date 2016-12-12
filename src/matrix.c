@@ -34,8 +34,7 @@ void cec_matrix_copy_data(const struct cec_matrix *restrict from, struct cec_mat
 
 struct cec_matrix * cec_matrix_create(int m, int n)
 {
-    struct cec_matrix * mat = 
-        m_alloc(sizeof (struct cec_matrix) + sizeof (double) * m * n);
+    struct cec_matrix * mat = alloc_fam(struct cec_matrix, double, m * n);
     
     if (!mat)
         return NULL;    

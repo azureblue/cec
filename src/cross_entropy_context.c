@@ -22,12 +22,12 @@ struct cross_entropy_context * create_cross_entropy_context_all(int n)
 
 struct cross_entropy_context * create_cross_entropy_context_spherical()
 {
-    return m_alloc(sizeof (struct cross_entropy_context));
+    return alloc(struct cross_entropy_context);
 }
 
 struct cross_entropy_context * create_cross_entropy_context_diagonal()
 {
-    return m_alloc(sizeof (struct cross_entropy_context));
+    return alloc(struct cross_entropy_context);
 }
 
 struct cross_entropy_context * create_cross_entropy_context_fixedr(double r)

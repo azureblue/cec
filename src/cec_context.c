@@ -52,8 +52,7 @@ void destroy_cec_context_results(struct cec_context * context)
 
 struct cec_matrix_array * create_cec_matrix_array(int l, int m, int n)
 {
-    struct cec_matrix_array * matrix_array = m_alloc(
-            sizeof (struct cec_matrix_array) + sizeof (struct cec_matrix *) * l);
+    struct cec_matrix_array * matrix_array = alloc_fam(struct cec_matrix_array, struct cec_matrix, l);
     
     if (!matrix_array)
         return NULL;
@@ -69,7 +68,7 @@ struct cec_matrix_array * create_cec_matrix_array(int l, int m, int n)
             destroy_cec_matrix_array(matrix_array);
             return NULL;
         }
-
+    
     return matrix_array;
 }
 
@@ -87,33 +86,30 @@ static struct cec_temp_data * create_temp_data(int k, int n)
     return data;
 }
 
-struct cec_context *
-create_cec_context(const struct cec_matrix * points, const struct cec_matrix * centers,
+struct cec_context * create_cec_context(const struct cec_matrix * points, const struct cec_matrix * centers,
         struct cec_model ** models, int max_iterations, int min_card)
 {
     checked_alloc(9);
+
+    int m = points->m;
+    int k = centers->m;
+    int n = points->n;
     
     struct cec_context * context = check_alloc(struct cec_context);
     context->input = check_alloc(struct cec_input);
     context->results = check_alloc(struct cec_results);
     
-    int m = points->m;
-    int k = centers->m;
-    int n = points->n;
-
     context->input->points = points;
     context->input->centers = centers;
     context->input->models = models;
     context->input->max_iterations = max_iterations;
-    context->input->min_card = min_card;
-    
+    context->input->min_card = min_card;    
     context->results->error = NO_ERROR;
     context->results->clustering_vector = check_alloc_n(int, m);
     context->results->centers = check_ptr(cec_matrix_create(k, n));
     context->results->clusters_number = check_alloc_n(int, max_iterations + 1);
     context->results->energy = check_alloc_n(double, max_iterations + 1);
-    context->results->covriances = check_ptr_dstr(create_cec_matrix_array(k, n, n), destroy_cec_matrix_array);
-    
+    context->results->covriances = check_ptr_dstr(create_cec_matrix_array(k, n, n), destroy_cec_matrix_array);    
     context->temp_data = check_ptr_dstr(create_temp_data(k, n), destroy_cec_temp_data);
     
     return context;

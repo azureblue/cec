@@ -58,6 +58,6 @@ struct cec_context * create_cec_context(
 
 void destroy_cec_matrix_array(memptr_t matrix_array);
 
-void destroy_cec_context_results(struct cec_context * context);
+void destroy_cec_context_results(struct cec_context *);
 
 #endif	/* CEC_CONTEXT_H */
