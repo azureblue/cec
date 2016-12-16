@@ -53,10 +53,6 @@ void cec_matrix_add(struct cec_matrix *restrict m1, const struct cec_matrix *res
 
 void cec_matrix_sub(struct cec_matrix *restrict m1, const struct cec_matrix *restrict m2);
 
-void cec_matrix_sum_multiplied(struct cec_matrix * dest, 
-        const struct cec_matrix *restrict m1, double a1, 
-        const struct cec_matrix *restrict m2, double a2);
-
 void cec_matrix_copy_data(const struct cec_matrix *restrict from, struct cec_matrix *restrict to);
 
 void cec_vector_outer_product(const double *restrict vec, struct cec_matrix *restrict output_matrix, int n);

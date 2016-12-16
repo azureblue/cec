@@ -189,7 +189,7 @@ int cec(struct cec_context * context)
                  * its value in n_covariance_matrix.
                  */
                 cec_cov_remove_point(n_covariance_matrix, covariance_matrices[l], cec_matrix_const_row(C, l),
-                        cec_matrix_const_row(X, i), card[l], t_matrix_nn);
+                        cec_matrix_const_row(X, i), card[l]);
 
                 /*
                  * Compute energy of group 'l' after removing data point 'i'.
@@ -224,7 +224,7 @@ int cec(struct cec_context * context)
                         card[j], n);
 
                 cec_cov_add_point(t_covariance_matrices[j], covariance_matrices[j], cec_matrix_const_row(C, j),
-                        cec_matrix_const_row(X, i), card[j], t_matrix_nn);
+                        cec_matrix_const_row(X, i), card[j]);
 
                 double energy = cluster_energy(models[j], t_covariance_matrices[j], card[j] + 1, m);
         

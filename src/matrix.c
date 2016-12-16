@@ -21,12 +21,6 @@ void cec_matrix_sub(struct cec_matrix *restrict m1, const struct cec_matrix *res
     array_sub(m1->data, m2->data, m1->m * m1->n);
 }
 
-void cec_matrix_sum_multiplied(struct cec_matrix *restrict dest, 
-        const struct cec_matrix *restrict m1, double a1, const struct cec_matrix *restrict m2, double a2)
-{
-    array_sum_multiplied(dest->data, m1->data, a1, m2->data, a2, m1->m * m1->n);
-}
-
 void cec_matrix_copy_data(const struct cec_matrix *restrict from, struct cec_matrix *restrict to)
 {
     array_copy(from->data, to->data, from->m * from->n);

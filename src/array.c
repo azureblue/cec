@@ -24,13 +24,6 @@ void array_sub(double *restrict x1, const double *restrict x2, const int n)
         x1[i] -= x2[i];
 }
 
-void array_sum_multiplied(double *restrict dest, const double *restrict x1, const double m1,
-        const double *restrict x2, const double m2, const int n)
-{
-    for (int i = 0; i < n; i++)
-        dest[i] = x1[i] * m1 + x2[i] * m2;
-}
-
 void array_mul(double * x, const double val, const int n)
 {
     for (int i = 0; i < n; i++)
@@ -45,16 +38,23 @@ double dist2(const double * x1, const double * x2, const int n)
     return dist;
 }
 
+inline void array_sum_mul(double *restrict dest, const double *restrict x1, const double m1,
+        const double *restrict x2, const double m2, const int n)
+{
+    for (int i = 0; i < n; i++)
+        dest[i] = x1[i] * m1 + x2[i] * m2;
+}
+
 void mean_add_point(double *restrict dest_mean, const double *restrict mean,
         const double *restrict point, const int card, const int n)
 {
-    double d = (double) card;
-    array_sum_multiplied(dest_mean, mean, d / (d + 1.0), point, 1.0 / (d + 1.0), n);
+    const double card_n = card + 1;
+    array_sum_mul(dest_mean, mean, card / card_n, point, 1 / card_n, n);
 }
 
 void mean_remove_point(double *restrict dest_mean, const double *restrict mean,
         const double *restrict point, const int card, const int n)
 {
-    double d = (double) card;
-    array_sum_multiplied(dest_mean, mean, d / (d - 1.0), point, -1.0 / (d - 1.0), n);
+    const double card_n = card - 1;
+    array_sum_mul(dest_mean, mean, card / card_n, point, -1 / card_n, n);
 }
