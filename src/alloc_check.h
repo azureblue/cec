@@ -33,8 +33,8 @@ struct alloc_check_context
 #define check_ptr(ptr) (alloc_check_assert_range(&_alloc_check_context), alloc_check_ptr(&_alloc_check_context, ptr, NULL))
 #define check_ptr_dstr(ptr, destr) (alloc_check_assert_range(&_alloc_check_context), alloc_check_ptr(&_alloc_check_context, ptr, destr))
 #define check_alloc(struct_t) check_ptr(alloc_check_mem_alloc(sizeof (struct_t)))
-#define check_alloc_n(type, n) check_ptr(alloc_check_mem_alloc(sizeof (type) * n))
-#define check_alloc_fam(struct_t, fam_type, fam_length) check_ptr(alloc_check_mem_alloc(sizeof (struct_t) + sizeof (fam_type) * fam_length))
+#define check_alloc_n(type, n) check_ptr(alloc_check_mem_alloc(sizeof (type) * (n)))
+#define check_alloc_fam(struct_t, fam_type, fam_length) check_ptr(alloc_check_mem_alloc(sizeof (struct_t) + sizeof (fam_type) * (fam_length)))
 
 #define free_checked_ptrs() alloc_check_free_ptrs(&_alloc_check_context)
 
