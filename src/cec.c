@@ -1,9 +1,6 @@
-#include <stdlib.h>
-#include <stdio.h>
 #include <math.h>
 #include "cec.h"
 #include "cov_utils.h"
-#include "model.h"
 
 int cec(struct cec_context * context)
 {

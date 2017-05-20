@@ -1,5 +1,4 @@
 #include "alloc.h"
-#include "errors.h"
 #include "kmeanspp.h"
 #include "rand.h"
 
@@ -27,14 +26,7 @@ int kmeanspp(struct cec_matrix * X, struct cec_matrix * C)
     
     double * dists_m = alloc_n(double, m + 1);
     double * sums_m = alloc_n(double, m + 1);
-    
-    if (!dists_m || !sums_m)
-    {
-        m_free(dists_m);
-        m_free(sums_m);
-        return MALLOC_ERROR;
-    }
-    
+
     cec_rand_init();
     
     int first_center = (int) (cec_rand() * m);
@@ -65,14 +57,10 @@ int kmeanspp(struct cec_matrix * X, struct cec_matrix * C)
             double dist = dist2(cec_matrix_const_row(X, j), cec_matrix_const_row(C, i), n);
             if (dist < dists[j])
                 dists[j] = dist;
-            
             sums_m[j + 1] = sums_m[j] + dists[j];
         }
     }
     
     cec_rand_end();
-    
-    m_free(dists_m);
-    m_free(sums_m);
     return 0;
 }

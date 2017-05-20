@@ -28,6 +28,7 @@ double h_given_covariance(struct cross_entropy_context * context, const struct c
     double trace = cec_cov_trace(temp_matrix);
     trace = handle_zero(trace);
     double det = cec_cov_cholesky_det(cgc->given_cov, temp_matrix);
+    
     det = handle_cholesky_nan(det);
     if (isnan(trace) || isnan(det))
     {

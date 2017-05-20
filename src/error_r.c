@@ -16,7 +16,7 @@ static const char * const CENTERS_INIT_ERROR_MSG = "Centers initialization error
 void noreturn error_r(enum error_code code) {
     switch (code)
     {
-        case MALLOC_ERROR:
+        case MEM_ALLOC_ERROR:
             error(MALLOC_ERROR_MSG);
         case INVALID_COVARIANCE_ERROR:
             error(INVALID_COVARIANCE_ERROR_MSG);

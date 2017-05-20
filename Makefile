@@ -16,7 +16,6 @@ $(EXEC): $(OBJECTS)
 	$(CC) -O0 -g $(OBJECTS) -o $(EXEC) -L/usr/lib/R/lib -lR -lm -llapack
 
 
-
 %.o: %.c
 	$(CC) -c $(CC_FLAGS) $< -o $@
 

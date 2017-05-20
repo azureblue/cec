@@ -12,7 +12,8 @@ cec <- function(
     interactive   = F,
     readline      = T
 )
-{ 
+{
+    on.exit(.Call(release_cec_mem_r));
     # check arguments  
     if (!hasArg(x)) stop("Missing requierd argument: 'x'.")
     if (!hasArg(centers)) stop("Missing requierd argument: 'centers'.")

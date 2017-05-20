@@ -7,9 +7,6 @@ struct cec_matrix * create_from_R_matrix(SEXP R_ma)
 
     struct cec_matrix * ma = cec_matrix_create(m, n);
 
-    if (!ma)
-        return NULL;
-
     for (int i = 0; i < m; i++)
         for (int j = 0; j < n; j++)
             cec_matrix_set_element(ma, i, j, REAL(R_ma)[j * m + i]);

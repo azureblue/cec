@@ -1,4 +1,5 @@
-#include <stdio.h>
+#include "alloc.h"
+#include "alloc_utils_r.h"
 #include "cec_r_utils.h"
 #include "centers_init_r.h"
 #include "error_r.h"
@@ -7,18 +8,9 @@
 
 SEXP init_kmeanspp_r(SEXP x, SEXP k)
 {
+    init_mem_mg(error_r_mem_error);
     struct cec_matrix * ma_x = create_from_R_matrix(x);
-
-    if (!ma_x)
-        error_r(MALLOC_ERROR);
-
     struct cec_matrix * ma_c = cec_matrix_create(asInteger(k), ma_x->n);
-
-    if (!ma_c)
-    {
-        cec_matrix_destroy(ma_x);
-        error_r(MALLOC_ERROR);
-    }
 
     int r = kmeanspp(ma_x, ma_c);
 
@@ -26,35 +18,23 @@ SEXP init_kmeanspp_r(SEXP x, SEXP k)
     {
         SEXP result;
         PROTECT(result = create_R_matrix(ma_c));
-        cec_matrix_destroy(ma_x);
-        cec_matrix_destroy(ma_c);
         UNPROTECT(1);
+        free_mem_mg();
         return result;
     } 
-    else
-    {
-        cec_matrix_destroy(ma_x);
-        cec_matrix_destroy(ma_c);
+    else {
+        free_mem_mg();
         error_r(r);
     }
 }
 
 SEXP init_random_r(SEXP x, SEXP rk)
 {
+    init_mem_mg(error_r_mem_error);
     int k = asInteger(rk);
 
     struct cec_matrix * ma_x = create_from_R_matrix(x);
-
-    if (!ma_x)
-        error_r(MALLOC_ERROR);
-
     struct cec_matrix * ma_c = cec_matrix_create(k, ma_x->n);
-
-    if (!ma_c)
-    {
-        cec_matrix_destroy(ma_x);
-        error_r(MALLOC_ERROR);
-    }
 
     cec_rand_init();
 
@@ -69,8 +49,7 @@ SEXP init_random_r(SEXP x, SEXP rk)
 
     SEXP result;
     PROTECT(result = create_R_matrix(ma_c));
-    cec_matrix_destroy(ma_x);
-    cec_matrix_destroy(ma_c);
     UNPROTECT(1);
+    free_mem_mg();
     return result;
 }

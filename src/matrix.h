@@ -8,10 +8,6 @@
 #include "errors.h"
 #include "array.h"
 
-/*
- * Simple matrix structure used in CEC and basic set of matrix functions.
- */
-
 struct cec_matrix
 {
     int m;
@@ -19,42 +15,44 @@ struct cec_matrix
     double data[];
 };
 
-struct cec_matrix * cec_matrix_create(int m, int n);
+typedef struct cec_matrix cec_mat;
 
-struct cec_matrix * cec_matrix_create_copy(const struct cec_matrix * mat);
+cec_mat * cec_matrix_create(int m, int n);
 
-void cec_matrix_destroy(struct cec_matrix * m);
+cec_mat * cec_matrix_create_copy(const cec_mat * mat);
 
-void cec_matrix_set(struct cec_matrix * m, double val);
+void cec_matrix_destroy(cec_mat * m);
 
-static inline void cec_matrix_set_element(struct cec_matrix * m, int a, int b, double val)
+void cec_matrix_set(cec_mat * m, double val);
+
+static inline void cec_matrix_set_element(cec_mat * m, int a, int b, double val)
 {
     m->data[m->n * a + b] = val;
 }
 
-static inline double cec_matrix_element(const struct cec_matrix * m, int a, int b)
+static inline double cec_matrix_element(const cec_mat * m, int a, int b)
 {
     return m->data[m->n * a + b];
 }
 
-static inline const double * cec_matrix_const_row(const struct cec_matrix * matrix, int m)
+static inline const double * cec_matrix_const_row(const cec_mat * matrix, int m)
 {
     return matrix->data + (m * matrix->n);
 }
 
-static inline double * cec_matrix_row(struct cec_matrix * matrix, int m)
+static inline double * cec_matrix_row(cec_mat * matrix, int m)
 {
     return matrix->data + (m * matrix->n);
 }
 
-void cec_matrix_mul(struct cec_matrix * m, double val);
+void cec_matrix_mul(cec_mat * m, double val);
 
-void cec_matrix_add(struct cec_matrix *restrict m1, const struct cec_matrix *restrict m2);
+void cec_matrix_add(cec_mat *restrict m1, const cec_mat *restrict m2);
 
-void cec_matrix_sub(struct cec_matrix *restrict m1, const struct cec_matrix *restrict m2);
+void cec_matrix_sub(cec_mat *restrict m1, const cec_mat *restrict m2);
 
-void cec_matrix_copy_data(const struct cec_matrix *restrict from, struct cec_matrix *restrict to);
+void cec_matrix_copy_data(const cec_mat *restrict from, cec_mat *restrict to);
 
-void cec_vector_outer_product(const double *restrict vec, struct cec_matrix *restrict output_matrix, int n);
+void cec_vector_outer_product(const double *restrict vec, cec_mat *restrict output_matrix, int n);
 
 #endif	/* MATRIX_H */
