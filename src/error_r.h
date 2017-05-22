@@ -4,6 +4,6 @@
 #include "errors.h"
 #include "noret.h"
 
-void noreturn error_r(enum error_code);
+void noreturn error_r(enum cec_result_code);
 
 #endif /* ERROR_R_H */

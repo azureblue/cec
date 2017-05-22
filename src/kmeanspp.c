@@ -18,11 +18,11 @@ static int binary_search_d(double key, double * array, int len)
     return a;
 }
 
-int kmeanspp(struct cec_matrix * X, struct cec_matrix * C)
+cec_res cec_init_centers_kmeanspp(const cec_mat *x, cec_mat *c)
 {
-    int m = X->m;
-    int k = C->m;
-    int n = X->n;
+    int m = x->m;
+    int k = c->m;
+    int n = x->n;
     
     double * dists_m = alloc_n(double, m + 1);
     double * sums_m = alloc_n(double, m + 1);
@@ -30,8 +30,7 @@ int kmeanspp(struct cec_matrix * X, struct cec_matrix * C)
     cec_rand_init();
     
     int first_center = (int) (cec_rand() * m);
-    
-    array_copy(cec_matrix_const_row(X, first_center), cec_matrix_row(C, 0), n);
+    array_copy(cec_matrix_const_row(x, first_center), cec_matrix_row(c, 0), n);
     dists_m[0] = 0.0;
     sums_m[0] = 0.0;
     
@@ -40,21 +39,20 @@ int kmeanspp(struct cec_matrix * X, struct cec_matrix * C)
     
     for (int i = 0; i < m; i++)
     {
-        double dist = dist2(cec_matrix_const_row(X, i), cec_matrix_const_row(C, 0), n);
+        double dist = dist2(cec_matrix_const_row(x, i), cec_matrix_const_row(c, 0), n);
         dists[i] = dist;
         sums[i] = sums[i - 1] + dist;
     }
-
     for (int i = 1; i < k; i++)
     {
         double r = cec_rand();
         double n_sum = r * sums[m - 1];
         int idx = binary_search_d(n_sum, sums, m);
-        array_copy(cec_matrix_const_row(X, idx), cec_matrix_row(C, i), n);
+        array_copy(cec_matrix_const_row(x, idx), cec_matrix_row(c, i), n);
 
         for (int j = 0; j < m; j++)
         {
-            double dist = dist2(cec_matrix_const_row(X, j), cec_matrix_const_row(C, i), n);
+            double dist = dist2(cec_matrix_const_row(x, j), cec_matrix_const_row(c, i), n);
             if (dist < dists[j])
                 dists[j] = dist;
             sums_m[j + 1] = sums_m[j] + dists[j];
@@ -62,5 +60,5 @@ int kmeanspp(struct cec_matrix * X, struct cec_matrix * C)
     }
     
     cec_rand_end();
-    return 0;
+    return NO_ERROR;
 }

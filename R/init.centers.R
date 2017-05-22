@@ -8,13 +8,7 @@ init.centers <- function(x, k, method = c("kmeans++", "random"))
     
     n <- ncol(x)
     m <- nrow(x)
-    
-    centers <- NULL
-    
-    if (method.int == 0)
-        centers <- .Call(init_kmeanspp_r , x, k)
-    else if (method.int == 1)
-        centers <- .Call(init_random_r , x, k)
-    
+
+    centers <- .Call(cec_init_centers_r, x, k, method.int);
     centers  
 }
