@@ -25,29 +25,54 @@ static struct cec_temp_data * create_temp_data(int k, int n)
     return data;
 }
 
-struct cec_context * create_cec_context(const struct cec_matrix * points, const struct cec_matrix * centers,
-        struct cec_model ** models, int max_iterations, int min_card)
+struct cec_results * create_cec_result(int m, int k, int n, int max_iterations) {
+    struct cec_results *results = alloc(struct cec_results);
+    results->error = NO_ERROR;
+    results->clustering_vector = alloc_n(int, m);
+    results->centers = cec_matrix_create(k, n);
+    results->clusters_number = alloc_n(int, max_iterations + 1);
+    results->energy = alloc_n(double, max_iterations + 1);
+    results->covriances = create_cec_matrix_array(k, n, n);
+    return results;
+}
+
+struct cec_input * create_cec_input(const struct cec_matrix * points, const struct cec_matrix * centers,
+                                    struct cec_model ** models, int max_iterations, int min_card) {
+    struct cec_input *input = alloc(struct cec_input);
+    input->points = points;
+    input->centers = centers;
+    input->models = models;
+    input->max_iterations = max_iterations;
+    input->min_card = min_card;
+    return input;
+}
+
+struct cec_context * create_cec_context(struct cec_input *in, struct cec_results *res)
 {
-    int m = points->m;
-    int k = centers->m;
-    int n = points->n;
-    
+    int k = in->centers->m;
+    int n = in->points->n;
     struct cec_context * context = alloc(struct cec_context);
-    context->input = alloc(struct cec_input);
-    context->results = alloc(struct cec_results);
-    
-    context->input->points = points;
-    context->input->centers = centers;
-    context->input->models = models;
-    context->input->max_iterations = max_iterations;
-    context->input->min_card = min_card;    
-    context->results->error = NO_ERROR;
-    context->results->clustering_vector = alloc_n(int, m);
-    context->results->centers = cec_matrix_create(k, n);
-    context->results->clusters_number = alloc_n(int, max_iterations + 1);
-    context->results->energy = alloc_n(double, max_iterations + 1);
-    context->results->covriances = create_cec_matrix_array(k, n, n);
+    context->input = in;
+    context->results = res;
     context->temp_data = create_temp_data(k, n);
     
     return context;
+}
+
+double cec_final_energy(cec_res *c_res) {
+    return c_res->energy[c_res->iterations];
+}
+
+void cec_copy_results_content(cec_res *from, cec_res *to, int m) {
+    to->iterations = from->iterations;
+    int output_size = to->iterations + 1;
+    for (int i = 0; i < output_size; i++) {
+        to->energy[i] = from->energy[i];
+        to->clusters_number[i] = from->clusters_number[i];
+    }
+    for (int i = 0; i < m; i++)
+        to->clustering_vector[i] = from->clustering_vector[i];
+    cec_matrix_copy_data(from->centers, to->centers);
+    for (int i = 0; i < from->covriances->l; i++)
+        cec_matrix_copy_data(from->covriances->mats[i], to->covriances->mats[i]);
 }

@@ -26,36 +26,44 @@ cec <- function(
     if (!all(complete.cases(x))) stop("Illegal argument: 'x' contains NA values.")
     if (!all(complete.cases(centers))) stop("Illegal argument: 'centers' contains NA values.")
     
-    var.centers <- F
-    var.starts  <- 1
+    var.centers = NULL
+    centers.mat = NULL
+
     if (!is.matrix(centers))
     {
         if (length(centers) > 1)
-        {      
-            var.centers <- T
-            var.starts <- length(centers)
-        }
+            var.centers <- centers
+        else
+            var.centers <- c(centers)
+
         for (i in centers) 
-            if (i < 1) stop("Illegal argument: 'centers' < 1")    
+            if (i < 1) stop("Illegal argument: 'centers' < 1")
         centers.initilized <- F
     } 
     else 
     {
         if (ncol(x) != ncol(centers)) stop("Illegal argument: ncol(x) != ncol(centers).")
         if (nrow(centers) < 1) stop("Illegal argument: nrow(centers) < 1.")
+        var.centers <- c(nrow(centers))
+        centers.mat = centers
         centers.initilized <- T
     }
     
     if (!(attr(regexpr("[\\.0-9]+%{0,1}", perl=TRUE, text=card.min), "match.length") == nchar(card.min)))
         stop("Illegal argument: 'card.min' in wrong format.")  
-    
-    
-    if (hasArg(centers.init)) match.arg(centers.init)
+
+    if (centers.initilized)
+        init.method.name = "none"
+    else if (hasArg(centers.init))
+        init.method.name = switch (match.arg(centers.init), "kmeans++" = "kmeanspp", "random" = "random")
+    else init.method.name = "kmeanspp"
+
+
     if (!hasArg(type))
         type <- "all"
     
-    if (var.centers && length(type) > 1)
-        stop("Illegal argument: 'type' with length > 1 is not supported for variable number of centers ('centers' as a vector).")
+    if (length(type) > 1 && length(var.centers) > length(type))
+        stop("Illegal argument: 'type' with length > 1 should be equal or greater than the length of the vector of variable number of centers ('centers' as a vector).")
     
     # run interactive mode if requested  
     if (interactive)
@@ -63,12 +71,7 @@ cec <- function(
     
     n = ncol(x)
     m = nrow(x)
-    k <- NULL
-    if (is.matrix(centers)) 
-        k <- nrow(centers) 
-    else 
-        k <- centers
-    
+
     if (substr(card.min, nchar(card.min), nchar(card.min)) == "%") 
         card.min = as.integer(as.double(substr(card.min , 1, nchar(card.min) - 1)) * m / 100)
     else
@@ -82,53 +85,38 @@ cec <- function(
     ok.flag <- F    
     
     # prepare input for C function cec_r
-    if (!var.centers)
-    {
-        params <- create.cec.params(k, n, type, param)
-        types <- as.integer(vapply(type, resolve.type, 0))
-        if (length(types) == 1) 
-            types <- rep(types, k)
-    }
-    
+    k <- max(var.centers)
+    params <- create.cec.params(k, n, type, param)
+    types <- as.integer(vapply(type, resolve.type, 0))
+    if (length(types) == 1)
+        types <- rep(types, k)
+
     startTime <- proc.time()     
     
-    # main loop
-    for (var.start in 1:var.starts)
-        for (start     in 1:nstart) 
-        {      
-            if (var.centers)
-            {
-                # prepare input for C function cec_r with regards to the variable number of centers
-                k <- centers[var.start]        
-                params <- create.cec.params(k, n, type, param)
-                types <- as.integer(vapply(type, resolve.type, 0))
-                if (length(types) == 1) 
-                    types <- rep(types, k)
-            }
-            # generate initial centers or use provided centers matrix
-            if (!centers.initilized) 
-                centers.matrix <- init.centers(x, k, centers.init)     
-            else
-                centers.matrix <- centers      
-            
-            tryCatch(
-                {
-                    # perform the clustering by calling C function cec_r
-                    X <- .Call(cec_r, x, centers.matrix, iter.max, types, card.min, params)  
-                    ok.flag <- T
-                    if ((var.start == 1 && start == 1) || X$energy[X$iterations + 1] < tenergy)
-                    {
-                        # keep the clustering results with the lowest energy (cost function)
-                        tenergy = X$energy[X$iterations+1]
-                        Z <- X
-                        k.final <- k
-                        types.final <- types
-                        params.final <- params
-                    }
-                }, error = function(er) {
-                    warning(paste("Error at start #", start, ": ", er$message), immediate.=T, call.=F)
-                })     
-        }
+    centers.r = list(
+        init.method = init.method.name,
+        var.centers = as.integer(var.centers),
+        mat = centers.mat
+    )
+
+    control.r = list(
+        min.card = as.integer(card.min),
+        max.iters = as.integer(iter.max),
+        starts = as.integer(nstart)
+    )
+
+    tryCatch(
+        {
+            # perform the clustering by calling C function cec_r
+            Z <- .Call(cec_r, x, centers.r, control.r, types, params)
+            k.final <- nrow(Z$centers)
+            ok.flag <- T
+            types.final <- types
+            params.final <- params
+        }, error = function(er) {
+            warning(paste("Error: ", er$message), immediate.=T, call.=F)
+        })
+
     
     if (ok.flag == F) 
     {

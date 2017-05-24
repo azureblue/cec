@@ -8,7 +8,9 @@ static const char * const UNKNOWN_ERROR_MSG = "Unknown error.";
 static const char * const ALL_CLUSTERS_REMOVED_ERROR_MSG = 
         "All clusters have been removed before first iteraions.";
 static const char * const CENTERS_INIT_ERROR_MSG = "Centers initialization error.";
-static const char * const INVALID_CENTERS_INIT_METHOD_MSG = "Invalid centers initialization method";
+static const char * const INVALID_CENTERS_INIT_METHOD_ERROR_MSG = "Invalid centers initialization method";
+static const char * const LIBRARY_DEFECT_ERROR_MSG = "CEC library error";
+
 
 void noreturn error_r(enum cec_result_code code) {
     switch (code)
@@ -21,8 +23,10 @@ void noreturn error_r(enum cec_result_code code) {
             error(ALL_CLUSTERS_REMOVED_ERROR_MSG);
         case CENTERS_INIT_ERROR:
             error(CENTERS_INIT_ERROR_MSG);
-        case INVALID_CENTERS_INIT_METHOD:
-            error(INVALID_CENTERS_INIT_METHOD_MSG);
+        case INVALID_CENTERS_INIT_METHOD_ERROR:
+            error(INVALID_CENTERS_INIT_METHOD_ERROR_MSG);
+        case LIBRARY_DEFECT_ERROR:
+            error(LIBRARY_DEFECT_ERROR_MSG);
             
         case UNKNOWN_ERROR:
         case NO_ERROR:

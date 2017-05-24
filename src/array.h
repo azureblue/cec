@@ -26,4 +26,5 @@ void mean_add_point(double *restrict new_mean, const double *restrict mean,
 void mean_remove_point(double *restrict new_mean, const double *restrict mean,
         const double *restrict point, const int card, const int n);
 
+
 #endif	/* ARRAY_H */

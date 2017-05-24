@@ -18,6 +18,7 @@ enum mem_mg_init_res init_mem_mg(mem_fail_handler fail_handler);
 void free_mem_mg();
 memptr_t m_alloc(size_t size);
 m_state m_current_state();
+void m_clear_states(m_state, m_state);
 void m_reset_state(m_state);
 
 #endif //CEC_CMEM_MG_H

@@ -9,11 +9,12 @@ enum cec_result_code
     INVALID_COVARIANCE_ERROR = 2,
     ALL_CLUSTERS_REMOVED_ERROR = 3,
     CENTERS_INIT_ERROR = 4,
-    INVALID_CENTERS_INIT_METHOD = 5,
+    INVALID_CENTERS_INIT_METHOD_ERROR = 5,
+    LIBRARY_DEFECT_ERROR = 6,
 
     UNKNOWN_ERROR = -1
 };
 
-typedef enum cec_result_code cec_res;
+typedef enum cec_result_code res_code;
 
 #endif	/* ERRORS_H */

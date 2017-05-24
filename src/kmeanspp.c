@@ -18,7 +18,7 @@ static int binary_search_d(double key, double * array, int len)
     return a;
 }
 
-cec_res cec_init_centers_kmeanspp(const cec_mat *x, cec_mat *c)
+res_code cec_init_centers_kmeanspp(const cec_mat *x, cec_mat *c)
 {
     int m = x->m;
     int k = c->m;
