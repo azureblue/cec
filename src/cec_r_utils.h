@@ -14,5 +14,7 @@ struct cec_matrix * create_from_R_matrix(SEXP R_matrix);
 
 SEXP create_R_matrix(struct cec_matrix * m);
 
+SEXP get_named_element(SEXP list, const char * name);
+
 #endif	/* CEC_R_UTILS_H */
 

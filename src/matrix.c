@@ -29,6 +29,8 @@ void cec_matrix_copy_data(const cec_mat *restrict from, cec_mat *restrict to)
 cec_mat * cec_matrix_create(int m, int n)
 {
     cec_mat * mat = alloc_fam(cec_mat, double, m * n);
+    if (!mat)
+        return NULL;
     mat->m = m;
     mat->n = n;
     return mat;

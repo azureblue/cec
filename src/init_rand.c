@@ -1,7 +1,7 @@
 #include "init_rand.h"
 #include "rand.h"
 
-cec_res cec_init_centers_random(const cec_mat *x, cec_mat *c) {
+res_code cec_init_centers_random(const cec_mat *x, cec_mat *c) {
     int k = c->m;
     int n = c->n;
     cec_rand_init();

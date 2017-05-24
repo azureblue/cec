@@ -5,49 +5,74 @@
 #include "cec_r_utils.h"
 #include "cec.h"
 #include "error_r.h"
-#include "model.h"
-#include "rand.h"
 #include "alloc_utils_r.h"
 
 static struct cec_model ** create_cec_models(SEXP type, SEXP params, int m, int k, int n);
-
 static struct cec_model * create_model_from_R_params(enum density_family family, SEXP param, int n);
+static SEXP create_R_result(cec_res* , int m);
+static cec_centers * get_centers_param(SEXP centers_param_r, int n);
+static cec_control * get_control_param(SEXP control_param_r);
 
-static SEXP create_R_result(struct cec_context * cec_c, int m, int k);
-
-SEXP cec_r(SEXP x, SEXP centers, SEXP iter_max, SEXP type, SEXP card_min, SEXP params)
+SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP type, SEXP params)
 {
     init_mem_mg(error_r_mem_error);
-
     int m = Rf_nrows(x);
-    int k = Rf_nrows(centers);
-    int n = Rf_ncols(x);
-    int iteration_max = Rf_asInteger(iter_max);
-    int card_min_int = Rf_asInteger(card_min);
+    int n = Rf_ncols(x);    
+    cec_centers *centers = get_centers_param(centers_param_r, n);
+    cec_control *control = get_control_param(control_param_r);
+    cec_mat * c_mat = centers->centers_mat;
+    int max_k = c_mat->m;
 
-    struct cec_matrix * X = create_from_R_matrix(x);
-    struct cec_matrix * C = create_from_R_matrix(centers);
-    struct cec_model ** cec_models = create_cec_models(type, params, m, k, n);
-    struct cec_context * cec_ctx = create_cec_context(X, C, cec_models, iteration_max, card_min_int);
-    int res = cec(cec_ctx);
+    cec_mat * x_mat = create_from_R_matrix(x);
+    struct cec_model ** cec_models = create_cec_models(type, params, m, max_k, n);
+    
+    double best_energy = BIG_DOUBLE;
+    cec_res *best_result = create_cec_result(m, max_k, n, control->max_iterations);
+    int all_res = -1;
+    
+    int starts = control->starts;
+    int vc_len = centers->var_centers_len;
+    
+    for (int start = 0; start < starts; start++) {
+        for (int vc = 0; vc < vc_len; vc++) {
+            int k = centers->var_centers[vc];
+            m_state ms = m_current_state();
+            c_mat->m = k;
+            cec_init_centers(x_mat, c_mat, centers->init_m);
+            cec_in *c_input = create_cec_input(x_mat, c_mat, cec_models, control->max_iterations, control->min_card);
+            cec_res *c_res = create_cec_result(m, k, n, control->max_iterations);
+            struct cec_context *cec_ctx = create_cec_context(c_input, c_res);
+            int res = cec(cec_ctx);
+            if (res == NO_ERROR) {
+                all_res = NO_ERROR;
+                double energy = cec_final_energy(c_res);
+                if (energy < best_energy) {
+                    cec_copy_results_content(c_res, best_result, m);
+                    best_energy = energy;
+                }
+            }
+            m_reset_state(ms);
+        }
+    }
 
     SEXP result = NULL;
 
-    if (res == NO_ERROR) {
-        PROTECT(result = create_R_result(cec_ctx, m, k));
+    if (all_res == NO_ERROR) {
+        PROTECT(result = create_R_result(best_result, m));
         UNPROTECT(1);
         free_mem_mg();
         return result;
     }
     free_mem_mg();
-    error_r(res);
+    error_r(all_res);
 
     return NULL;
 }
 
-static SEXP create_R_result(struct cec_context * cec_c, int m, int k)
+static SEXP create_R_result(cec_res * results, int m)
 {
-    int iters = cec_c->results->iterations;
+    int iters = results->iterations;
+    int k = results->centers->m;
     int output_size = iters + 1;
     SEXP energy_vector;
     SEXP clusters_number_vector;
@@ -61,23 +86,23 @@ static SEXP create_R_result(struct cec_context * cec_c, int m, int k)
     PROTECT(assignment_vector = allocVector(INTSXP, m));
     PROTECT(covariance_list = allocVector(VECSXP, k));
     PROTECT(iterations = allocVector(INTSXP, 1));
-    PROTECT(centers_matrix = create_R_matrix(cec_c->results->centers));
+    PROTECT(centers_matrix = create_R_matrix(results->centers));
 
     INTEGER(iterations)[0] = iters;
 
     for (int i = 0; i < output_size; i++)
     {
-        REAL(energy_vector)[i] = cec_c->results->energy[i];
-        INTEGER(clusters_number_vector)[i] = cec_c->results->clusters_number[i];
+        REAL(energy_vector)[i] = results->energy[i];
+        INTEGER(clusters_number_vector)[i] = results->clusters_number[i];
     }
 
     for (int i = 0; i < m; i++)
-        INTEGER(assignment_vector)[i] = cec_c->results->clustering_vector[i] + 1;
+        INTEGER(assignment_vector)[i] = results->clustering_vector[i] + 1;
 
     for (int i = 0; i < k; i++)
     {
         SEXP covariance;
-        PROTECT(covariance = create_R_matrix(cec_c->results->covriances->mats[i]));
+        PROTECT(covariance = create_R_matrix(results->covriances->mats[i]));
         SET_VECTOR_ELT(covariance_list, i, covariance);
     }
 
@@ -159,4 +184,28 @@ struct cec_model * create_model_from_R_params(enum density_family family, SEXP p
         }
         
         return model;
+}
+
+cec_centers * get_centers_param(SEXP centers_param_r, int n) {
+    cec_centers *centers = alloc(cec_centers);
+    if (!parse_init_method(CHAR(STRING_ELT(get_named_element(centers_param_r, "init.method"), 0)), &centers->init_m))
+        error_r(LIBRARY_DEFECT_ERROR);
+    SEXP var_centers = get_named_element(centers_param_r, "var.centers");
+    centers->var_centers_len = LENGTH(var_centers);
+    centers->var_centers = INTEGER(var_centers);
+    int max_centers_num = centers->var_centers[0];
+    for (int i = 1; i < centers->var_centers_len; i++)
+        max_centers_num = max_centers_num < centers->var_centers[i] ? centers->var_centers[i] : max_centers_num;
+    centers->centers_mat = cec_matrix_create(max_centers_num, n);
+    if (centers->init_m == NONE)
+        copy_from_R_matrix(get_named_element(centers_param_r, "mat"), centers->centers_mat);
+    return centers;
+}
+
+static cec_control * get_control_param(SEXP control_param_r) {
+    cec_control *control = alloc(cec_control);
+    control->min_card = asInteger(get_named_element(control_param_r, "min.card"));
+    control->max_iterations = asInteger(get_named_element(control_param_r, "max.iters"));
+    control->starts = asInteger(get_named_element(control_param_r, "starts"));
+    return control;
 }

@@ -1,3 +1,5 @@
+#include <string.h>
+#include <Rdefines.h>
 #include "cec_r_utils.h"
 
 struct cec_matrix * create_from_R_matrix(SEXP R_ma)
@@ -40,4 +42,13 @@ SEXP create_R_matrix(struct cec_matrix * ma)
     UNPROTECT(1);
 
     return R_ma;
+}
+
+SEXP get_named_element(SEXP list, const char *name) {
+    int len = LENGTH(list);
+    SEXP elementNames = GET_NAMES(list);
+    for (int i = 0; i < len; i++)
+        if (strcmp(CHAR(STRING_ELT(elementNames, i)), name) == 0)
+            return VECTOR_ELT(list, i);
+    return NULL;
 }

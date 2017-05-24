@@ -100,3 +100,17 @@ void m_reset_state(m_state idx) {
         mem_free(ctx.ptrs[ctx.idx]);
     ctx.idx = idx;
 }
+
+void m_clear_states(m_state a, m_state b) {
+    m_state tmp;
+    if (a > b) {
+        tmp = a;
+        a = b;
+        b = tmp;
+    }
+
+    for (m_state i = a; i < b; i++) {
+        mem_free(ctx.ptrs[i]);
+        ctx.ptrs[i] = NULL;
+    }        
+}
