@@ -13,7 +13,7 @@ double cluster_energy(struct cec_model * model, struct cec_matrix * cov, int car
     return isnan(ce) ? ce : energy(ce, card, m);
 }
 
-int cluster_energy_get_last_error(struct cec_model * model)
+res_code cluster_energy_get_last_error(struct cec_model * model)
 {
     return model->cross_entropy_context->last_error;
 }

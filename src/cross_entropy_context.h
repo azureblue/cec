@@ -1,6 +1,8 @@
 #ifndef CROSS_ENTROPY_CONTEXT_H
 #define	CROSS_ENTROPY_CONTEXT_H
 
+#include "errors.h"
+
 enum density_family
 {
     GIVEN_COVARIANCE = 0, FIXED_R = 1, SPHERICAL = 2, DIAGONAL = 3, FIXEDEIGENVALUES = 4, ALL = 5
@@ -11,7 +13,7 @@ enum density_family
  */
 struct cross_entropy_context
 {
-    int last_error;
+    res_code last_error;
     void * specific_context;
 };
 
@@ -52,12 +54,5 @@ struct cross_entropy_context * create_cross_entropy_context_fixedr(double r);
 struct cross_entropy_context * create_cross_entropy_context_covariance(int n, const struct cec_matrix * cov,
         const struct cec_matrix * cov_i);
 struct cross_entropy_context * create_cross_entropy_context_eigenvalues(int n, const double * given_evals);
-
-void destroy_cross_entropy_context_all(struct cross_entropy_context * context);
-void destroy_cross_entropy_context_spherical(struct cross_entropy_context * context);
-void destroy_cross_entropy_context_diagonal(struct cross_entropy_context * context);
-void destroy_cross_entropy_context_fixedr(struct cross_entropy_context * context);
-void destroy_cross_entropy_context_covariance(struct cross_entropy_context * context);
-void destroy_cross_entropy_context_eigenvalues(struct cross_entropy_context * context);
 
 #endif	/* CROSS_ENTROPY_CONTEXT_H */

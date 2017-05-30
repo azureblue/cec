@@ -11,8 +11,7 @@
 struct cec_centers_param {
     init_method init_m;
     cec_mat * centers_mat;
-    const int * var_centers;
-    int var_centers_len;
+    const vec_i * var_centers;
 };
 
 struct cec_control_param {
