@@ -32,10 +32,12 @@ struct cross_entropy_context * create_cross_entropy_context_fixedr(double r)
     return context;
 }
 
-struct cross_entropy_context * create_cross_entropy_context_covariance(int n, const struct cec_matrix * cov, const struct cec_matrix * cov_i)
+struct cross_entropy_context * create_cross_entropy_context_covariance(const struct cec_matrix * cov,
+                                                                       const struct cec_matrix * cov_i)
 {
     struct cross_entropy_context * context = alloc(struct cross_entropy_context);
-    struct context_gc * c_gc =  alloc(struct context_gc);    
+    struct context_gc * c_gc =  alloc(struct context_gc);
+    int n = cov->n;
     c_gc->given_cov = cec_matrix_create_copy(cov);
     c_gc->i_given_cov = cec_matrix_create_copy(cov_i);
     c_gc->temp_matrix = cec_matrix_create(n, n);

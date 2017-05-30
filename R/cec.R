@@ -105,10 +105,14 @@ cec <- function(
         starts = as.integer(nstart)
     )
 
+    models.r = rep(list(NULL), k)
+    for (i in 1:k)
+        models.r[[i]] = list(type = types[i], params = params[[i]])
+
     tryCatch(
         {
             # perform the clustering by calling C function cec_r
-            Z <- .Call(cec_r, x, centers.r, control.r, types, params)
+            Z <- .Call(cec_r, x, centers.r, control.r, models.r)
             k.final <- nrow(Z$centers)
             ok.flag <- T
             types.final <- types
@@ -119,7 +123,7 @@ cec <- function(
 
     if (ok.flag == F) 
     {
-        stop("All starts faild with error.")
+        stop("All starts failed with error.")
     }    
     
     # prepare the results  
@@ -152,7 +156,7 @@ cec <- function(
                 types.final <- types.final[-na.rows]
         }     
     }
-    covs = length(types.final)
+    covs = length(Z$covariances)
     covariances.model = rep(list(NA), covs)
     
     # obtain the covariances of the model

@@ -27,8 +27,6 @@ res_code cec_init_centers_kmeanspp(const cec_mat *x, cec_mat *c)
     double * dists_m = alloc_n(double, m + 1);
     double * sums_m = alloc_n(double, m + 1);
 
-    cec_rand_init();
-    
     int first_center = (int) (cec_rand() * m);
     array_copy(cec_matrix_const_row(x, first_center), cec_matrix_row(c, 0), n);
     dists_m[0] = 0.0;
@@ -58,7 +56,6 @@ res_code cec_init_centers_kmeanspp(const cec_mat *x, cec_mat *c)
             sums_m[j + 1] = sums_m[j] + dists[j];
         }
     }
-    
-    cec_rand_end();
+
     return NO_ERROR;
 }

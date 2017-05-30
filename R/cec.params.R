@@ -45,8 +45,8 @@ create.cec.params <- function(k, n, type, param)
             if (!try.chol(cov)) 
                 stop("Illegal argument: illegal parameter for \"covariance\" type - matrix must be positive-definite.")
             
-            i.cov = solve(cov)  
-            params[[i]] <- list(cov, i.cov)
+            cov.inv = solve(cov)
+            params[[i]] <- list(cov = cov, cov.inv = cov.inv)
         }
         else if (type.i == resolve.type("fixed")) 
         {
@@ -59,7 +59,7 @@ create.cec.params <- function(k, n, type, param)
             if (length(r) != 1) stop("Illegal argument: illegal parameter for \"fixedr\" type.")
             if (!is.numeric(r)) stop("Illegal argument: illegal parameter for \"fixedr\" type.")
             if (!r > 0)  stop("Illegal argument: illegal parameter for \"fixedr\" type.")
-            params[i] <- r
+            params[[i]] <- list(r = r)
         } 
         else if ( type.i == resolve.type("eigenvalues"))
         {
@@ -72,7 +72,7 @@ create.cec.params <- function(k, n, type, param)
             
             if (length(evals) != n) stop("Illegal argument: illegal parameter for \"eigenvalues\" type: invalid length.")
             if (!all(evals != 0)) stop("Illegal argument: illegal parameter for \"eigenvalues\" type: all values must be greater than 0.")
-            params[[i]] = sort(evals)
+            params[[i]] = list(eigenvalues = sort(evals))
         }
     } 
     params

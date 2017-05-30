@@ -6,11 +6,11 @@ model.covariance <- function(type, cov, param)
     }  
     else if (type == resolve.type("covariance"))
     {
-        param[[1]]
+        param$cov
     }  
     else if (type == resolve.type("fixedr"))
     {
-        diag(ncol(cov)) * param
+        diag(ncol(cov)) * param$r
     }
     else if (type == resolve.type("spherical"))
     {
@@ -23,7 +23,7 @@ model.covariance <- function(type, cov, param)
     else if (type == resolve.type("eigenvalues"))
     {    
         V <- eigen(cov)$vec
-        D <- diag(sort(param, decreasing=T))    
+        D <- diag(sort(param$eigenvalues, decreasing=T))
         V %*% D %*% t(V)
     }
     else if (type == resolve.type("all"))

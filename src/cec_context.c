@@ -27,6 +27,7 @@ cec_out * create_cec_output(int m, int k, int n, int max_iterations) {
     output->energy = vec_d_create(max_iterations + 1);
     output->centers = cec_matrix_create(k, n);
     output->covriances = create_cec_matrix_array(k, n, n);
+    output->initial_k = k;
     return output;
 }
 
@@ -58,6 +59,7 @@ double cec_final_energy(cec_out *c_res) {
 }
 
 void cec_copy_results_content(cec_out *from, cec_out *to) {
+    to->initial_k = from->initial_k;
     to->iterations = from->iterations;
     vec_i_copy(from->clustering_vector, to->clustering_vector);
     vec_i_copy(from->clusters_number, to->clusters_number);

@@ -3,6 +3,8 @@
 
 #include <Rinternals.h>
 #include "centers_init.h"
+#include "cross_entropy_context.h"
+#include "cec_context.h"
 
 /*
  * Entry point to CEC - called from R.
@@ -20,9 +22,38 @@ struct cec_control_param {
     int min_card;
 };
 
-typedef struct cec_centers_param cec_centers;
-typedef struct cec_control_param cec_control;
+struct cec_model_r_params {
+    double r;
+};
 
-SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP type, SEXP params);
+struct cec_model_eigenvalues_params {
+    const vec_d * given_eigenvalues;
+};
+
+struct cec_model_covariances_params {
+    const cec_mat * cov;
+    const cec_mat * cov_inv;
+};
+
+struct cec_model_spec {
+    enum density_family type;
+    memptr_t type_specific_params;
+    int n;
+};
+
+struct cec_models_param {
+    int len;
+    struct cec_model_spec model_specs[];
+};
+
+typedef struct cec_centers_param cec_centers_par;
+typedef struct cec_control_param cec_control_par;
+typedef struct cec_models_param cec_models_par;
+
+#define model_r_params(model_spec) ((struct cec_model_r_params*) (model_spec)->type_specific_params)
+#define model_eigenvalues_params(model_spec) ((struct cec_model_eigenvalues_params*) (model_spec)->type_specific_params)
+#define model_covariances_params(model_spec) ((struct cec_model_covariances_params*) (model_spec)->type_specific_params)
+
+SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models_param_r);
 
 #endif	/* CEC_R_H */
