@@ -2,7 +2,7 @@
 #include "cec.h"
 #include "cov_utils.h"
 
-int cec(struct cec_context * context)
+res_code cec_start(struct cec_context *context)
 {
     const struct cec_matrix * X = context->input->points;
 
@@ -14,10 +14,10 @@ int cec(struct cec_context * context)
 
     struct cec_model ** models = context->input->models;
 
-    int * cluster = context->results->clustering_vector;
-    int * clusters_number = context->results->clusters_number;
+    int * cluster = context->results->clustering_vector->ar;
+    int * clusters_number = context->results->clusters_number->ar;
     struct cec_matrix ** covariance_matrices = context->results->covriances->mats;
-    double * energy = context->results->energy;
+    double * energies = context->results->energy->ar;
     
     struct cec_matrix * C = context->results->centers;
     cec_matrix_copy_data(context->input->centers, C);
@@ -45,8 +45,8 @@ int cec(struct cec_context * context)
         double dist = BIG_DOUBLE;
         for (int j = 0; j < k; j++)
         {
-            double dist_temp = dist2(cec_matrix_const_row(X, i),
-                    cec_matrix_const_row(C, j), n);
+            double dist_temp = dist_sq(cec_matrix_const_row(X, i),
+                                       cec_matrix_const_row(C, j), n);
             if (dist > dist_temp)
             {
                 dist = dist_temp;
@@ -115,7 +115,7 @@ int cec(struct cec_context * context)
         double energy = cluster_energy(models[i], covariance_matrices[i], card[i], m);
         
         if (isnan(energy))
-            return cluster_energy_get_last_error(models[i]);
+            return (res_code) cluster_energy_get_last_error(models[i]);
 
         clusters_energy[i] = energy;
 
@@ -141,7 +141,7 @@ int cec(struct cec_context * context)
 
     clusters_number[0] = _k;
 
-    energy[0] = energy_sum;
+    energies[0] = energy_sum;
 
     /*
      * Special case when a cluster was removed before the first iteration.
@@ -305,7 +305,7 @@ int cec(struct cec_context * context)
             }
         }
 
-        energy[iter + 1] = energy_sum;
+        energies[iter + 1] = energy_sum;
         clusters_number[iter + 1] = _k;
         context->results->iterations = iter + 1;
 

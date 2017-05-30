@@ -117,7 +117,6 @@ cec <- function(
             warning(paste("Error: ", er$message), immediate.=T, call.=F)
         })
 
-    
     if (ok.flag == F) 
     {
         stop("All starts faild with error.")

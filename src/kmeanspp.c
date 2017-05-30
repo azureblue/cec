@@ -39,7 +39,7 @@ res_code cec_init_centers_kmeanspp(const cec_mat *x, cec_mat *c)
     
     for (int i = 0; i < m; i++)
     {
-        double dist = dist2(cec_matrix_const_row(x, i), cec_matrix_const_row(c, 0), n);
+        double dist = dist_sq(cec_matrix_const_row(x, i), cec_matrix_const_row(c, 0), n);
         dists[i] = dist;
         sums[i] = sums[i - 1] + dist;
     }
@@ -52,7 +52,7 @@ res_code cec_init_centers_kmeanspp(const cec_mat *x, cec_mat *c)
 
         for (int j = 0; j < m; j++)
         {
-            double dist = dist2(cec_matrix_const_row(x, j), cec_matrix_const_row(c, i), n);
+            double dist = dist_sq(cec_matrix_const_row(x, j), cec_matrix_const_row(c, i), n);
             if (dist < dists[j])
                 dists[j] = dist;
             sums_m[j + 1] = sums_m[j] + dists[j];
