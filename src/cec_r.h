@@ -20,6 +20,7 @@ struct cec_control_param {
     int starts;
     int max_iterations;
     int min_card;
+    int threads;
 };
 
 struct cec_model_r_params {

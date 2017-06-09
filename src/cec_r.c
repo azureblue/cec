@@ -30,6 +30,7 @@ static cec_control_par * get_control_param(SEXP control_param_r) {
     control->min_card = asInteger(get_named_element(control_param_r, "min.card"));
     control->max_iterations = asInteger(get_named_element(control_param_r, "max.iters"));
     control->starts = asInteger(get_named_element(control_param_r, "starts"));
+    control->threads = asInteger(get_named_element(control_param_r, "threads"));
     return control;
 }
 

@@ -40,9 +40,8 @@ struct cec_model * create_model(struct cec_model_spec * model_spec)
     return model;
 }
 
-
-res_code cec_perform(cec_mat *x_mat, cec_centers_par *centers, cec_control_par *control, cec_models_par *models,
-                     cec_out **results) {
+res_code cec_perform(cec_mat *x_mat, cec_centers_par *centers, cec_control_par *control,
+                     cec_models_par *models, cec_out **results) {
     int vc_len = centers->var_centers->len;
     int m = x_mat->m;
     int n = x_mat->n;
@@ -57,6 +56,13 @@ res_code cec_perform(cec_mat *x_mat, cec_centers_par *centers, cec_control_par *
     double best_energy = BIG_DOUBLE;
     res_code all_res = UNKNOWN_ERROR;
     int starts = control->starts;
+    int threads_default = omp_get_max_threads();
+    int threads = control->threads == 0 ? threads_default : control->threads;
+
+    if (threads > starts)
+        threads = starts;
+
+    omp_set_num_threads(threads);
 
     for (int vc = 0; vc < vc_len; vc++) {
         int vc_k = centers->var_centers->ar[vc];
@@ -104,6 +110,7 @@ res_code cec_perform(cec_mat *x_mat, cec_centers_par *centers, cec_control_par *
         }
         m_reset_state(vc_start);
     }
+    omp_set_num_threads(threads_default);
     m_reset_state(ms_start);
     *results = best_result;
     return all_res;
