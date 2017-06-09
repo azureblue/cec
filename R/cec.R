@@ -128,7 +128,7 @@ cec <- function(
     
     # prepare the results  
     
-    execution.time = as.vector((proc.time() - startTime))[1]
+    execution.time = as.vector((proc.time() - startTime))[3]
     
     Z$centers[is.nan(Z$centers)] <- NA
     
