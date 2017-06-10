@@ -15,11 +15,8 @@ typedef struct cec_array_int vec_i;
 typedef struct cec_array_double vec_d;
 
 vec_i * cec_array_int_create(int len);
-
 vec_i * cec_array_int_create_from(int len, int * src);
-
 vec_d * cec_array_double_create_from(int len, double * src);
-
 vec_d * cec_array_double_create(int len);
 
 void cec_array_int_copy(vec_i *src, vec_i *dst);

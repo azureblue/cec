@@ -3,42 +3,7 @@
 #include "cec_context.h"
 #include "cec_r.h"
 #include "cec.h"
-
-struct cec_model * create_model(struct cec_model_spec * model_spec)
-{
-    struct cec_model *model = alloc(struct cec_model);
-    switch (model_spec->type)
-    {
-        case ALL:
-            model->cross_entropy = h_all;
-            model->cross_entropy_context = create_cross_entropy_context_all(model_spec->n);
-            break;
-        case SPHERICAL:
-            model->cross_entropy = h_spherical;
-            model->cross_entropy_context = create_cross_entropy_context_spherical();
-            break;
-        case DIAGONAL:
-            model->cross_entropy = h_diagonal;
-            model->cross_entropy_context = create_cross_entropy_context_diagonal();
-            break;
-        case FIXED_R:
-            model->cross_entropy = h_fixed_r;
-            model->cross_entropy_context = create_cross_entropy_context_fixedr(model_r_params(model_spec)->r);
-            break;
-        case GIVEN_COVARIANCE:
-            model->cross_entropy = h_given_covariance;
-            model->cross_entropy_context = create_cross_entropy_context_covariance(
-                    model_covariances_params(model_spec)->cov, model_covariances_params(model_spec)->cov_inv);
-            break;
-        case FIXEDEIGENVALUES:
-            model->cross_entropy = h_fixedeigenvalues;
-            model->cross_entropy_context = create_cross_entropy_context_eigenvalues(
-                    model_eigenvalues_params(model_spec)->given_eigenvalues->len,
-                    model_eigenvalues_params(model_spec)->given_eigenvalues->ar);
-    }
-
-    return model;
-}
+#include "models/models.h"
 
 res_code cec_perform(cec_mat *x_mat, cec_centers_par *centers, cec_control_par *control,
                      cec_models_par *models, cec_out **results) {
