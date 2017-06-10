@@ -1,5 +1,6 @@
 #ifndef ENERGY_H
 #define	ENERGY_H
+#include <math.h>
 #include "../matrix.h"
 #include "../errors.h"
 #include "../cross_entropy_context.h"

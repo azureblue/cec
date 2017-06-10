@@ -3,6 +3,7 @@
 
 #include "../matrix.h"
 #include "../cec_r.h"
+#include "../cec_params.h"
 
 struct cec_model * cec_create_ce_ctx_all(int n);
 struct cec_model * cec_create_ce_ctx_covariance(const cec_mat * cov,

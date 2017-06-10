@@ -1,18 +1,22 @@
 #include <omp.h>
-#include "errors.h"
-#include "cec_context.h"
-#include "cec_r.h"
+#include "cec_starter_omp.h"
 #include "cec.h"
 #include "models/models.h"
 
-res_code cec_perform(cec_mat *x_mat, cec_centers_par *centers, cec_control_par *control,
-                     cec_models_par *models, cec_out **results) {
+static int max_i(const vec_i *ar) {
+    int len = ar->len;
+    int max = INT_MIN;
+    for (int i = 0; i < len; i++)
+        max = max > ar->ar[i] ? max : ar->ar[i];
+    return max;
+}
+
+res_code cec_perform(cec_mat *x_mat, cec_centers_par *centers, cec_control_par *control, cec_models_par *models,
+                     cec_out **results) {
     int vc_len = centers->var_centers->len;
     int m = x_mat->m;
     int n = x_mat->n;
-    int vc_max_k = -1;
-    for (int i = 0; i < vc_len; i++)
-        vc_max_k = vc_max_k < centers->var_centers->ar[i] ? centers->var_centers->ar[i] : vc_max_k;
+    int vc_max_k = max_i(centers->var_centers);
     cec_out *best_result = create_cec_output(m, vc_max_k, n, control->max_iterations);
     m_state ms_start = m_current_state();
     cec_mat * c_mat = cec_matrix_create(vc_max_k, n);
@@ -33,14 +37,14 @@ res_code cec_perform(cec_mat *x_mat, cec_centers_par *centers, cec_control_par *
         int vc_k = centers->var_centers->ar[vc];
         c_mat->m = vc_k;
         m_state vc_start = m_current_state();
-        #pragma omp parallel default(shared)
+#pragma omp parallel default(shared)
         {
             cec_mat *local_c_mat;
             cec_in *in;
             cec_out *out;
             cec_ctx *ctx;
             struct cec_model *cec_models[models->len];
-            #pragma omp critical
+#pragma omp critical
             {
                 for (int i = 0; i < models->len; i++)
                     cec_models[i] = create_model(&models->model_specs[i]);
@@ -50,10 +54,10 @@ res_code cec_perform(cec_mat *x_mat, cec_centers_par *centers, cec_control_par *
                 out = create_cec_output(m, vc_k, n, control->max_iterations);
                 ctx = create_cec_context(in, out);
             }
-            #pragma omp for nowait
+#pragma omp for nowait
             for (int start = 0; start < starts; start++) {
 
-                #pragma omp critical
+#pragma omp critical
                 cec_init_centers(x_mat, local_c_mat, centers->init_m);
 
                 int res = cec_start(ctx);
@@ -62,7 +66,7 @@ res_code cec_perform(cec_mat *x_mat, cec_centers_par *centers, cec_control_par *
                     double energy = cec_final_energy(out);
                     // best_energy may be stale but never lower than the true value
                     if (energy < best_energy) {
-                        #pragma omp critical
+#pragma omp critical
                         // need to check again!
                         if (energy < best_energy) {
                             cec_copy_results_content(out, best_result);

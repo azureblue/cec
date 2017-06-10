@@ -1,10 +1,6 @@
 #ifndef MATRIX_H
 #define	MATRIX_H
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-
 #include "errors.h"
 #include "array.h"
 

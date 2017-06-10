@@ -13,11 +13,15 @@ set(SOURCE_FILES
         src/cec.h
         src/cec_context.c
         src/cec_context.h
+        src/cec_params.h
+        src/cec_params_r.c
+        src/cec_params_r.h
         src/cec_r.c
         src/cec_r.h
         src/cec_r_utils.c
         src/cec_r_utils.h
-        src/cec_starter.c
+        src/cec_starter_omp.c
+        src/cec_starter_omp.h
         src/centers_init.c
         src/centers_init.h
         src/centers_init_r.c
@@ -44,7 +48,8 @@ set(SOURCE_FILES
         src/noret.h
         src/rand.c
         src/rand.h
-        src/models
+        src/result_r.c
+        src/result_r.h
         src/models/all.c
         src/models/covariance.c
         src/models/diagonal.c

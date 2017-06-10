@@ -20,9 +20,8 @@ static double cross_entropy(struct cross_entropy_context * context, const struct
     double * given_evals = cfe -> evals_given;
     double * evals = cfe -> evals_temp;
     int n = cov->n;
-    int error = cec_cov_eigenvalues(cov, temp_matrix, cfe->workspace, evals);
-    if (error) {
-        context->last_error = error;
+    if (!cec_cov_eigenvalues(cov, temp_matrix, cfe->workspace, evals)) {
+        context->last_error = UNKNOWN_ERROR;
         return NAN;
     }
     double e_sum = 0;
