@@ -2,7 +2,9 @@
 ^\.Rproj\.user$
 \.travis\.yml$
 \.idea$
-Makefile$
 LICENSE$
 cmake-build-debug$
 CMakeLists.txt$
+CMakeFiles$
+^.*\.tar.gz$
+^.*\.sh$
