@@ -34,6 +34,7 @@ struct cec_output {
     vec_d * energy;
     int iterations;
     struct cec_matrix_array * covriances;
+    int initial_k;
 };
 
 struct cec_context

@@ -13,7 +13,7 @@ Performs Cross-Entropy Clustering on a data matrix.
 cec(x, centers, type = c("covariance", "fixedr", "spherical", "diagonal",  
 "eigenvalues", "all"), iter.max = 25, nstart = 1, param, 
 centers.init = c("kmeans++", "random"), card.min = "5\%", keep.removed = F, 
-interactive = F, readline = T)
+interactive = F, threads = "auto", readline = T)
 }
 
 \arguments{
@@ -81,6 +81,14 @@ If this parameter is TRUE, removed clusters will be visible in the results as NA
 
 \item{interactive}{
 Interactive mode. If TRUE, the result of clustering will be plotted after every iteration.
+}
+
+\item{threads}{
+Specifies the number of threads to use or "auto" to use default number of threads (usually
+the number of available processing units/cores) when performing multiple starts (\code{nstart} parameter).
+
+The execution of a single start is always performed by a single thread, thus for \code{nstart = 1} only one thread
+will be used regardless of the value of this parameter.
 }
 
 \item{readline}{
