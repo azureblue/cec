@@ -27,4 +27,5 @@ SEXP cec_init_centers_r(SEXP x_r, SEXP k_r, SEXP method_r) {
     }
     cec_clean_env();
     error_r(r);
+    return NULL;
 }

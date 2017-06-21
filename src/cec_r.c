@@ -7,8 +7,6 @@
 #include "error_r.h"
 #include "init_utils_r.h"
 
-static struct cec_model ** create_cec_models(SEXP type, SEXP params, int m, int k, int n);
-static struct cec_model * create_model_from_R_params(enum density_family family, SEXP param, int n);
 static SEXP create_R_result(cec_out*);
 res_code cec_perform(cec_mat *x_mat, cec_centers_par *centers, cec_control_par *control, cec_models_par *cec_models,
                      cec_out **results);
@@ -77,7 +75,6 @@ static cec_models_par * get_models_param(SEXP models_param_r, int n) {
 SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models_param_r)
 {
     cec_init_env();
-    int m = Rf_nrows(x);
     int n = Rf_ncols(x);
     cec_centers_par *centers = get_centers_param(centers_param_r);
     cec_control_par *control = get_control_param(control_param_r);
