@@ -1,6 +1,7 @@
 #ifndef COV_UTILS_H
 #define	COV_UTILS_H
 
+#include <stdbool.h>
 #include "matrix.h"
 
 /*
@@ -17,11 +18,11 @@ void cec_cov_multiply(const struct cec_matrix *restrict m1,
 double cec_cov_cholesky_det(const struct cec_matrix * m,
         struct cec_matrix * temp);
 
-int cec_cov_eigenvalues(const struct cec_matrix * sym_matrix,
-        struct cec_matrix * temp_matrix, struct cec_matrix * workspace, double * values);
+bool cec_cov_eigenvalues(const struct cec_matrix * sym_matrix,
+                         struct cec_matrix * temp_matrix, struct cec_matrix * workspace, double * values);
 
-int cec_cov_cholesky(const struct cec_matrix * sym_matrix,
-        struct cec_matrix * temp_matrix);
+bool cec_cov_cholesky(const struct cec_matrix * sym_matrix,
+                      struct cec_matrix * temp_matrix);
 
 void cec_cov_add_point(struct cec_matrix *restrict dest_covariance, const struct cec_matrix *restrict covariance, 
         const double *restrict mean, double const *restrict point, int card);

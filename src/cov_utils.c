@@ -1,4 +1,5 @@
-#include <float.h>
+#include <math.h>
+#include <stdbool.h>
 #include <R_ext/Lapack.h>
 #include "cov_utils.h"
 
@@ -32,41 +33,29 @@ void cec_cov_multiply(const cec_mat *m1, const cec_mat *m2, cec_mat *restrict de
                     * cec_matrix_element(m2, j, k));
 }
 
-int cec_cov_eigenvalues(const cec_mat *sym_matrix, cec_mat *temp_matrix,
-        cec_mat *workspace, double *values)
-{
+bool cec_cov_eigenvalues(const cec_mat *sym_matrix, cec_mat *temp_matrix,
+        cec_mat *workspace, double *values) {
     int n = sym_matrix->n;
     int info;
     array_copy(sym_matrix->data, temp_matrix->data, n * n);
     int workspace_len = workspace->m * workspace->n;
     F77_NAME(dsyev)("N", "U", &n, temp_matrix->data, &n, values, workspace->data, &workspace_len, &info);
-    if (info != 0)
-        return UNKNOWN_ERROR;
-    return 0;
+    return info == 0;
 }
 
-int cec_cov_cholesky(const cec_mat *restrict sym_matrix, cec_mat *restrict temp_matrix)
-{
+bool cec_cov_cholesky(const cec_mat *restrict sym_matrix, cec_mat *restrict temp_matrix) {
     int n = sym_matrix->n;
     int info;
     array_copy(sym_matrix->data, temp_matrix->data, n * n);
     F77_NAME(dpotrf)("U", &n, temp_matrix->data, &n, &info);
-    if (info != 0)
-        return INVALID_COVARIANCE_ERROR;
-    else
-        return 0;
+    return info == 0;
 }
 
-double cec_cov_cholesky_det(const cec_mat *m, cec_mat *temp)
-{
+double cec_cov_cholesky_det(const cec_mat *m, cec_mat *temp) {
     if (m->n == 2)
-    {
-        double det = m->data[0] * m->data[3] - m->data[1] * m->data[2];
-        return det;
-
-    } else if (cec_cov_cholesky(m, temp) != NO_ERROR)
-        return NAN;
-
+        return m->data[0] * m->data[3] - m->data[1] * m->data[2];
+    else if (!cec_cov_cholesky(m, temp))
+            return NAN;
     double prod = cec_cov_diagonal_product(temp);
     return prod * prod;
 }

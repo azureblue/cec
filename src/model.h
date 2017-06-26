@@ -2,7 +2,7 @@
 #define MODEL_H
 
 #include <Rdefines.h>
-#include "energy.h"
+#include "models/energy.h"
 
 struct cec_model
 {
