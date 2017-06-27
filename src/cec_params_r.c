@@ -1,11 +1,12 @@
 #include "cec_params_r.h"
 #include "cec_r_utils.h"
 #include "error_r.h"
+#include "type.h"
 
 cec_centers_par * get_centers_param(SEXP centers_param_r) {
     cec_centers_par *centers = alloc(cec_centers_par);
     if (!parse_init_method(CHAR(STRING_ELT(get_named_element(centers_param_r, "init.method"), 0)), &centers->init_m))
-        error_r(LIBRARY_DEFECT_ERROR);
+        defect_error_r("invalid init method");
     SEXP var_centers = get_named_element(centers_param_r, "var.centers");
     centers->var_centers = vec_i_create_from(LENGTH(var_centers), INTEGER(var_centers));
     centers->centers_mat = NULL;
@@ -29,7 +30,9 @@ cec_models_par * get_models_param(SEXP models_param_r, int n) {
     model_par->len = len;
     for (int i = 0; i < len; i++) {
         SEXP model_r = VECTOR_ELT(models_param_r, i);
-        enum density_family type = (enum density_family) asInteger(get_named_element(model_r, "type"));
+        enum density_family type;
+        if (!cec_parse_type(CHAR(STRING_ELT(get_named_element(model_r, "type"), 0)), &type))
+            defect_error_r("invalid type");
         SEXP params = get_named_element(model_r, "params");
         struct cec_model_spec *spec = &model_par->model_specs[i];
         spec->n = n;
@@ -41,14 +44,14 @@ cec_models_par * get_models_param(SEXP models_param_r, int n) {
                 r_params->r = asReal(get_named_element(params, "r"));
                 break;
             }
-            case GIVEN_COVARIANCE: {
+            case COVARIANCE: {
                 struct cec_model_covariances_params *cov_params = spec->type_specific_params = alloc(
                         struct cec_model_covariances_params);
                 cov_params->cov = create_from_R_matrix(get_named_element(params, "cov"));
                 cov_params->cov_inv = create_from_R_matrix(get_named_element(params, "cov.inv"));
                 break;
             }
-            case FIXEDEIGENVALUES: {
+            case EIGENVALUES: {
                 struct cec_model_eigenvalues_params *eigen_params = spec->type_specific_params = alloc(
                         struct cec_model_eigenvalues_params);
                 SEXP eigenvalues = get_named_element(params, "eigenvalues");

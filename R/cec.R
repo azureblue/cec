@@ -87,10 +87,6 @@ cec <- function(
     
     # prepare input for C function cec_r
     k <- max(var.centers)
-    params <- create.cec.params(k, n, type, param)
-    types <- as.integer(vapply(type, resolve.type, 0))
-    if (length(types) == 1)
-        types <- rep(types, k)
 
     startTime <- proc.time()     
     
@@ -110,17 +106,13 @@ cec <- function(
         threads = threads
     )
 
-    models.r = rep(list(NULL), k)
-    for (i in 1:k)
-        models.r[[i]] = list(type = types[i], params = params[[i]])
+    models.r = create.cec.params.for.models(k, n, type, param)
 
     tryCatch(
         {
             # perform the clustering by calling C function cec_r
             Z <- .Call(cec_r, x, centers.r, control.r, models.r)
             k.final <- nrow(Z$centers)
-            types.final <- types
-            params.final <- params
         }, error = function(er) {
             warning(paste("Error: ", er$message), immediate.=T, call.=F)
             stop("All starts failed with error.")
@@ -152,8 +144,7 @@ cec <- function(
                 Z$centers <- matrix(Z$centers[-na.rows,],,n)        
                 Z$covariances <- Z$covariances[-na.rows]
                 probability <- probability[-na.rows]
-                params.final <- params.final[-na.rows]
-                types.final <- types.final[-na.rows]
+                models.r <- models.r[-na.rows]
         }     
     }
     covs = length(Z$covariances)
@@ -161,7 +152,7 @@ cec <- function(
     
     # obtain the covariances of the model
     for(i in 1:covs)
-        covariances.model[[i]] = model.covariance(types.final[[i]], Z$covariances[[i]], params.final[[i]])
+        covariances.model[[i]] = model.covariance(models.r[[i]]$type, Z$covariances[[i]], models.r[[i]]$params)
     
     structure(list(
         data                = x,

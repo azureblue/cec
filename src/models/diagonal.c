@@ -16,7 +16,7 @@ static double cross_entropy(struct cross_entropy_context * context, const struct
            + (1.0 / 2.0) * log(diagonal_product);
 }
 
-struct cec_model * cec_create_ce_ctx_diagonal() {
+struct cec_model * cec_create_model_diagonal() {
     struct cec_model *model = alloc(struct cec_model);
     model->cross_entropy_context = alloc(cross_entropy_ctx);
     model->cross_entropy = cross_entropy;

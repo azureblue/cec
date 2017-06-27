@@ -36,7 +36,14 @@ void noreturn error_r(enum cec_result_code code) {
     }
 }
 
-void missing_param_error_r(const char *param_name) {
+void noreturn defect_error_r(const char *details) {
+    strcpy(error_msg_buffer, LIBRARY_DEFECT_ERROR_MSG);
+    strcat(error_msg_buffer, ": ");
+    strcat(error_msg_buffer, details);
+    error(error_msg_buffer);
+}
+
+void noreturn missing_param_error_r(const char *param_name) {
     strcpy(error_msg_buffer, LIBRARY_DEFECT_ERROR_MSG);
     strcat(error_msg_buffer, ": ");
     strcat(error_msg_buffer, "missing param: ");

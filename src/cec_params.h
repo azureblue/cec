@@ -3,7 +3,7 @@
 
 #include "alloc.h"
 #include "centers_init.h"
-#include "cross_entropy_context.h"
+#include "type.h"
 
 struct cec_centers_param {
     init_method init_m;

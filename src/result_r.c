@@ -66,4 +66,3 @@ SEXP create_R_result(cec_out * out) {
 
     return ret_s;
 }
-

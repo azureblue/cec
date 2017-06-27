@@ -31,7 +31,7 @@ static double cross_entropy(struct cross_entropy_context * context, const struct
                                                                * log(cfe->given_evals_product);
 }
 
-struct cec_model * cec_create_ce_ctx_eigenvalues(int n, const double * given_evals) {
+struct cec_model * cec_create_model_eigenvalues(int n, const double *given_evals) {
     struct cec_model *model = alloc(struct cec_model);
     model->cross_entropy_context = alloc(cross_entropy_ctx);
     struct context_fe * c_fe =  alloc(struct context_fe);
