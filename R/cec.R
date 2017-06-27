@@ -102,6 +102,7 @@ cec <- function(
 
     if (threads == "auto")
         threads = 0
+
     control.r = list(
         min.card = as.integer(card.min),
         max.iters = as.integer(iter.max),
@@ -242,10 +243,9 @@ cec.interactive <- function(
     }    
     plot(Z, ellipses="TRUE")
     par(ask = old.ask)
-    if (readline) 
-    {
+    if (readline)
         ignore = readline(prompt="Press <Enter>:")
-    }
+
     Z
     }
 }

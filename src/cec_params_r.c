@@ -35,20 +35,22 @@ cec_models_par * get_models_param(SEXP models_param_r, int n) {
         spec->n = n;
         spec->type = type;
         switch (type) {
-            case FIXED_R:
-                spec->type_specific_params = alloc(struct cec_model_r_params);
-                ((struct cec_model_r_params*) spec->type_specific_params)->r = asReal(get_named_element(params, "r"));
+            case FIXED_R: {
+                struct cec_model_r_params *r_params = spec->type_specific_params = alloc(
+                        struct cec_model_r_params);
+                r_params->r = asReal(get_named_element(params, "r"));
                 break;
+            }
             case GIVEN_COVARIANCE: {
                 struct cec_model_covariances_params *cov_params = spec->type_specific_params = alloc(
-                struct cec_model_covariances_params);
+                        struct cec_model_covariances_params);
                 cov_params->cov = create_from_R_matrix(get_named_element(params, "cov"));
                 cov_params->cov_inv = create_from_R_matrix(get_named_element(params, "cov.inv"));
                 break;
             }
             case FIXEDEIGENVALUES: {
                 struct cec_model_eigenvalues_params *eigen_params = spec->type_specific_params = alloc(
-                struct cec_model_eigenvalues_params);
+                        struct cec_model_eigenvalues_params);
                 SEXP eigenvalues = get_named_element(params, "eigenvalues");
                 eigen_params->given_eigenvalues = vec_d_create_from(LENGTH(eigenvalues), REAL(eigenvalues));
                 break;

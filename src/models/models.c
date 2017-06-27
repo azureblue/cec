@@ -11,7 +11,7 @@ struct cec_model * create_model(struct cec_model_spec * model_spec)
         case DIAGONAL:
             return cec_create_ce_ctx_diagonal();
         case FIXED_R:
-            return cec_create_ce_ctx_fixed_r((model_r_params(model_spec)->r));
+            return cec_create_ce_ctx_fixed_r(model_r_params(model_spec)->r);
         case GIVEN_COVARIANCE:
             return cec_create_ce_ctx_covariance(model_covariances_params(model_spec)->cov,
                                                 model_covariances_params(model_spec)->cov_inv);

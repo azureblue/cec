@@ -1,3 +1,4 @@
+#include <string.h>
 #include <R_ext/Error.h>
 #include "error_r.h"
 
@@ -11,6 +12,7 @@ static const char * const CENTERS_INIT_ERROR_MSG = "Centers initialization error
 static const char * const INVALID_CENTERS_INIT_METHOD_ERROR_MSG = "Invalid centers initialization method";
 static const char * const LIBRARY_DEFECT_ERROR_MSG = "CEC library error";
 
+static char error_msg_buffer[256];
 
 void noreturn error_r(enum cec_result_code code) {
     switch (code)
@@ -32,4 +34,12 @@ void noreturn error_r(enum cec_result_code code) {
         case NO_ERROR:
             error(UNKNOWN_ERROR_MSG);
     }
+}
+
+void missing_param_error_r(const char *param_name) {
+    strcpy(error_msg_buffer, LIBRARY_DEFECT_ERROR_MSG);
+    strcat(error_msg_buffer, ": ");
+    strcat(error_msg_buffer, "missing param: ");
+    strcat(error_msg_buffer, param_name);
+    error(error_msg_buffer);
 }
