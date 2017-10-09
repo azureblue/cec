@@ -1,4 +1,5 @@
 #include <string.h>
+#include <limits.h>
 #include "array.h"
 #include "alloc.h"
 
@@ -99,4 +100,12 @@ void cec_array_int_copy_to(vec_i *restrict src, int *restrict  dst) {
 
 void cec_array_double_copy_to(vec_d *restrict src, double *restrict dst) {
     memcpy(dst, src->ar, sizeof (double) * src->len);
+}
+
+int max_i(const vec_i *ar) {
+    int len = ar->len;
+    int max = INT_MIN;
+    for (int i = 0; i < len; i++)
+        max = max > ar->ar[i] ? max : ar->ar[i];
+    return max;
 }

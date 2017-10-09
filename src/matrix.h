@@ -41,6 +41,10 @@ static inline double * cec_matrix_row(cec_mat * matrix, int m)
     return matrix->data + (m * matrix->n);
 }
 
+static inline void cec_matrix_copy_row(const cec_mat *src, int src_row, cec_mat *dst, int dst_row){
+    array_copy(cec_matrix_const_row(src, src_row), cec_matrix_row(dst, dst_row), src->n);
+}
+
 void cec_matrix_mul(cec_mat * m, double val);
 
 void cec_matrix_add(cec_mat *restrict m1, const cec_mat *restrict m2);

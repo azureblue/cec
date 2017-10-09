@@ -21,7 +21,7 @@ struct cec_temp_data {
 
 struct cec_input {
     const struct cec_matrix * points;
-    const struct cec_matrix * centers;
+    struct cec_matrix * centers;
     struct cec_model ** models;
     int max_iterations;
     int min_card;
@@ -54,7 +54,7 @@ cec_ctx * create_cec_context(cec_in *in, cec_out *out);
 
 cec_out * create_cec_output(int m, int k, int n, int max_iterations);
 
-cec_in * create_cec_input(const cec_mat * points, const cec_mat * centers,
+cec_in * create_cec_input(const cec_mat * points, cec_mat * centers,
                                     struct cec_model ** models, int max_iterations, int min_card);
 
 void cec_copy_results_content(cec_out *from, cec_out *to);

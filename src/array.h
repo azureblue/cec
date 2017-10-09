@@ -33,6 +33,8 @@ void cec_array_double_copy_to(vec_d *src, double *dst);
 #define vec_i_copy_to cec_array_int_copy_to
 #define vec_d_copy_to cec_array_double_copy_to
 
+int max_i(const vec_i *ar);
+
 void array_fill(double * x, const double val, const int n);
 
 void array_copy(const double *restrict from, double *restrict to, const int n);
@@ -53,6 +55,5 @@ void mean_add_point(double *restrict new_mean, const double *restrict mean,
 
 void mean_remove_point(double *restrict new_mean, const double *restrict mean,
         const double *restrict point, const int card, const int n);
-
 
 #endif	/* ARRAY_H */

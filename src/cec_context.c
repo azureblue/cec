@@ -31,7 +31,7 @@ cec_out * create_cec_output(int m, int k, int n, int max_iterations) {
     return output;
 }
 
-cec_in * create_cec_input(const cec_mat * points, const cec_mat * centers,
+cec_in * create_cec_input(const cec_mat * points, cec_mat * centers,
                                     struct cec_model ** models, int max_iterations, int min_card) {
     cec_in *input = alloc(cec_in);
     input->points = points;

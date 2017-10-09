@@ -3,21 +3,19 @@
 #include "cec.h"
 #include "models/models.h"
 
-static int max_i(const vec_i *ar) {
-    int len = ar->len;
-    int max = INT_MIN;
-    for (int i = 0; i < len; i++)
-        max = max > ar->ar[i] ? max : ar->ar[i];
-    return max;
+cec_out * create_cec_out_for_all_starts(cec_mat *x_mat, cec_centers_par *centers, cec_control_par *control) {
+    int m = x_mat->m;
+    int n = x_mat->n;
+    int vc_max_k = max_i(centers->var_centers);
+    return create_cec_output(m, vc_max_k, n, control->max_iterations);
 }
 
 res_code cec_perform(cec_mat *x_mat, cec_centers_par *centers, cec_control_par *control, cec_models_par *models,
-                     cec_out **results) {
+                     cec_out *results) {
     int vc_len = centers->var_centers->len;
     int m = x_mat->m;
     int n = x_mat->n;
     int vc_max_k = max_i(centers->var_centers);
-    cec_out *best_result = create_cec_output(m, vc_max_k, n, control->max_iterations);
     m_state ms_start = m_current_state();
     cec_mat * c_mat = cec_matrix_create(vc_max_k, n);
     if (centers->centers_mat)
@@ -58,7 +56,7 @@ res_code cec_perform(cec_mat *x_mat, cec_centers_par *centers, cec_control_par *
             for (int start = 0; start < starts; start++) {
 
 #pragma omp critical
-                cec_init_centers(x_mat, local_c_mat, centers->init_m);
+                cec_init_centers(x_mat, in->centers, centers->init_m);
 
                 int res = cec_start(ctx);
 
@@ -69,7 +67,7 @@ res_code cec_perform(cec_mat *x_mat, cec_centers_par *centers, cec_control_par *
 #pragma omp critical
                         // need to check again!
                         if (energy < best_energy) {
-                            cec_copy_results_content(out, best_result);
+                            cec_copy_results_content(out, results);
                             best_energy = energy;
                             all_res = NO_ERROR;
                         }
@@ -81,7 +79,6 @@ res_code cec_perform(cec_mat *x_mat, cec_centers_par *centers, cec_control_par *
     }
     omp_set_num_threads(threads_default);
     m_reset_state(ms_start);
-    *results = best_result;
     return all_res;
 }
 
