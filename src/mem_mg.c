@@ -1,116 +1,119 @@
-#include <stdbool.h>
+#include <inttypes.h>
 #include "mem_mg.h"
-
-#define DEFAULT_START_SIZE 10
 
 #ifdef R_ALLOC
 #include <R.h>
+
 static memptr_t mem_alloc(size_t size) {
     return Calloc(size, char);
 }
 
-static memptr_t mem_realloc(memptr_t ptr, size_t size) {
-    return Realloc(ptr, size, char);
-}
 static void mem_free(memptr_t ptr) {
     Free(ptr);
 }
-
 #else
 #include <stdlib.h>
 
 static memptr_t mem_alloc(size_t size) {
     return malloc(size);
 }
-
-static memptr_t mem_realloc(memptr_t ptr, size_t size) {
-    return realloc(ptr, size);
-}
-
 static void mem_free(memptr_t ptr) {
     free(ptr);
 }
 #endif
 
-static struct {
-    size_t size;
-    size_t idx;
-    intptr_t **ptrs;
-    mem_fail_handler fail_handler;
-} mem_mg_ctx = {.size = 0, .idx = 0, .ptrs = NULL};
+struct mem_mg_node {
+    size_t id;
+    intptr_t ptr;
+    struct mem_mg_node * prev;
+    struct mem_mg_node * next;
+};
 
-static void handle_fail(mem_fail_handler fail_handler) {
-    fail_handler();
-}
+#define mem_node struct mem_mg_node
+
+mem_node end_node = {.id = SIZE_MAX, .next = NULL};
+mem_node start_node = {.id = 0, .prev = NULL};
+
+static struct {
+    size_t current_id;
+    mem_node * start;
+    mem_node * end;
+    mem_fail_handler fail_handler;
+} ctx = {.current_id = 1, .end = NULL};
 
 void free_mem_mg() {
-    if (mem_mg_ctx.size == 0)
-        return;
-    m_reset_state(0);
-    mem_free(mem_mg_ctx.ptrs);
-    mem_mg_ctx.size = 0;
-    mem_mg_ctx.idx = 0;
-    mem_mg_ctx.ptrs = NULL;
+    mem_reset_state(0);
+    ctx.current_id = 1;
 }
 
-enum mem_mg_init_res init_mem_mg(mem_fail_handler fail_handler) {
-    if (mem_mg_ctx.size > 0)
-        return ALREADY_INITIALIZED;
-    intptr_t **ptrs = mem_alloc(DEFAULT_START_SIZE * sizeof(intptr_t));
-    if (!ptrs) {
-        handle_fail(fail_handler);
-        return FAILED;
-    }
-    mem_mg_ctx.fail_handler = fail_handler;
-    mem_mg_ctx.ptrs = ptrs;
-    mem_mg_ctx.size = DEFAULT_START_SIZE;
-    mem_mg_ctx.idx = 0;
-    return OK;
-}
-
-static bool mem_mg_grow() {
-    size_t nsize = mem_mg_ctx.size * 2;
-    intptr_t **ptrs = mem_realloc((memptr_t) mem_mg_ctx.ptrs, sizeof(intptr_t) * nsize);
-    if (!ptrs)
-        return false;
-    mem_mg_ctx.ptrs = ptrs;
-    mem_mg_ctx.size = nsize;
-    return true;
+void init_mem_mg(mem_fail_handler fail_handler) {
+    ctx.end = &end_node;
+    ctx.end->prev = &start_node;
+    ctx.end->prev->next = ctx.end;
+    ctx.start = &start_node;
+    ctx.fail_handler = fail_handler;
 }
 
 memptr_t m_alloc(size_t size) {
-    if (mem_mg_ctx.idx == mem_mg_ctx.size && !mem_mg_grow())
+    mem_node * node = mem_alloc(sizeof (mem_node));
+    if (!node)
         goto fail;
+    node->prev = NULL;
+    node->next = NULL;
     memptr_t ptr = mem_alloc(size);
     if (!ptr)
         goto fail;
-    mem_mg_ctx.ptrs[mem_mg_ctx.idx++] = ptr;
+    node->id = ctx.current_id++;
+    node->ptr = (intptr_t) ptr;
+    node->prev = ctx.end->prev;
+    node->next = ctx.end;
+    node->prev->next = node;
+    ctx.end->prev = node;
     return ptr;
 fail:
-    mem_mg_ctx.fail_handler();
+    mem_free(node);
+    ctx.fail_handler();
     return NULL;
 }
 
-m_state m_current_state() {
-    return mem_mg_ctx.idx;
+mem_node * m_last_alloc_node() {
+    return ctx.end->prev;
 }
 
-void m_reset_state(m_state idx) {
-    while (mem_mg_ctx.idx-- > idx)
-        mem_free(mem_mg_ctx.ptrs[mem_mg_ctx.idx]);
-    mem_mg_ctx.idx = idx;
+mem_state_id mem_track_start() {
+    return ctx.end->prev->id;
 }
 
-void m_clear_states(m_state a, m_state b) {
-    m_state tmp;
-    if (a > b) {
-        tmp = a;
-        a = b;
-        b = tmp;
+static void free_node(mem_node *node) {
+    if (!node)
+        return;
+    mem_free((memptr_t) node->ptr);
+    if (node->prev)
+        node->prev->next = node->next;
+    if (node->next)
+        node->next->prev = node->prev;
+    mem_free(node);
+}
+
+void mem_reset_state(mem_state_id state_id) {
+    mem_free_range((mem_state_range) {state_id, ctx.end->prev});
+}
+
+void mem_free_range(mem_state_range range) {
+    mem_node *node = range.to_node;
+    while (node->id > range.from_id) {
+        mem_node * prev = node->prev;
+        free_node(node);
+        node = prev;
     }
+}
 
-    for (m_state i = a; i < b; i++) {
-        mem_free(mem_mg_ctx.ptrs[i]);
-        mem_mg_ctx.ptrs[i] = NULL;
-    }        
+mem_state_range mem_empty_range() {
+    return (mem_state_range) {ctx.start->id, ctx.start};
+}
+
+mem_state_range mem_track_end(mem_state_id start) {
+    if (m_last_alloc_node()->id <= start)
+        return mem_empty_range();
+    return (mem_state_range) {start, m_last_alloc_node()};
 }

@@ -1,24 +1,33 @@
-#ifndef CEC_CMEM_MG_H
-#define CEC_CMEM_MG_H
-#include <inttypes.h>
-#include <setjmp.h>
+#ifndef MEM_MG_H
+#define MEM_MG_H
 #include <stddef.h>
 
 typedef void* memptr_t;
 typedef void (*mem_fail_handler)();
-typedef size_t m_state;
+typedef size_t mem_state_id;
 
-enum mem_mg_init_res {
-    OK = 0,
-    ALREADY_INITIALIZED = 1,
-    FAILED = -1
+struct mem_mg_state_range {
+    size_t from_id;
+    memptr_t to_node;
 };
+typedef struct mem_mg_state_range mem_state_range;
 
-enum mem_mg_init_res init_mem_mg(mem_fail_handler fail_handler);
-void free_mem_mg();
 memptr_t m_alloc(size_t size);
-m_state m_current_state();
-void m_clear_states(m_state, m_state);
-void m_reset_state(m_state);
 
-#endif //CEC_CMEM_MG_H
+void init_mem_mg(mem_fail_handler fail_handler);
+void free_mem_mg();
+
+void mem_free_range(mem_state_range);
+void mem_reset_state(mem_state_id);
+
+mem_state_id mem_track_start();
+mem_state_range mem_track_end(mem_state_id start);
+mem_state_range mem_empty_range();
+
+#define mem_track(mem_alloc_exp, m_range_ptr) {   \
+    mem_state_id start = mem_track_start();       \
+    mem_alloc_exp;                                \
+    *(m_range_ptr) = mem_track_end(start);        \
+}
+
+#endif //MEM_MG_H

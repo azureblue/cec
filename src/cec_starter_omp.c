@@ -16,7 +16,7 @@ res_code cec_perform(cec_mat *x_mat, cec_centers_par *centers, cec_control_par *
     int m = x_mat->m;
     int n = x_mat->n;
     int vc_max_k = max_i(centers->var_centers);
-    m_state ms_start = m_current_state();
+    mem_state_id ms_start = mem_track_start();
     cec_mat * c_mat = cec_matrix_create(vc_max_k, n);
     if (centers->centers_mat)
         cec_matrix_copy_data(centers->centers_mat, c_mat);
@@ -34,7 +34,7 @@ res_code cec_perform(cec_mat *x_mat, cec_centers_par *centers, cec_control_par *
     for (int vc = 0; vc < vc_len; vc++) {
         int vc_k = centers->var_centers->ar[vc];
         c_mat->m = vc_k;
-        m_state vc_start = m_current_state();
+        mem_state_id vc_start = mem_track_start();
 #pragma omp parallel default(shared)
         {
             cec_mat *local_c_mat;
@@ -75,10 +75,9 @@ res_code cec_perform(cec_mat *x_mat, cec_centers_par *centers, cec_control_par *
                 }
             }
         }
-        m_reset_state(vc_start);
+        mem_reset_state(vc_start);
     }
     omp_set_num_threads(threads_default);
-    m_reset_state(ms_start);
+    mem_reset_state(ms_start);
     return all_res;
 }
-
