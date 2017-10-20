@@ -3,12 +3,15 @@
 #include "kmeanspp.h"
 #include "init_rand.h"
 
-static void no_init(centers_init_ctx ctx, const cec_mat *x, cec_mat *c) {
+static void copy_init(centers_init_ctx ctx, const cec_mat *x, cec_mat *c) {
+    for (int i = 0; i < c->m; i++)
+        cec_matrix_copy_row(((cec_mat *) ctx), i, c, i);
 }
 
-static centers_init *create_none_initializer() {
+static centers_init *create_copy_initializer(cec_centers_par *centers_par) {
     centers_init * ci = alloc(centers_init);
-    ci->init = no_init;
+    ci->ctx = cec_matrix_create_copy(centers_par->centers_mat);
+    ci->init = copy_init;
     return ci;
 }
 
@@ -23,7 +26,7 @@ centers_init * create_centers_init(cec_centers_par *centers_par, int m_max) {
         case RANDOM:
             return create_random_initializer();
         case NONE:
-            return create_none_initializer();
+            return create_copy_initializer(centers_par);
     }
     return NULL;
 }

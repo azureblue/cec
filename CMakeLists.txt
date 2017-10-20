@@ -59,6 +59,8 @@ set(SOURCE_FILES
         src/models/models.c
         src/models/models.h
         src/models/spherical.c
+        src/cec_starter_vc.c
+        src/cec_starter_vc.h
         )
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fopenmp -DR_ALLOC -DR_RAND -Wall -Werror")
