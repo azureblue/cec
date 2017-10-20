@@ -14,6 +14,7 @@ set(SOURCE_FILES
         src/cec_context.c
         src/cec_context.h
         src/cec_params.h
+        src/cec_params.c
         src/cec_params_r.c
         src/cec_params_r.h
         src/cec_r.c
@@ -58,8 +59,7 @@ set(SOURCE_FILES
         src/models/models.c
         src/models/models.h
         src/models/spherical.c
-        src/type.c
-        src/type.h)
+        )
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fopenmp -DR_ALLOC -DR_RAND -Wall -Werror")
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -z defs")

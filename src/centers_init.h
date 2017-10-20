@@ -1,21 +1,20 @@
-#include <stdbool.h>
+#ifndef CENTERS_INIT_H
+#define CENTERS_INIT_H
+
 #include "matrix.h"
+#include "cec_params.h"
 
-#ifndef CEC_CENTERS_INIT_H
-#define CEC_CENTERS_INIT_H
+typedef memptr_t centers_init_ctx;
+typedef void (*centers_init_function)(centers_init_ctx ctx, const cec_mat * x, cec_mat * c);
 
-enum centers_init_method {
-    NONE = 0,
-    KMEANSPP = 1,
-    RANDOM = 2
+struct centers_initializer {
+    centers_init_function init;
+    centers_init_ctx ctx;
 };
 
-#define UNDEFINED -1
+typedef struct centers_initializer centers_init;
 
-typedef enum centers_init_method init_method;
+void cec_init_centers(centers_init * ci, const cec_mat * x, cec_mat * c);
+centers_init * create_centers_init(cec_centers_par *centers_par, int m_max);
 
-res_code cec_init_centers(const cec_mat * x, cec_mat * c, init_method method);
-
-bool parse_init_method(const char * method, init_method * result);
-
-#endif //CEC_CENTERS_INIT_H
+#endif //CENTERS_INIT_H

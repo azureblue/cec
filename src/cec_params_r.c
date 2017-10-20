@@ -1,7 +1,6 @@
 #include "cec_params_r.h"
 #include "cec_r_utils.h"
 #include "error_r.h"
-#include "type.h"
 
 cec_centers_par * get_centers_param(SEXP centers_param_r) {
     cec_centers_par *centers = alloc(cec_centers_par);

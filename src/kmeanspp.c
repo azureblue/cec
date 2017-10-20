@@ -2,7 +2,14 @@
 #include "kmeanspp.h"
 #include "rand.h"
 
-static int binary_search_d(double key, double * array, int len)
+struct kmeanspp_ctx {
+    double * dists_m;
+    double * sums_m;
+};
+
+typedef struct kmeanspp_ctx kmeanspp_ctx;
+
+static int binary_search_d(double key, const double * array, int len)
 {
     int a = 0, b = len - 1;
     while (a != b)
@@ -18,14 +25,14 @@ static int binary_search_d(double key, double * array, int len)
     return a;
 }
 
-res_code cec_init_centers_kmeanspp(const cec_mat *x, cec_mat *c)
+static void init(centers_init_ctx ctx, const cec_mat *x, cec_mat *c)
 {
     int m = x->m;
     int k = c->m;
     int n = x->n;
     
-    double * dists_m = alloc_n(double, m + 1);
-    double * sums_m = alloc_n(double, m + 1);
+    double * dists_m = ((kmeanspp_ctx*) ctx)->dists_m;
+    double * sums_m = ((kmeanspp_ctx*) ctx)->sums_m;
 
     int first_center = (int) (cec_rand() * m);
     array_copy(cec_matrix_const_row(x, first_center), cec_matrix_row(c, 0), n);
@@ -56,6 +63,14 @@ res_code cec_init_centers_kmeanspp(const cec_mat *x, cec_mat *c)
             sums_m[j + 1] = sums_m[j] + dists[j];
         }
     }
+}
 
-    return NO_ERROR;
+centers_init * create_kmeanspp_initializer(int m) {
+    centers_init * ci = alloc(centers_init);
+    kmeanspp_ctx * km_ctx = alloc(kmeanspp_ctx);
+    km_ctx->dists_m = alloc_n(double, m + 1);
+    km_ctx->sums_m = alloc_n(double, m + 1);
+    ci->ctx = km_ctx;
+    ci->init = init;
+    return ci;
 }

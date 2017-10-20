@@ -1,4 +1,3 @@
-#include "alloc.h"
 #include "model.h"
 
 static inline double energy(double cross_entropy, int card, int m)

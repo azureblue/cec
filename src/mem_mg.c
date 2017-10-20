@@ -1,4 +1,5 @@
 #include <inttypes.h>
+#include <stdbool.h>
 #include "mem_mg.h"
 
 #ifdef R_ALLOC
@@ -30,18 +31,22 @@ struct mem_mg_node {
 };
 
 #define mem_node struct mem_mg_node
-
-mem_node end_node = {.id = SIZE_MAX, .next = NULL};
+extern mem_node end_node;
 mem_node start_node = {.id = 0, .prev = NULL};
+mem_node end_node = {.id = SIZE_MAX, .next = NULL};
+
+static bool initialized = false;
 
 static struct {
     size_t current_id;
     mem_node * start;
     mem_node * end;
     mem_fail_handler fail_handler;
-} ctx = {.current_id = 1, .end = NULL};
+} ctx = {.current_id = 1, .start = &start_node, .end = &end_node};
 
 void free_mem_mg() {
+    if (!initialized)
+        return;
     mem_reset_state(0);
     ctx.current_id = 1;
 }
@@ -52,6 +57,7 @@ void init_mem_mg(mem_fail_handler fail_handler) {
     ctx.end->prev->next = ctx.end;
     ctx.start = &start_node;
     ctx.fail_handler = fail_handler;
+    initialized = true;
 }
 
 memptr_t m_alloc(size_t size) {

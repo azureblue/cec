@@ -1,9 +1,8 @@
-#ifndef CEC_INIT_RAND_H
-#define CEC_INIT_RAND_H
+#ifndef INIT_RAND_H
+#define INIT_RAND_H
 
-#include "errors.h"
-#include "matrix.h"
+#include "centers_init.h"
 
-res_code cec_init_centers_random(const cec_mat *x, cec_mat *c);
+centers_init * create_random_initializer();
 
-#endif //CEC_INIT_RAND_H
+#endif //INIT_RAND_H
