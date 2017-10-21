@@ -152,7 +152,7 @@ cec <- function(
     
     # obtain the covariances of the model
     for(i in 1:covs)
-        covariances.model[[i]] = model.covariance(models.r[[i]]$type, Z$covariances[[i]], models.r[[i]]$params)
+        covariances.model[[i]] = model.covariance(models.r[[1]]$type, Z$covariances[[i]], models.r[[1]]$params)
     
     structure(list(
         data                = x,

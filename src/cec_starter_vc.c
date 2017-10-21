@@ -19,7 +19,7 @@ res_code cec_perform_vc(cec_mat *x_mat, cec_centers_par *centers, cec_control_pa
         cec_mat *c_mat = cec_matrix_create(vc_k, n);
         cec_out *vc_out;
 
-        if (cec_perform(x_mat, c_mat, ci, control, models, &vc_out) != NO_ERROR)
+        if (cec_perform_starts(x_mat, c_mat, ci, control, models, &vc_out) != NO_ERROR)
             continue;
 
         double energy = cec_final_energy(vc_out);

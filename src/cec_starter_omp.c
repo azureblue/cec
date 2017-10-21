@@ -5,8 +5,9 @@
 #include "init_utils_r.h"
 #include "centers_init.h"
 
-res_code cec_perform(cec_mat *x_mat, cec_mat *c_mat, centers_init *ci, cec_control_par *control, cec_models_par *models,
-                     cec_out **results) {
+res_code cec_perform_starts(cec_mat *x_mat, cec_mat *c_mat, centers_init *ci, cec_control_par *control,
+                            cec_models_par *models,
+                            cec_out **results) {
     mem_state_id ms_start = mem_track_start();
     int m = x_mat->m;
     int k = c_mat->m;

@@ -62,9 +62,10 @@ set(SOURCE_FILES
         src/models/spherical.c
         src/cec_starter_vc.c
         src/cec_starter_vc.h
-        )
+        src/cec_starter_split.c
+        src/cec_starter_split.h)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fopenmp -DR_ALLOC -DR_RAND -Wall -Werror")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fopenmp -DR_ALLOC -DR_RAND -Wall")
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -z defs")
 
 link_libraries(m R lapack blas)
