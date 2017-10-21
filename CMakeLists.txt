@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.5)
 project(cec)
 set(CMAKE_C_STANDARD 99)
-
+set(CMAKE_VERBOSE_MAKEFILE TRUE)
 include_directories($ENV{R_INCLUDE_PATH})
 
 set(SOURCE_FILES
@@ -91,3 +91,5 @@ add_custom_target(install_CEC
 add_custom_target(dist_lib
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:cec> $ENV{R_CEC_LIB_PATH}
         )
+
+add_dependencies(dist_lib cec)

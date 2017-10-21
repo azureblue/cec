@@ -25,7 +25,8 @@ cec_control_par * get_control_param(SEXP control_param_r) {
 
 cec_models_par * get_models_param(SEXP models_param_r, int n) {
     int len = LENGTH(models_param_r);
-    cec_models_par *model_par = alloc_fam(cec_models_par, struct cec_model_spec, len);
+    cec_models_par *model_par = alloc(cec_models_par);
+    model_par->model_specs = alloc_n(cec_model_spec, len);
     model_par->len = len;
     for (int i = 0; i < len; i++) {
         SEXP model_r = VECTOR_ELT(models_param_r, i);
@@ -33,28 +34,22 @@ cec_models_par * get_models_param(SEXP models_param_r, int n) {
         if (!cec_parse_type(CHAR(STRING_ELT(get_named_element(model_r, "type"), 0)), &type))
             defect_error_r("invalid type");
         SEXP params = get_named_element(model_r, "params");
-        struct cec_model_spec *spec = &model_par->model_specs[i];
+        cec_model_spec *spec = &model_par->model_specs[i];
         spec->n = n;
         spec->type = type;
         switch (type) {
             case FIXED_R: {
-                struct cec_model_r_params *r_params = spec->type_specific_params = alloc(
-                        struct cec_model_r_params);
-                r_params->r = asReal(get_named_element(params, "r"));
+                spec->r_params.r = asReal(get_named_element(params, "r"));
                 break;
             }
             case COVARIANCE: {
-                struct cec_model_covariances_params *cov_params = spec->type_specific_params = alloc(
-                        struct cec_model_covariances_params);
-                cov_params->cov = create_from_R_matrix(get_named_element(params, "cov"));
-                cov_params->cov_inv = create_from_R_matrix(get_named_element(params, "cov.inv"));
+                spec->covariances_params.cov = create_from_R_matrix(get_named_element(params, "cov"));
+                spec->covariances_params.cov_inv = create_from_R_matrix(get_named_element(params, "cov.inv"));
                 break;
             }
             case EIGENVALUES: {
-                struct cec_model_eigenvalues_params *eigen_params = spec->type_specific_params = alloc(
-                        struct cec_model_eigenvalues_params);
                 SEXP eigenvalues = get_named_element(params, "eigenvalues");
-                eigen_params->given_eigenvalues = vec_d_create_from(LENGTH(eigenvalues), REAL(eigenvalues));
+                spec->eigenvalues_params.given_eigenvalues = vec_d_create_from(LENGTH(eigenvalues), REAL(eigenvalues));
                 break;
             }
             case SPHERICAL:break;

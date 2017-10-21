@@ -44,23 +44,24 @@ struct cec_model_covariances_params {
     const cec_mat * cov_inv;
 };
 
-struct cec_model_spec {
+struct cec_model_specification {
     enum density_family type;
-    memptr_t type_specific_params;
     int n;
+    union {
+        struct cec_model_r_params r_params;
+        struct cec_model_eigenvalues_params eigenvalues_params;
+        struct cec_model_covariances_params covariances_params;
+    };
 };
 
 struct cec_models_param {
     int len;
-    struct cec_model_spec model_specs[];
+    struct cec_model_specification *model_specs;
 };
 
 typedef struct cec_centers_param cec_centers_par;
 typedef struct cec_control_param cec_control_par;
 typedef struct cec_models_param cec_models_par;
-
-#define model_r_params(model_spec) ((struct cec_model_r_params*) (model_spec)->type_specific_params)
-#define model_eigenvalues_params(model_spec) ((struct cec_model_eigenvalues_params*) (model_spec)->type_specific_params)
-#define model_covariances_params(model_spec) ((struct cec_model_covariances_params*) (model_spec)->type_specific_params)
+typedef struct cec_model_specification cec_model_spec;
 
 #endif //CEC_PARAMS_H

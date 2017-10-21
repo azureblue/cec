@@ -13,6 +13,6 @@ struct cec_model * cec_create_model_fixed_r(double r);
 struct cec_model * cec_create_model_spherical();
 struct cec_model * cec_create_model_diagonal();
 
-struct cec_model * create_model(struct cec_model_spec * model_spec);
+struct cec_model * create_model(struct cec_model_specification * model_spec);
 
 #endif //CEC_MODELS_H

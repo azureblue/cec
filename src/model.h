@@ -14,4 +14,3 @@ double cluster_energy(struct cec_model * model, struct cec_matrix * cov, int car
 res_code cluster_energy_get_last_error(struct cec_model * model);
 
 #endif /* MODEL_H */
-
