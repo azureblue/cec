@@ -55,4 +55,7 @@ void cec_matrix_copy_data(const cec_mat *restrict from, cec_mat *restrict to);
 
 void cec_vector_outer_product(const double *restrict vec, cec_mat *restrict output_matrix, int n);
 
+#define mat_row cec_matrix_row
+#define mat_crow cec_matrix_const_row
+#define mat_copy_row cec_matrix_copy_row
 #endif	/* MATRIX_H */

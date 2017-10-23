@@ -3,7 +3,7 @@
 #include "cec_context.h"
 #include "cec_starter_omp.h"
 
-static cec_mat ** group_points_by_clusters(cec_mat *x, int k, vec_i *clustering_vector) {
+cec_mat ** group_points_by_clusters(cec_mat *x, int k, vec_i *clustering_vector) {
     int m = clustering_vector->len;
     int n = x->n;
     int cluster_sizes[k];
@@ -28,14 +28,21 @@ static vec_i * create_one_vc(int k) {
     return vc;
 }
 
-static cec_mat * create_single_row_matrix(int n, double data[]) {
+static cec_mat * create_sub_matrix(const cec_mat *src, int start_row, int end_row) {
+    cec_mat * mat = cec_matrix_create(end_row - start_row, src->n);
+    for (int i = start_row; i < end_row; i++)
+        mat_copy_row(src, i, mat, i - start_row);
+    return mat;
+}
+
+static cec_mat * create_single_row_matrix(int n, const double *data) {
     cec_mat *mat = cec_matrix_create(1, n);
     for (int i = 0; i < n; ++i)
         cec_matrix_set_element(mat, 0, i, data[i]);
     return mat;
 }
 
-static double calculate_single_cluster_energy(cec_mat *x_mat, double* cluster_pos, int min_card, cec_model_spec model_spec) {
+double calculate_single_cluster_energy(const cec_mat *x_mat, const double* cluster_pos, int min_card, cec_model_spec model_spec) {
     mem_state_id start = mem_track_start();
     cec_mat *c_mat = create_single_row_matrix(x_mat->n, cluster_pos);
     vec_i * single_vc = create_one_vc(1);
@@ -65,112 +72,157 @@ static double calculate_single_cluster_energy(cec_mat *x_mat, double* cluster_po
     return energy;
 }
 
-res_code cec_perform_split(cec_mat *x_mat, cec_centers_par *centers, cec_control_par *control, cec_models_par *models,
-                        cec_out **results) {
-    mem_state_id perform_split_start = mem_track_start();
-    cec_model_spec model_spec = models->model_specs[0];
+bool try_split_cluster(cec_mat *x_mat, double *cluster_pos, int min_card, int max_iters,
+                              cec_model_spec model_spec, cec_mat *out_c_mat) {
     int n = x_mat->n;
-    int k = centers->var_centers->ar[0];
+    double single_cluster_energy = calculate_single_cluster_energy(x_mat,cluster_pos, min_card, model_spec);
 
-    centers_init *ci = create_centers_init(centers, x_mat->m);
-    cec_out *initial_results;
+    mem_state_id split_start = mem_track_start();
+    vec_i *vc_two_centers = create_one_vc(2);
 
-    res_code initial_res = cec_perform_starts(x_mat, cec_matrix_create(k, n), ci, control, models, &initial_results);
-    if (initial_res != NO_ERROR) {
-        mem_reset_state(perform_split_start);
-        return initial_res;
-    }
-    cec_mat ** split = group_points_by_clusters(x_mat, k, initial_results->clustering_vector);
-    cec_mat * split_centers = cec_matrix_create(k * 2, n);
-    int split_centers_k = k;
-
-    for (int i = 0; i < k; i++) {
-        if (split[i]->m == 0)
-            continue;
-        cec_matrix_copy_row(initial_results->centers, i, split_centers, i);
-        cec_mat *split_x_mat = split[i];
-        double single_cluster_energy
-                = calculate_single_cluster_energy(split_x_mat, cec_matrix_row(initial_results->centers, i), control->min_card, model_spec);
-
-
-        mem_state_id split_start = mem_track_start();
-        vec_i * vc_two_centers = create_one_vc(2);
-
-        cec_centers_par cen_double_par = {
-                .centers_mat = NULL,
-                .init_m = KMEANSPP,
-                .var_centers = vc_two_centers
-        };
-
-        cec_mat *split_c_mat = cec_matrix_create(2, n);
-        centers_init *split_ci = create_centers_init(&cen_double_par, split_x_mat->m);
-
-        cec_control_par split_con_par = {
-                .max_iterations = control->max_iterations,
-                .min_card = control->min_card,
-                .starts = 10,
-                .threads = 0
-        };
-
-        cec_model_spec two_specs[] = {model_spec, model_spec};
-        cec_models_par split_models = {.len = 2, .model_specs = two_specs};
-
-        cec_out *split_results;
-        res_code split_res_code = cec_perform_starts(
-                split_x_mat,
-                split_c_mat,
-                split_ci,
-                &split_con_par,
-                &split_models,
-                &split_results
-        );
-
-        if (split_res_code != NO_ERROR) {
-            continue;
-        }
-
-        if (cec_final_centers_number(split_results) == 2 && cec_final_energy(split_results) < single_cluster_energy) {
-            cec_matrix_copy_row(split_results->centers, 0, split_centers, i);
-            cec_matrix_copy_row(split_results->centers, 1, split_centers, split_centers_k++);
-        }
-        mem_reset_state(split_start);
-    }
-
-    cec_model_spec model_specs_final[split_centers_k];
-    cec_models_par mod_par_final = {.len = split_centers_k, .model_specs = model_specs_final};
-    cec_mat *centers_final = cec_matrix_create(split_centers_k, n);
-    for (int i = 0; i < split_centers_k; ++i) {
-        model_specs_final[i] = model_spec;
-        cec_matrix_copy_row(split_centers, i, centers_final, i);
-    }
-    vec_i * vc_final = create_one_vc(split_centers_k);
-
-    cec_centers_par centers_final_par = {
-            .centers_mat = centers_final,
-            .init_m = NONE,
-            .var_centers = vc_final
+    cec_centers_par cen_double_par = {
+            .centers_mat = NULL,
+            .init_m = KMEANSPP,
+            .var_centers = vc_two_centers
     };
 
-    centers_init *ci_final = create_centers_init(&centers_final_par, x_mat->m);
+    cec_mat *c_mat = cec_matrix_create(2, n);
+    centers_init *split_ci = create_centers_init(&cen_double_par, x_mat->m);
 
-    cec_control_par con_par_final = {
-            .max_iterations = control->max_iterations,
-            .min_card = control->min_card,
+    cec_control_par split_con_par = {
+            .max_iterations = max_iters,
+            .min_card = min_card,
+            .starts = 10,
+            .threads = 0
+    };
+
+    cec_model_spec two_specs[] = {model_spec, model_spec};
+    cec_models_par split_models = {.len = 2, .model_specs = two_specs};
+
+    cec_out *split_results;
+    res_code split_res_code = cec_perform_starts(
+            x_mat,
+            c_mat,
+            split_ci,
+            &split_con_par,
+            &split_models,
+            &split_results
+    );
+
+    bool split_success = false;
+
+    if (split_res_code == NO_ERROR
+            && cec_final_centers_number(split_results) == 2
+            && cec_final_energy(split_results) < single_cluster_energy) {
+        cec_matrix_copy_data(split_results->centers, out_c_mat);
+        split_success = true;
+    }
+    mem_reset_state(split_start);
+    return split_success;
+}
+
+res_code run_single_start_with_given_clusters(cec_mat *x_mat, cec_mat *c_mat, int min_card, int max_iters,
+                                                     cec_model_spec model_spec, cec_out ** results) {
+    mem_state_id run_start = mem_track_start();
+    vec_i *vc = create_one_vc(c_mat->m);
+
+    cec_centers_par centers_final_par = {
+            .centers_mat = c_mat,
+            .init_m = NONE,
+            .var_centers = vc
+    };
+
+    centers_init *ci = create_centers_init(&centers_final_par, x_mat->m);
+
+    cec_control_par con_par = {
+            .max_iterations = max_iters,
+            .min_card = min_card,
             .starts = 1,
             .threads = 1
     };
 
-    mem_state_range split_range = mem_track_end(perform_split_start);
+    cec_model_spec model_specs_final[c_mat->m];
+    cec_models_par mod_par = {.len = c_mat->m, .model_specs = model_specs_final};
+    for (int i = 0; i < c_mat->m; ++i)
+        model_specs_final[i] = model_spec;
 
-    res_code final_res = cec_perform_starts(
-            x_mat,
-            centers_final,
-            ci_final,
-            &con_par_final,
-            &mod_par_final,
-            results
+    mem_state_range split_level_range = mem_track_end(run_start);
+    res_code res = cec_perform_starts(x_mat,
+                                      c_mat,
+                                      ci,
+                                      &con_par,
+                                      &mod_par,
+                                      results);
+    mem_free_range(split_level_range);
+    return res;
+}
+
+res_code cec_perform_split(cec_mat *x_mat, cec_centers_par *centers, cec_control_par *control, cec_models_par *models,
+                        cec_out **results) {
+    cec_model_spec model_spec = models->model_specs[0];
+    int n = x_mat->n;
+    int k = centers->var_centers->ar[0];
+
+    int split_depth = 2;
+
+    res_code current_res_code;
+    mem_state_range current_res_range = mem_empty_range();
+    cec_out *current_res;
+    mem_track(
+            current_res_code = cec_perform_starts(
+                    x_mat,
+                    cec_matrix_create(k, n),
+                    create_centers_init(centers, x_mat->m),
+                    control,
+                    models,
+                    &current_res),
+            &current_res_range
     );
 
-    mem_free_range(split_range);
-    return final_res;
+    if (current_res_code != NO_ERROR) {
+        mem_free_range(current_res_range);
+        return current_res_code;
+    }
+
+    for (int split_level = 0; split_level < split_depth; split_level++) {
+        mem_state_id split_level_start = mem_track_start();
+        k = current_res->centers->m;
+        cec_mat **split = group_points_by_clusters(x_mat, k, current_res->clustering_vector);
+        cec_mat *split_centers = cec_matrix_create(k * 2, n);
+        cec_mat *split_res_c_mat = cec_matrix_create(2, n);
+        int split_centers_k = k;
+
+        for (int i = 0; i < k; i++) {
+            if (split[i]->m == 0)
+                continue;
+            mat_copy_row(current_res->centers, i, split_centers, i);
+            cec_mat *split_x_mat = split[i];
+            bool split_success = try_split_cluster(split_x_mat,
+                              mat_row(current_res->centers, i),
+                              control->min_card,
+                              control->max_iterations,
+                              model_spec,
+                              split_res_c_mat
+            );
+            if (split_success) {
+                mat_copy_row(split_res_c_mat, 0, split_centers, i);
+                mat_copy_row(split_res_c_mat, 1, split_centers, split_centers_k++);
+            } else
+                mat_copy_row(current_res->centers, i, split_centers, i);
+        }
+
+        cec_mat *level_c_mat = create_sub_matrix(split_centers, 0, split_centers_k);
+
+        mem_state_range split_level_range = mem_track_end(split_level_start);
+        mem_free_range(current_res_range);
+        mem_track(run_single_start_with_given_clusters(x_mat, level_c_mat, control->min_card, control->max_iterations,
+                          model_spec, &current_res),
+                  &current_res_range);
+
+        mem_free_range(split_level_range);
+    }
+
+    *results = current_res;
+
+    return current_res_code;
 }

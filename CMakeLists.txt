@@ -65,6 +65,8 @@ set(SOURCE_FILES
         src/cec_starter_split.c
         src/cec_starter_split.h)
 
+
+set(CMAKE_C_FLAGS "-O0 -g")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fopenmp -DR_ALLOC -DR_RAND -Wall")
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -z defs")
 
