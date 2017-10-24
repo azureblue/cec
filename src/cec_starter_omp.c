@@ -2,10 +2,9 @@
 #include "cec_starter_omp.h"
 #include "cec.h"
 #include "models/models.h"
-#include "init_utils_r.h"
-#include "centers_init.h"
 
-res_code cec_perform_starts(const cec_mat *x_mat, cec_mat *c_mat, centers_init *ci, cec_control_par *control,
+res_code cec_perform_starts(const cec_mat *x_mat, cec_mat *c_mat, centers_initializer *ci, initial_assignment *ia,
+                            cec_control_par *control,
                             cec_models_par *models,
                             cec_out **results) {
     mem_state_id ms_start = mem_track_start();
@@ -22,14 +21,16 @@ res_code cec_perform_starts(const cec_mat *x_mat, cec_mat *c_mat, centers_init *
 
     omp_set_num_threads(threads);
 
-    struct cec_model *cec_models[threads][models->len];
+    cec_model *cec_models[threads][models->len];
     cec_mat *local_c_mat[threads];
     cec_ctx *ctx[threads];
+    vec_i *init_assign_vec[threads];
 
     for (int t = 0; t < threads; t++) {
         local_c_mat[t] = cec_matrix_create(k, n);
+        init_assign_vec[t] = vec_i_create(m);
         ctx[t] = create_cec_context(
-                create_cec_input(x_mat, local_c_mat[t], cec_models[t], control->max_iterations, control->min_card),
+                create_cec_input(x_mat, local_c_mat[t], init_assign_vec[t], cec_models[t], control->max_iterations, control->min_card),
                 create_cec_output(m, k, n, control->max_iterations)
         );
 
@@ -48,6 +49,8 @@ res_code cec_perform_starts(const cec_mat *x_mat, cec_mat *c_mat, centers_init *
         for (int start = 0; start < starts; start++) {
             #pragma omp critical
             cec_init_centers(ci, x_mat, local_c_mat[th]);
+
+            cec_assign_points(ia, x_mat, local_c_mat[th], init_assign_vec[th]);
 
             if(cec_start(ctx[th]) != NO_ERROR)
                 continue;

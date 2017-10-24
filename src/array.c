@@ -74,31 +74,31 @@ vec_d * cec_array_double_create(int len) {
     return vec;
 }
 
-vec_i *cec_array_int_create_from(int len, int *src) {
+vec_i *cec_array_int_create_from(int len,const int *src) {
     vec_i *vec = cec_array_int_create(len);
     memcpy(vec->ar, src, sizeof (int) * len);
     return vec;
 }
 
-vec_d *cec_array_double_create_from(int len, double *src) {
+vec_d *cec_array_double_create_from(int len,const double *src) {
     vec_d *vec = cec_array_double_create(len);
     memcpy(vec->ar, src, sizeof (double) * len);
     return vec;
 }
 
-void cec_array_int_copy(vec_i *src, vec_i *dst) {
+void cec_array_int_copy(const vec_i *src, vec_i *dst) {
     memcpy(dst->ar, src->ar, sizeof (int) * src->len);
 }
 
-void cec_array_double_copy(vec_d *src, vec_d *dst) {
+void cec_array_double_copy(const vec_d *src, vec_d *dst) {
     memcpy(dst->ar, src->ar, sizeof (double) * src->len);
 }
 
-void cec_array_int_copy_to(vec_i *restrict src, int *restrict  dst) {
+void cec_array_int_copy_to(const vec_i *restrict src, int *restrict  dst) {
     memcpy(dst, src->ar, sizeof (int) * src->len);
 }
 
-void cec_array_double_copy_to(vec_d *restrict src, double *restrict dst) {
+void cec_array_double_copy_to(const vec_d *restrict src, double *restrict dst) {
     memcpy(dst, src->ar, sizeof (double) * src->len);
 }
 

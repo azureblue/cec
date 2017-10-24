@@ -10,7 +10,8 @@ res_code cec_perform_vc(cec_mat *x_mat, cec_centers_par *centers, cec_control_pa
     cec_out *best = NULL;
     double best_energy = BIG_DOUBLE;
     mem_state_range cec_out_best_mem_range = mem_empty_range();
-    centers_init *ci = create_centers_init(centers, x_mat->m);
+    centers_initializer *ci = create_centers_init(centers, x_mat->m);
+    initial_assignment *ia = create_initial_assignment_closest();
     res_code all_res = UNKNOWN_ERROR;
 
     for (int vc = 0; vc < centers->var_centers->len; vc++) {
@@ -19,7 +20,7 @@ res_code cec_perform_vc(cec_mat *x_mat, cec_centers_par *centers, cec_control_pa
         cec_mat *c_mat = cec_matrix_create(vc_k, n);
         cec_out *vc_out;
 
-        if (cec_perform_starts(x_mat, c_mat, ci, control, models, &vc_out) != NO_ERROR)
+        if (cec_perform_starts(x_mat, c_mat, ci, ia, control, models, &vc_out) != NO_ERROR)
             continue;
 
         double energy = cec_final_energy(vc_out);
@@ -28,7 +29,7 @@ res_code cec_perform_vc(cec_mat *x_mat, cec_centers_par *centers, cec_control_pa
         if (energy < best_energy) {
             all_res = NO_ERROR;
             mem_free_range(cec_out_best_mem_range);
-            mem_track(best = create_cec_output(m, vc_k, n, control->max_iterations), &cec_out_best_mem_range);
+            mem_track(&cec_out_best_mem_range, best = create_cec_output(m, vc_k, n, control->max_iterations));
             cec_copy_results_content(vc_out, best);
             best_energy = energy;
         }

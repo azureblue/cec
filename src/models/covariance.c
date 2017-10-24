@@ -30,9 +30,9 @@ static double cross_entropy(struct cross_entropy_context * context, const struct
            + (1.0 / 2.0) * log(det);
 }
 
-struct cec_model * cec_create_model_covariance(const struct cec_matrix *cov,
+cec_model * cec_create_model_covariance(const struct cec_matrix *cov,
                                                const struct cec_matrix *cov_inv) {
-    struct cec_model *model = alloc(struct cec_model);
+    cec_model *model = alloc(cec_model);
     model->cross_entropy_context = alloc(cross_entropy_ctx);
     struct context_gc * c_gc =  alloc(struct context_gc);
     int n = cov->n;

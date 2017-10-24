@@ -65,8 +65,8 @@ static void init(centers_init_ctx ctx, const cec_mat *x, cec_mat *c)
     }
 }
 
-centers_init * create_kmeanspp_initializer(int m) {
-    centers_init * ci = alloc(centers_init);
+centers_initializer * create_kmeanspp_initializer(int m) {
+    centers_initializer * ci = alloc(centers_initializer);
     kmeanspp_ctx * km_ctx = alloc(kmeanspp_ctx);
     km_ctx->dists_m = alloc_n(double, m + 1);
     km_ctx->sums_m = alloc_n(double, m + 1);

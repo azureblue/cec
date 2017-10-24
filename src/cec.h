@@ -8,7 +8,7 @@
 /*
  * Performs the CEC algorithm on the cec_context structure.
  */
-res_code cec_start(struct cec_context *cec_context);
+res_code cec_start(struct cec_context *ctx);
 
 #endif	/* CEC_H */
 

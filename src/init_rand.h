@@ -3,6 +3,6 @@
 
 #include "centers_init.h"
 
-centers_init * create_random_initializer();
+centers_initializer * create_random_initializer();
 
 #endif //INIT_RAND_H

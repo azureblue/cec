@@ -11,8 +11,8 @@ static void init(centers_init_ctx ctx, const cec_mat *x, cec_mat *c) {
     }
 }
 
-centers_init *create_random_initializer() {
-    centers_init *ci = alloc(centers_init);
+centers_initializer *create_random_initializer() {
+    centers_initializer *ci = alloc(centers_initializer);
     ci->ctx = NULL;
     ci->init = init;
     return ci;

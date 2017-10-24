@@ -6,8 +6,9 @@
 #include "cec_params.h"
 #include "cec_context.h"
 #include "centers_init.h"
+#include "initial_assignment.h"
 
-res_code cec_perform_starts(const cec_mat *x_mat, cec_mat *c_mat, centers_init *ci, cec_control_par *control,
+res_code cec_perform_starts(const cec_mat *x_mat, cec_mat *c_mat, centers_initializer *ci, initial_assignment *ia, cec_control_par *control,
                             cec_models_par *models,
                             cec_out **results);
 

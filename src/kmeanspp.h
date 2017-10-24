@@ -3,6 +3,6 @@
 
 #include "centers_init.h"
 
-centers_init * create_kmeanspp_initializer(int m);
+centers_initializer * create_kmeanspp_initializer(int m);
 
 #endif	/* KMEANSPP_H */

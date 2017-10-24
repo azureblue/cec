@@ -1,6 +1,6 @@
 #include "models.h"
 
-struct cec_model * create_model(cec_model_spec * model_spec)
+cec_model * create_model(cec_model_spec * model_spec)
 {
     switch (model_spec->type)
     {

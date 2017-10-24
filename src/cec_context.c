@@ -30,11 +30,12 @@ cec_out * create_cec_output(int m, int k, int n, int max_iterations) {
     return output;
 }
 
-cec_in * create_cec_input(const cec_mat * points, const cec_mat * centers, struct cec_model ** models,
+cec_in * create_cec_input(const cec_mat * points, const cec_mat * centers, const vec_i * initial_assignment, cec_model ** models,
                           int max_iterations, int min_card) {
     cec_in *input = alloc(cec_in);
     input->points = points;
     input->centers = centers;
+    input->initial_assignment = initial_assignment;
     input->models = models;
     input->max_iterations = max_iterations;
     input->min_card = min_card;
@@ -58,7 +59,7 @@ int cec_final_centers_number(cec_out *c_res) {
     return c_res->clusters_number->ar[c_res->iterations];
 }
 
-void cec_copy_results_content(cec_out *from, cec_out *to) {
+void cec_copy_results_content(const cec_out *from, cec_out *to) {
     to->iterations = from->iterations;
     vec_i_copy(from->clustering_vector, to->clustering_vector);
     vec_i_copy(from->clusters_number, to->clusters_number);

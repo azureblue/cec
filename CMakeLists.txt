@@ -63,7 +63,7 @@ set(SOURCE_FILES
         src/cec_starter_vc.c
         src/cec_starter_vc.h
         src/cec_starter_split.c
-        src/cec_starter_split.h)
+        src/cec_starter_split.h src/initial_assignment.c src/initial_assignment.h)
 
 
 set(CMAKE_C_FLAGS "-O0 -g")

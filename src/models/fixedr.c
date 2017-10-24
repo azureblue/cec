@@ -17,8 +17,8 @@ static double cross_entropy(struct cross_entropy_context * context, const struct
            + (1.0 / (2.0 * r)) * cec_cov_trace(cov) + (n / 2.0) * log(r);
 }
 
-struct cec_model * cec_create_model_fixed_r(double r) {
-    struct cec_model *model = alloc(struct cec_model);
+cec_model * cec_create_model_fixed_r(double r) {
+    cec_model *model = alloc(cec_model);
     model->cross_entropy_context = alloc(cross_entropy_ctx);
     struct context_r * c_r =  alloc(struct context_r);
     c_r->r = r;

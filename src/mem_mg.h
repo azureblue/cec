@@ -24,7 +24,7 @@ mem_state_id mem_track_start();
 mem_state_range mem_track_end(mem_state_id start);
 mem_state_range mem_empty_range();
 
-#define mem_track(mem_alloc_exp, m_range_ptr) {   \
+#define mem_track(m_range_ptr, mem_alloc_exp) {   \
     mem_state_id start = mem_track_start();       \
     mem_alloc_exp;                                \
     *(m_range_ptr) = mem_track_end(start);        \
