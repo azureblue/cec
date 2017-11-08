@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.5)
 project(cec)
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
+
 include_directories($ENV{R_INCLUDE_PATH})
 
 set(SOURCE_FILES

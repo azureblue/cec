@@ -4,7 +4,6 @@
 #include "centers_init_r.h"
 #include "error_r.h"
 #include "centers_init.h"
-#include "rand.h"
 
 SEXP cec_init_centers_r(SEXP x_r, SEXP k_r, SEXP method_r) {
     cec_init_env();
@@ -21,8 +20,7 @@ SEXP cec_init_centers_r(SEXP x_r, SEXP k_r, SEXP method_r) {
 
     SEXP result;
     PROTECT(result = create_R_matrix(c));
-    UNPROTECT(1);
     cec_clean_env();
+    UNPROTECT(1);
     return result;
-    return NULL;
 }

@@ -22,8 +22,8 @@ SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models_param
 
     if (all_res == NO_ERROR) {
         PROTECT(result = create_R_result(out));
-        UNPROTECT(1);
         cec_clean_env();
+        UNPROTECT(1);
         return result;
     }
     cec_clean_env();
