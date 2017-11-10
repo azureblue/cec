@@ -13,7 +13,8 @@ Performs Cross-Entropy Clustering on a data matrix.
 cec(x, centers, type = c("covariance", "fixedr", "spherical", "diagonal",  
 "eigenvalues", "all"), iter.max = 25, nstart = 1, param, 
 centers.init = c("kmeans++", "random"), card.min = "5\%", keep.removed = F, 
-interactive = F, threads = "auto", readline = T)
+interactive = F, threads = "auto", split = F, split.depth = 8, split.tries = 5,
+readline = T)
 }
 
 \arguments{
@@ -54,6 +55,8 @@ only if the \code{centers} argument is a number or a vector.
 
 If the \code{centers} argument is a vector, \code{length(centers)} clusterings will be performed
 for each start and the total number of clusterings will be \code{length(centers) * nstart}.
+
+When \code{split} = TRUE, split method will be used for each start.
 }
 
 \item{centers.init}{
@@ -85,10 +88,26 @@ Interactive mode. If TRUE, the result of clustering will be plotted after every 
 
 \item{threads}{
 Specifies the number of threads to use or "auto" to use default number of threads (usually
-the number of available processing units/cores) when performing multiple starts (\code{nstart} parameter).
+the number of available processing units/cores) when performing clustering.
 
-The execution of a single start is always performed by a single thread, thus for \code{nstart = 1} only one thread
-will be used regardless of the value of this parameter.
+Multiple threads are used for:
+\itemize{
+\item - standard cec with multiple starts
+\item - cluster splitting and initial clustering in split mode (\code{split} = TRUE)
+}
+}
+
+\item{split}{
+Enables split mode. This mode discovers new clusters by trying to split single clusters into two
+to lower the cost function.
+}
+
+\item{split.depth}{
+Cluster subdivision depth used in split mode.
+}
+
+\item{split.tries}{
+The number of attempts that are made when trying to split a cluster in split mode.
 }
 
 \item{readline}{
