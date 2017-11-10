@@ -13,6 +13,7 @@ cec <- function(
     threads       = "auto",
     split         = F,
     split.depth   = 8,
+    split.tries   = 5,
     readline      = T
 )
 {
@@ -111,7 +112,7 @@ cec <- function(
     split.r = list(
         split = split,
         depth = split.depth,
-        tries = 5
+        tries = split.tries
     )
 
     models.r = create.cec.params.for.models(k, n, type, param)

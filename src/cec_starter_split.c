@@ -309,6 +309,7 @@ res_code cec_perform_split(cec_mat *x_mat, cec_centers_par *centers, cec_control
             mem_free_range(cec_out_best_mem_range);
             cec_out_best_mem_range = local_res_range;
             best = split_start_res;
+            best_energy = cec_final_energy(split_start_res);
             best_res_code = res;
         } else
             mem_free_range(local_res_range);
