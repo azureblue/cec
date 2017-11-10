@@ -11,6 +11,8 @@ cec <- function(
     keep.removed  = F,
     interactive   = F,
     threads       = "auto",
+    split         = F,
+    split.depth   = 8,
     readline      = T
 )
 {
@@ -106,12 +108,18 @@ cec <- function(
         threads = threads
     )
 
+    split.r = list(
+        split = split,
+        depth = split.depth,
+        tries = 5
+    )
+
     models.r = create.cec.params.for.models(k, n, type, param)
 
     tryCatch(
         {
             # perform the clustering by calling C function cec_r
-            Z <- .Call(cec_r, x, centers.r, control.r, models.r)
+            Z <- .Call(cec_r, x, centers.r, control.r, models.r, split.r)
             k.final <- nrow(Z$centers)
         }, error = function(er) {
             warning(paste("Error: ", er$message), immediate.=T, call.=F)
@@ -126,7 +134,10 @@ cec <- function(
     
     tab <- tabulate(Z$cluster)
     probability <- vapply(tab, function(c.card){c.card / m}, 0)
-    
+
+    #TODO: change this temporary hack
+    model.one = models.r[[1]];
+
     # change cluster assignment if keep.removed == F
     if (!keep.removed)
     {
@@ -149,11 +160,15 @@ cec <- function(
     }
     covs = length(Z$covariances)
     covariances.model = rep(list(NA), covs)
-    
+
+    #TODO: change this temporary hack
+    if (split)
+        models.r = rep(list(model.one), covs)
+
     # obtain the covariances of the model
     for(i in 1:covs)
-        covariances.model[[i]] = model.covariance(models.r[[1]]$type, Z$covariances[[i]], models.r[[1]]$params)
-    
+        covariances.model[[i]] = model.covariance(models.r[[i]]$type, Z$covariances[[i]], models.r[[i]]$params)
+
     structure(list(
         data                = x,
         cluster             = Z$cluster,

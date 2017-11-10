@@ -5,10 +5,7 @@
 
 #define BIG_DOUBLE 100000000000000.0
 
-/*
- * Performs the CEC algorithm on the cec_context structure.
- */
-res_code cec_start(struct cec_context *ctx);
+res_code cec_start(const cec_in *input, cec_out *results, cec_tmp_data *temp_data);
 
 #endif	/* CEC_H */
 

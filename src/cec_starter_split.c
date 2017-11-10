@@ -4,6 +4,7 @@
 #include "cec_starter_omp.h"
 #include "cec_r_utils.h"
 #include "kmeanspp.h"
+#include "cec.h"
 
 typedef struct {
     cec_mat *points;
@@ -36,28 +37,11 @@ cluster_split *group_points_by_clusters(cec_mat *x, int k, vec_i *clustering_vec
     return split;
 }
 
-void debug_clustering(cec_mat *x_mat, int *clustering) {
-    FILE *file = fopen("/media/docs_ram/debug.R", "w");
-    fprintf(file, "X11(); \n plot(matrix(c(");
-
-    for (int j = 0; j < x_mat->n - 1; ++j)
-        for (int i = 0; i < x_mat->m; ++i)
-            fprintf(file, "%lf, ", cec_matrix_element(x_mat, i, j));
-
-    for (int j = 0; j < x_mat->m - 1; ++j)
-        fprintf(file, "%lf, ", cec_matrix_element(x_mat, j, x_mat->n - 1));
-
-    fprintf(file, "%lf", cec_matrix_element(x_mat, x_mat->m - 1, x_mat->n - 1));
-
-    fprintf(file, "),,2), col=c(");
-    for (int i = 0; i < x_mat->m - 1; ++i) {
-        fprintf(file, "%d, ", clustering[i] + 1);
-    }
-    fprintf(file, "%d", clustering[x_mat->m - 1] + 1);
-    fprintf(file, "), xlab=1, ylab=2, pch=20); \nSys.sleep(2);\n while (!is.null(dev.list())) Sys.sleep(0.2);");
-    fclose(file);
-
-    system("Rscript /media/docs_ram/debug.R");
+bool same_pos(const double *a, const double *b, int n) {
+    for (int i = 0; i < n; i++)
+        if (a[i] != b[i])
+            return false;
+    return true;
 }
 
 static vec_i *create_one_vc(int k) {
@@ -112,7 +96,7 @@ double calculate_single_cluster_energy(const cec_mat *x_mat, const double *clust
     return energy;
 }
 
-bool try_split_cluster(cec_mat *x_mat, double *cluster_pos, int min_card, int max_iters,
+bool try_split_cluster(cec_mat *x_mat, double *cluster_pos, int min_card, int max_iters, int tries,
                        cec_model_spec model_spec, cec_mat *out_c_mat, vec_i *assignment) {
     int n = x_mat->n;
     double single_cluster_energy = calculate_single_cluster_energy(x_mat, cluster_pos, min_card, model_spec);
@@ -123,7 +107,7 @@ bool try_split_cluster(cec_mat *x_mat, double *cluster_pos, int min_card, int ma
     cec_control_par split_con_par = {
             .max_iterations = max_iters,
             .min_card = min_card,
-            .starts = 10,
+            .starts = tries,
             .threads = 0
     };
 
@@ -172,7 +156,7 @@ res_code run_single_start_with_given_clusters(cec_mat *x_mat, cec_mat *c_mat, ve
     for (int i = 0; i < c_mat->m; ++i)
         model_specs_final[i] = model_spec;
 
-    mem_state_range split_level_range = mem_track_end(run_start);
+    mem_state_range run_range = mem_track_end(run_start);
 
     res_code res = cec_perform_starts(x_mat,
                                       c_mat,
@@ -181,17 +165,17 @@ res_code run_single_start_with_given_clusters(cec_mat *x_mat, cec_mat *c_mat, ve
                                       &con_par,
                                       &mod_par,
                                       results);
-    mem_free_range(split_level_range);
+    mem_free_range(run_range);
     return res;
 }
 
-res_code cec_perform_split(cec_mat *x_mat, cec_centers_par *centers, cec_control_par *control, cec_models_par *models,
-                           cec_out **results) {
+static res_code cec_perform_split_start(cec_mat *x_mat, cec_centers_par *centers, cec_control_par *control, cec_models_par *models,
+                                        cec_split_par *split_par, cec_out **results) {
     cec_model_spec model_spec = models->model_specs[0];
     int n = x_mat->n;
     int k = centers->var_centers->ar[0];
 
-    int split_depth = 4;
+    int split_depth = split_par->depth;
 
     res_code current_res_code;
     mem_state_range current_res_range = mem_empty_range();
@@ -214,64 +198,121 @@ res_code cec_perform_split(cec_mat *x_mat, cec_centers_par *centers, cec_control
         return current_res_code;
     }
 
+    mem_state_id moved_start = mem_track_start();
+    bool *moved = alloc_n(bool, k);
+    mem_state_range moved_range = mem_track_end(moved_start);
+    for (int i = 0; i < k; i++)
+        moved[i] = true;
+
     for (int split_level = 0; split_level < split_depth; split_level++) {
         vec_i_copy(current_res->clustering_vector, cluster);
         mem_state_id split_level_start = mem_track_start();
         k = current_res->centers->m;
         cluster_split *split = group_points_by_clusters(x_mat, k, current_res->clustering_vector);
-        cec_mat *split_centers = cec_matrix_create(k * 2, n);
-        cec_mat *split_res_c_mat = cec_matrix_create(2, n);
-        int split_centers_k = k;
+        cec_mat *split_centers = mat_create(k * 2, n);
+        cec_mat *split_res_c_mat = mat_create(2, n);
+        int k_s = 0;
+        bool splitted[k * 2];
+        bool split_flag = false;
 
         for (int i = 0; i < k; i++) {
             int split_m = split[i].points->m;
             if (split_m == 0)
                 continue;
-            mat_copy_row(current_res->centers, i, split_centers, i);
+            mat_copy_row(current_res->centers, i, split_centers, k_s);
+            bool split_success = false;
+
             cec_mat *split_x_mat = split[i].points;
             vec_i *mapping = split[i].mapping;
-            vec_i *split_cluster = vec_i_create(split_x_mat->m);
-            bool split_success = try_split_cluster(split_x_mat,
+            vec_i *split_assignment = vec_i_create(split_x_mat->m);
+            if (moved[i])
+                split_success = try_split_cluster(split_x_mat,
                                                    mat_row(current_res->centers, i),
                                                    control->min_card,
                                                    control->max_iterations,
+                                                   split_par->tries,
                                                    model_spec,
                                                    split_res_c_mat,
-                                                   split_cluster
+                                                   split_assignment
             );
+            split_flag = split_flag || split_success;
             if (split_success) {
-                mat_copy_row(split_res_c_mat, 0, split_centers, i);
-                mat_copy_row(split_res_c_mat, 1, split_centers, split_centers_k);
+                splitted[k_s] = true;
+                splitted[k_s + 1] = true;
+                mat_copy_row(split_res_c_mat, 0, split_centers, k_s);
+                mat_copy_row(split_res_c_mat, 1, split_centers, k_s + 1);
                 for (int p = 0; p < split_m; p++) {
-                    int c = split_cluster->ar[p];
-                    if (c == 0)
-                        cluster->ar[mapping->ar[p]] = i;
+                    if (split_assignment->ar[p] == 0)
+                        cluster->ar[mapping->ar[p]] = k_s;
                     else
-                        cluster->ar[mapping->ar[p]] = split_centers_k;
+                        cluster->ar[mapping->ar[p]] = k_s + 1;
                 }
-                split_centers_k++;
+                k_s += 2;
 
-            } else
-                mat_copy_row(current_res->centers, i, split_centers, i);
+            } else {
+                splitted[k_s] = false;
+                mat_copy_row(current_res->centers, i, split_centers, k_s);
+                for (int p = 0; p < split_m; p++)
+                    cluster->ar[mapping->ar[p]] = k_s;
+                k_s++;
+            }
         }
-        //debug_clustering(x_mat, cluster->ar);
-        cec_mat *level_c_mat = create_sub_matrix(split_centers, 0, split_centers_k);
+        cec_mat *level_c_mat = create_sub_matrix(split_centers, 0, k_s);
 
         mem_state_range split_level_range = mem_track_end(split_level_start);
 
-        mem_free_range(current_res_range);
         res_code rc;
-        mem_track(&current_res_range,
-                  rc = run_single_start_with_given_clusters(x_mat, level_c_mat, cluster, control->min_card,
-                                                       control->max_iterations, model_spec, &current_res));
+        bool need_another_split = false;
+        if (split_flag) {
+            mem_track(&current_res_range,
+                      rc = run_single_start_with_given_clusters(x_mat, level_c_mat, cluster, control->min_card,
+                                                                control->max_iterations, model_spec, &current_res));
 
-        printf("res: %d, iters: %d\n", rc, current_res->iterations);
-        debug_clustering(x_mat, current_res->clustering_vector->ar);
+            mem_track(&moved_range, moved = alloc_n(bool, k_s));
+
+            for (int i = 0; i < x_mat->m; i++) {
+                if (cluster->ar[i] != current_res->clustering_vector->ar[i]) {
+                    moved[cluster->ar[i]] = true;
+                    moved[current_res->clustering_vector->ar[i]] = true;
+                }
+            }
+            for (int i = 0; i < k_s; i++) {
+                if (splitted[i])
+                    moved[i] = true;
+                need_another_split = (need_another_split || moved[i]);
+            }
+        }
 
         mem_free_range(split_level_range);
+        if (!need_another_split)
+            break;
     }
 
     *results = current_res;
 
     return current_res_code;
+}
+
+res_code cec_perform_split(cec_mat *x_mat, cec_centers_par *centers, cec_control_par *control, cec_models_par *models,
+                           cec_split_par *split, cec_out **results) {
+    cec_out *best = NULL;
+    res_code best_res_code = UNKNOWN_ERROR;
+    double best_energy = BIG_DOUBLE;
+    mem_state_range cec_out_best_mem_range = mem_empty_range();
+    for (int i = 0; i < control->starts; i++){
+        cec_out *split_start_res;
+        mem_state_range local_res_range = mem_empty_range();
+        res_code res;
+        mem_track(&local_res_range,
+                  res = cec_perform_split_start(x_mat, centers, control, models, split, &split_start_res));
+        if (res == NO_ERROR && cec_final_energy(split_start_res) < best_energy) {
+            mem_free_range(cec_out_best_mem_range);
+            cec_out_best_mem_range = local_res_range;
+            best = split_start_res;
+            best_res_code = res;
+        } else
+            mem_free_range(local_res_range);
+    }
+    *results = best;
+    return best_res_code;
 }

@@ -31,6 +31,12 @@ struct cec_control_param {
     int threads;
 };
 
+struct cec_split_param {
+    bool split;
+    int depth;
+    int tries;
+};
+
 struct cec_model_r_params {
     double r;
 };
@@ -63,5 +69,6 @@ typedef struct cec_centers_param cec_centers_par;
 typedef struct cec_control_param cec_control_par;
 typedef struct cec_models_param cec_models_par;
 typedef struct cec_model_specification cec_model_spec;
+typedef struct cec_split_param cec_split_par;
 
 #endif //CEC_PARAMS_H

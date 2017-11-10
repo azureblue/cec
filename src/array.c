@@ -102,6 +102,20 @@ void cec_array_double_copy_to(const vec_d *restrict src, double *restrict dst) {
     memcpy(dst, src->ar, sizeof (double) * src->len);
 }
 
+const int * cec_array_int_const_data(const vec_i *src) {
+    return src->ar;
+}
+const double * cec_array_double_const_data(const vec_d *src) {
+    return src->ar;
+}
+
+int * cec_array_int_data(vec_i *src) {
+    return src->ar;
+}
+double * cec_array_double_data(vec_d *src) {
+    return src->ar;
+}
+
 int max_i(const vec_i *ar) {
     int len = ar->len;
     int max = INT_MIN;

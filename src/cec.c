@@ -3,28 +3,29 @@
 #include "cec.h"
 #include "cov_utils.h"
 
-res_code cec_start(struct cec_context *ctx)
+res_code cec_start(const cec_in *input, cec_out *results, cec_tmp_data *temp_data)
 {
-    const struct cec_matrix * X = ctx->input->points;
+    const struct cec_matrix *X = input->points;
 
     int m = X->m;
-    int k = ctx->input->centers->m;
+
+    int k = input->centers->m;
     int n = X->n;
-    int max = ctx->input->max_iterations;
-    int min_card = ctx->input->min_card;
+    int max = input->max_iterations;
+    int min_card = input->min_card;
 
-    cec_model ** models = ctx->input->models;
+    const cec_model * const *models = input->models;
 
-    vec_i_copy(ctx->input->initial_assignment, ctx->results->clustering_vector);
-    int * cluster = ctx->results->clustering_vector->ar;
-    int * clusters_number = ctx->results->clusters_number->ar;
-    struct cec_matrix ** covariance_matrices = ctx->results->covriances->mats;
-    double * energies = ctx->results->energy->ar;
-    
-    struct cec_matrix * C = ctx->results->centers;
-    cec_matrix_copy_data(ctx->input->centers, C);
+    vec_i_copy(input->initial_assignment, results->clustering_vector);
+    int * cluster = vec_i_data(results->clustering_vector);
+    int * clusters_number = vec_i_data(results->clusters_number);
+    double * energies = vec_d_data(results->energy);
+    struct cec_matrix ** covariance_matrices = results->covriances->mats;
 
-    struct cec_matrix * t_mean_matrix = ctx->temp_data->t_mean_matrix;
+    struct cec_matrix * C = results->centers;
+    cec_matrix_copy_data(input->centers, C);
+
+    struct cec_matrix * t_mean_matrix = temp_data->t_mean_matrix;
     
     int _k = k;
     int removed_clusters = 0;
@@ -32,11 +33,11 @@ res_code cec_start(struct cec_context *ctx)
     int card[k], removed[k], cluster_map[k];
     double clusters_energy[k];
 
-    struct cec_matrix * t_matrix_nn = ctx->temp_data->t_matrix_nn;
-    struct cec_matrix * n_covariance_matrix = ctx->temp_data->n_covariance_matrix;
-    struct cec_matrix ** t_covariance_matrices = ctx->temp_data->t_covariance_matrices->mats;
+    struct cec_matrix * t_matrix_nn = temp_data->t_matrix_nn;
+    struct cec_matrix * n_covariance_matrix = temp_data->n_covariance_matrix;
+    struct cec_matrix ** t_covariance_matrices = temp_data->t_covariance_matrices->mats;
 
-    ctx->results->iterations = 0;
+    results->iterations = 0;
 
     for (int i = 0; i < k; i++)
     {
@@ -290,7 +291,7 @@ res_code cec_start(struct cec_context *ctx)
 
         energies[iter + 1] = energy_sum;
         clusters_number[iter + 1] = _k;
-        ctx->results->iterations = iter + 1;
+        results->iterations = iter + 1;
 
         if (!transfer_flag)
             return NO_ERROR;

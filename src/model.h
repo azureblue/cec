@@ -9,8 +9,8 @@ typedef struct
     struct cross_entropy_context * cross_entropy_context; 
 } cec_model;
 
-double cluster_energy(cec_model * model, cec_mat * cov, int card, int m);
+double cluster_energy(const cec_model * model, cec_mat * cov, int card, int m);
 
-res_code cluster_energy_get_last_error(cec_model * model);
+res_code cluster_energy_get_last_error(const cec_model * model);
 
 #endif /* MODEL_H */

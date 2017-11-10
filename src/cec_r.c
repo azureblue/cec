@@ -9,15 +9,20 @@
 #include "cec_starter_vc.h"
 #include "cec_starter_split.h"
 
-SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models_param_r)
-{
+SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models_param_r, SEXP split_param_r) {
     cec_init_env();
     int n = Rf_ncols(x);
     cec_centers_par *centers = get_centers_param(centers_param_r);
     cec_control_par *control = get_control_param(control_param_r);
     cec_models_par *models = get_models_param(models_param_r, n);
+    cec_split_par *split = get_split_param(split_param_r);
     cec_out * out;
-    res_code all_res = cec_perform_split(create_from_R_matrix(x), centers, control, models, &out);
+    res_code all_res = UNKNOWN_ERROR;
+    if (split->split) {
+        all_res = cec_perform_split(create_from_R_matrix(x), centers, control, models, split, &out);
+    } else {
+        all_res = cec_perform_vc(create_from_R_matrix(x), centers, control, models, &out);
+    }
 
     SEXP result = NULL;
 

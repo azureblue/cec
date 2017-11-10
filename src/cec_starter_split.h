@@ -6,6 +6,6 @@
 #define CEC_SPLIT_H
 
 res_code cec_perform_split(cec_mat *x_mat, cec_centers_par *centers, cec_control_par *control, cec_models_par *models,
-                           cec_out **results);
+                           cec_split_par *split, cec_out **results);
 
 #endif //CEC_SPLIT_H

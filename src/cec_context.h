@@ -23,7 +23,7 @@ struct cec_input {
     const struct cec_matrix * points;
     const struct cec_matrix * centers;
     const vec_i * initial_assignment;
-    cec_model ** models;
+    const cec_model * const* models;
     int max_iterations;
     int min_card;
 };
@@ -37,25 +37,17 @@ struct cec_output {
     struct cec_matrix_array * covriances;
 };
 
-struct cec_context
-{
-    struct cec_input * input;
-    struct cec_output * results;
-    struct cec_temp_data * temp_data;
-};
-
 typedef struct cec_output cec_out;
 typedef struct cec_input cec_in;
-typedef struct cec_context cec_ctx;
+typedef struct cec_temp_data cec_tmp_data;
 
 struct cec_matrix_array * create_cec_matrix_array(int len, int m, int n);
-
-cec_ctx * create_cec_context(cec_in *in, cec_out *out);
 
 cec_out * create_cec_output(int m, int k, int n, int max_iterations);
 
 cec_in * create_cec_input(const cec_mat * points, const cec_mat * centers, const vec_i * initial_assignment,
-                                    cec_model ** models, int max_iterations, int min_card);
+                                    const cec_model ** models, int max_iterations, int min_card);
+cec_tmp_data * create_temp_data(int k, int n);
 
 void cec_copy_results_content(const cec_out *from, cec_out *to);
 

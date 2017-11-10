@@ -5,6 +5,7 @@
 #include "cec_params.h"
 
 cec_centers_par * get_centers_param(SEXP centers_param_r);
+cec_split_par * get_split_param(SEXP split_param_r);
 cec_control_par * get_control_param(SEXP control_param_r);
 cec_models_par * get_models_param(SEXP models_param_r, int n);
 

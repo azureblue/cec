@@ -23,6 +23,14 @@ cec_control_par * get_control_param(SEXP control_param_r) {
     return control;
 }
 
+cec_split_par * get_split_param(SEXP split_param_r) {
+    cec_split_par * split = alloc(cec_split_par);
+    split->split = (bool) asLogical(get_named_element(split_param_r, "split"));
+    split->depth = asInteger(get_named_element(split_param_r, "depth"));
+    split->tries = asInteger(get_named_element(split_param_r, "tries"));
+    return split;
+}
+
 cec_models_par * get_models_param(SEXP models_param_r, int n) {
     int len = LENGTH(models_param_r);
     cec_models_par *model_par = alloc(cec_models_par);

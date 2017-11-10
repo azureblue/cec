@@ -15,9 +15,14 @@ typedef struct cec_array_int vec_i;
 typedef struct cec_array_double vec_d;
 
 vec_i * cec_array_int_create(int len);
-vec_i * cec_array_int_create_from(int len,const int * src);
+vec_i * cec_array_int_create_from(int len, const int * src);
 vec_d * cec_array_double_create_from(int len,const double * src);
 vec_d * cec_array_double_create(int len);
+
+const int * cec_array_int_const_data(const vec_i *src);
+const double * cec_array_double_const_data(const vec_d *src);
+int * cec_array_int_data(vec_i *src);
+double * cec_array_double_data(vec_d *src);
 
 void cec_array_int_copy(const vec_i *src, vec_i *dst);
 void cec_array_double_copy(const vec_d *src, vec_d *dst);
@@ -32,6 +37,10 @@ void cec_array_double_copy_to(const vec_d *src, double *dst);
 #define vec_d_copy cec_array_double_copy
 #define vec_i_copy_to cec_array_int_copy_to
 #define vec_d_copy_to cec_array_double_copy_to
+#define vec_i_cdata cec_array_int_const_data
+#define vec_i_data cec_array_int_data
+#define vec_d_cdata cec_array_double_const_data
+#define vec_d_data cec_array_double_data
 
 int max_i(const vec_i *ar);
 

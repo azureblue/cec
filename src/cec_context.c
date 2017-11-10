@@ -10,9 +10,9 @@ cec_mat_arr * create_cec_matrix_array(int len, int m, int n)
     return matrix_array;
 }
 
-static struct cec_temp_data * create_temp_data(int k, int n)
+cec_tmp_data * create_temp_data(int k, int n)
 {
-    struct cec_temp_data * data = alloc(struct cec_temp_data);
+    cec_tmp_data * data = alloc(cec_tmp_data);
     data->n_covariance_matrix = cec_matrix_create(n, n);
     data->t_matrix_nn = cec_matrix_create(n, n);
     data->t_mean_matrix = cec_matrix_create(k, n);
@@ -30,7 +30,7 @@ cec_out * create_cec_output(int m, int k, int n, int max_iterations) {
     return output;
 }
 
-cec_in * create_cec_input(const cec_mat * points, const cec_mat * centers, const vec_i * initial_assignment, cec_model ** models,
+cec_in * create_cec_input(const cec_mat * points, const cec_mat * centers, const vec_i * initial_assignment, const cec_model ** models,
                           int max_iterations, int min_card) {
     cec_in *input = alloc(cec_in);
     input->points = points;
@@ -42,21 +42,12 @@ cec_in * create_cec_input(const cec_mat * points, const cec_mat * centers, const
     return input;
 }
 
-cec_ctx * create_cec_context(cec_in *in, cec_out *out)
-{
-    cec_ctx * ctx = alloc(cec_ctx);
-    ctx->input = in;
-    ctx->results = out;
-    ctx->temp_data = create_temp_data(in->centers->m, in->points->n);
-    return ctx;
-}
-
 double cec_final_energy(cec_out *c_res) {
-    return c_res->energy->ar[c_res->iterations];
+    return vec_d_data(c_res->energy)[c_res->iterations];
 }
 
 int cec_final_centers_number(cec_out *c_res) {
-    return c_res->clusters_number->ar[c_res->iterations];
+    return vec_i_data(c_res->clusters_number)[c_res->iterations];
 }
 
 void cec_copy_results_content(const cec_out *from, cec_out *to) {
