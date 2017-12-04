@@ -1,75 +1,40 @@
 # CLion IDE project
 cmake_minimum_required(VERSION 3.5)
 project(cec)
-set(CMAKE_C_STANDARD 99)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
-include_directories($ENV{R_INCLUDE_PATH})
+include_directories(/usr/share/R/include)
 
 set(SOURCE_FILES
-        src/alloc.h
-        src/array.c
-        src/array.h
-        src/cec.c
-        src/cec.h
-        src/cec_context.c
-        src/cec_context.h
+        src/cec_params.cpp
         src/cec_params.h
-        src/cec_params.c
-        src/cec_params_r.c
+        src/cec_params_r.cpp
         src/cec_params_r.h
-        src/cec_r.c
-        src/cec_r.h
-        src/cec_r_utils.c
+        src/cec_starter.cpp
+        src/cec_starter.h
+        src/cec_r_utils.cpp
         src/cec_r_utils.h
-        src/cec_starter_omp.c
-        src/cec_starter_omp.h
-        src/centers_init.c
-        src/centers_init.h
-        src/centers_init_r.c
-        src/centers_init_r.h
-        src/cov_utils.c
-        src/cov_utils.h
-        src/cross_entropy_context.h
-        src/error_r.c
-        src/error_r.h
-        src/errors.h
-        src/init_rand.c
-        src/init_rand.h
-        src/init_utils_r.c
-        src/init_utils_r.h
-        src/kmeanspp.c
-        src/kmeanspp.h
-        src/matrix.c
-        src/matrix.h
-        src/mem_mg.c
-        src/mem_mg.h
-        src/model.c
-        src/model.h
-        src/noret.h
-        src/rand.c
-        src/rand.h
-        src/result_r.c
-        src/result_r.h
-        src/models/all.c
-        src/models/covariance.c
-        src/models/diagonal.c
-        src/models/eigenvalues.c
-        src/models/energy.h
-        src/models/fixedr.c
-        src/models/models.c
-        src/models/models.h
-        src/models/spherical.c
-        src/cec_starter_vc.c
-        src/cec_starter_vc.h
+        src/cluster.h
+        src/exceptions.h
+        src/single_start_input.h
+        src/models/cov_utils.h
+        src/models/cov_utils.cpp
+        src/models/model.h
+        src/models/all.h
+        src/vec.h
         )
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fopenmp -DR_ALLOC -DR_RAND -Wall -Werror")
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -z defs")
+
+set(CMAKE_C_FLAGS "-O0 -g")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fopenmp -DR_ALLOC -DR_RAND -Wall")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -z defs -fopenmp")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -z defs -fopenmp")
 
 link_libraries(m R lapack blas)
 
-add_library(cec SHARED ${SOURCE_FILES})
+add_library(cec SHARED ${SOURCE_FILES} src/exceptions.h src/models/cov_utils.cpp)
+add_executable(cec_test ${SOURCE_FILES} src/vec_test.cpp)
 
 set(MAKEVARS_PKG_CFLAGS "-DR_ALLOC -DR_RAND $(SHLIB_OPENMP_CFLAGS)")
 set(MAKEVARS_PKG_LIBS "$(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) $(SHLIB_OPENMP_CFLAGS)")
@@ -80,6 +45,7 @@ file(APPEND src/Makevars "PKG_LIBS = " ${MAKEVARS_PKG_LIBS} "\n")
 string (REPLACE ";" " " SOURCE_FILES_STRING "${SOURCE_FILES}")
 string (REPLACE "src/" "" SOURCE_FILES_STRING ${SOURCE_FILES_STRING})
 string (REGEX REPLACE "[^ ]+\\.h" "" SOURCE_FILES_STRING ${SOURCE_FILES_STRING})
+string (REPLACE ".cpp" ".o" SOURCE_FILES_STRING ${SOURCE_FILES_STRING})
 string (REPLACE ".c" ".o" SOURCE_FILES_STRING ${SOURCE_FILES_STRING})
 string (REGEX REPLACE " +" " " SOURCE_FILES_STRING ${SOURCE_FILES_STRING})
 
