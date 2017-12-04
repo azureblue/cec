@@ -1,67 +1,77 @@
 #ifndef CEC_PARAMS_H
 #define CEC_PARAMS_H
 
-#include <stdbool.h>
-#include "alloc.h"
-#include "matrix.h"
+#include "vec.h"
+#include "models/model.h"
+#include "models/all.h"
 
-enum centers_init_method {
-    NONE = 0,
-    KMEANSPP = 1,
-    RANDOM = 2
-};
-
-enum density_family {
-    ALL, COVARIANCE, DIAGONAL, EIGENVALUES, FIXED_R, SPHERICAL
-};
-
-bool parse_init_method(const char * method, enum centers_init_method * result);
-bool cec_parse_type(const char * type, enum density_family * result);
-
-struct cec_centers_param {
-    enum centers_init_method init_m;
-    cec_mat * centers_mat;
-    const vec_i * var_centers;
-};
-
-struct cec_control_param {
-    int starts;
-    int max_iterations;
-    int min_card;
-    int threads;
-};
-
-struct cec_model_r_params {
-    double r;
-};
-
-struct cec_model_eigenvalues_params {
-    const vec_d * given_eigenvalues;
-};
-
-struct cec_model_covariances_params {
-    const cec_mat * cov;
-    const cec_mat * cov_inv;
-};
-
-struct cec_model_specification {
-    enum density_family type;
-    int n;
-    union {
-        struct cec_model_r_params r_params;
-        struct cec_model_eigenvalues_params eigenvalues_params;
-        struct cec_model_covariances_params covariances_params;
+namespace cec {
+    enum class init_method {
+        NONE,
+        KMEANSPP,
+        RANDOM
     };
-};
 
-struct cec_models_param {
-    int len;
-    struct cec_model_specification *model_specs;
-};
+    enum class model_type {
+        ALL, COVARIANCE, DIAGONAL, EIGENVALUES, FIXED_R, SPHERICAL
+    };
 
-typedef struct cec_centers_param cec_centers_par;
-typedef struct cec_control_param cec_control_par;
-typedef struct cec_models_param cec_models_par;
-typedef struct cec_model_specification cec_model_spec;
+    init_method parse_init_method(const std::string &method);
 
+    model_type parse_model_type(const std::string &name);
+
+    struct centers_param {
+        init_method init_m;
+        mat centers_mat;
+        std::vector<int> var_centers;
+
+        centers_param(init_method init_m, mat centers_mat, std::vector<int> var_centers)
+                : init_m(init_m),
+                  centers_mat(std::move(centers_mat)),
+                  var_centers(std::move(var_centers)) {}
+    };
+
+    struct control_param {
+        int starts;
+        int max_iterations;
+        int min_card;
+        int threads;
+
+        control_param(int starts, int max_iter, int min_card, int threads) :
+                starts(starts),
+                max_iterations(max_iter),
+                min_card(min_card),
+                threads(threads) {}
+    };
+
+    class model_spec {
+    public:
+        const model_type type;
+
+        virtual std::unique_ptr<model> create_model() const = 0;
+
+        explicit model_spec(const model_type type)
+                : type(type) {}
+    };
+
+    class model_all_spec : public model_spec {
+    public:
+        const int n;
+
+        explicit model_all_spec(int n)
+                : model_spec(model_type::ALL),
+                  n(n) {}
+
+        std::unique_ptr<model> create_model() const override {
+            return std::unique_ptr<model>(new all(n));
+        }
+    };
+
+    class models_param {
+    public:
+        const std::vector<std::shared_ptr<model_spec>> specs;
+        explicit models_param(std::vector<std::shared_ptr<model_spec>> specs)
+                : specs(std::move(specs)) {}
+    };
+}
 #endif //CEC_PARAMS_H
