@@ -1,20 +1,17 @@
 #ifndef CEC_R_UTILS_H
 #define	CEC_R_UTILS_H
 
+#include "vec.h"
+
+extern "C" {
 #include <Rinternals.h>
+};
 
-#include "matrix.h"
-
-/*
- * Utility functions, convertions between R matrix and cec_matrix structure.
- */
-void copy_from_R_matrix(SEXP R_ma, struct cec_matrix * ma);
-
-struct cec_matrix * create_from_R_matrix(SEXP R_matrix);
-
-SEXP create_R_matrix(struct cec_matrix * m);
-
-SEXP get_named_element(SEXP list, const char * name);
-
+namespace cec::r {
+    template<typename T> T get(SEXP sexp);
+    SEXP create_R_matrix(const mat &);
+    template <typename T>
+    T get_named_element(SEXP list, std::string name);
+}
 #endif	/* CEC_R_UTILS_H */
 

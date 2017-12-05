@@ -113,7 +113,7 @@ namespace cec {
             t_point_ = point;
             card_change_ = 1;
             cluster_utils::cec_cov_add_point(t_cov_, cov_, mean_, point);
-            t_energy_ = energy();
+            t_energy_ = t_energy();
             return t_energy_ - energy_;
         }
 
@@ -121,7 +121,7 @@ namespace cec {
             t_point_ = point;
             card_change_ = -1;
             cluster_utils::cec_cov_remove_point(t_cov_, cov_, mean_, point);
-            t_energy_ = energy();
+            t_energy_ = t_energy();
             return t_energy_ - energy_;
 
         }
@@ -138,7 +138,7 @@ namespace cec {
             return cov_;
         }
 
-        void update() {
+        void apply_change() {
             cov_ = t_cov_;
             if (card_change_ == 1)
                 mean_.add_point(t_point_);
@@ -149,10 +149,13 @@ namespace cec {
         }
 
         double energy() {
-            return model_.energy(t_cov_, mean_.card() + card_change_, m_);
+            return model_.energy(cov_, mean_.card(), m_);
         }
 
     private:
+        double t_energy() {
+            return model_.energy(t_cov_, mean_.card() + card_change_, m_);
+        }
         const int m_;
         int card_change_ = 0;
         double t_energy_;

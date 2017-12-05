@@ -45,7 +45,7 @@ cec::single_start_results cec::cec_starter::start(const cec::single_start_input 
 
         double energy = clusters[i]->energy();
 
-        if (isnan(energy))
+        if (std::isnan(energy))
             throw invalid_covariance(*clusters[i], i);
 
         energy_sum += energy;
@@ -58,87 +58,70 @@ cec::single_start_results cec::cec_starter::start(const cec::single_start_input 
         std::cout << cl->mean() << std::endl;
         std::cout << cl->covariance() << std::endl;
     }
-//
-//    if (k == 0) {
-//        return ALL_CLUSTERS_REMOVED_ERROR;
-//    }
 
-    /*
-     * Special case when a cluster was removed before the first iteration.
-     */
+    if (removed_k == k) 
+        throw all_clusters_removed();
+
     int handle_removed_flag = (removed_k == 0) ? 0 : 1;
 
-    /*
-     * Main loop.
-     */
     for (int iter = (handle_removed_flag ? -1 : 0); iter < max_iter; iter++) {
         int transfer_flag = 0;
         int removed_last_iteration_flag = 0;
 
         for (int i = 0; i < m; i++) {
 
-            int l = assignment[i];
+            const int cl_num = assignment[i];
+            const bool cl_removed = removed[cl_num];
+            cluster &cl = *clusters[cl_num];            
 
-            if (handle_removed_flag && !removed[l])
+            if (handle_removed_flag && !cl_removed)
                 continue;
 
-            /*
-             * Energy and mean vector of cluster 'l' after removing point 'i'.
-             * Initializing to NAN to get rid of compiler warning.
-             */
-            double n_l_energy = NAN;
+            double rem_energy_gain = !cl_removed ? cl.rem_point(X[i]) : 0;
+            double best_gain = !cl_removed ? 0 : std::numeric_limits<double>::infinity();
+            if (std::isnan(rem_energy_gain))
+                throw invalid_covariance(cl, cl_num);
 
-            double rem_energy_gain = !removed[l] ? clusters[l]->rem_point(X[i]) : 0;
-            double best_gain = !removed[l] ? 0 : std::numeric_limits<double>::infinity();
-            if (isnan(rem_energy_gain))
-                throw invalid_covariance(*clusters[l], l);
-
-            int idx = -1;
-
-            double best_energy;
-
+            int dest_cl_num = -1;
+            
             for (int j = 0; j < k; j++) {
-
-                if ((j == l) || (removed[j]))
+                if ((j == cl_num) || removed[j])
                     continue;
 
-                double add_energy_gain = clusters[j]->add_point(X[i]);
+                cluster &cl_j = *clusters[j];
+                double add_energy_gain = cl_j.add_point(X[i]);
 
-                if (isnan(add_energy_gain))
-                    throw invalid_covariance(*clusters[j], j);
+                if (std::isnan(add_energy_gain))
+                    throw invalid_covariance(cl_j, j);
 
-                if (removed[l] == 1) {
+                if (cl_removed) {
                     double gain = add_energy_gain;
                     if (gain < best_gain) {
-                        idx = j;
+                        dest_cl_num = j;
                         best_gain = gain;
                     }
                 } else {
                     double gain = rem_energy_gain + add_energy_gain;
                     if (gain < best_gain) {
-                        idx = j;
+                        dest_cl_num = j;
                         best_gain = gain;
                     }
                 }
             }
 
-            /*
-             * Transfer point 'i' to cluster 'idx'.
-             */
-            if (idx != -1) {
-                assignment[i] = idx;
-                clusters[idx]->update();
-                if (!removed[l]) {
-                    clusters[l]->update();
-                    if (clusters[l]->card() < min_card) {
+            if (dest_cl_num != -1) {
+                assignment[i] = dest_cl_num;
+                clusters[dest_cl_num]->apply_change();
+                if (!cl_removed) {
+                    cl.apply_change();
+                    if (cl.card() < min_card) {
                         removed_last_iteration_flag = 1;
 
-                        energy_sum -= clusters[l]->energy();
-                        removed[l] = true;
+                        energy_sum -= cl.energy();
+                        removed[cl_num] = true;
                     }
                 }
                 energy_sum += best_gain;
-
                 transfer_flag = 1;
             }
         }
@@ -163,10 +146,15 @@ cec::single_start_results cec::cec_starter::start(const cec::single_start_input 
     mat centers = in.c;
     std::vector<mat> covs(centers.m, mat(n, n));
 
+    double energy_check = 0;
     for (int i = 0; i < k; i++) {
+        if (removed[i])
+            continue;
         centers[i] = clusters[i]->mean();
         covs[i] = clusters[i]->covariance();
+        energy_check += clusters[i]->energy();
     }
+    std::cout << energy_check << " - check" << std::endl;
     return single_start_results(centers, assignment, k, iterations, energy_sum, covs);
 
 }

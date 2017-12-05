@@ -1,18 +1,25 @@
 # CLion IDE project
 cmake_minimum_required(VERSION 3.5)
 project(cec)
-set(CMAKE_C_STANDARD 99)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
 include_directories(/usr/share/R/include)
 
 set(SOURCE_FILES
+        src/cec_params.cpp
+        src/cec_params.h
+        src/cec_params_r.cpp
+        src/cec_params_r.h
         src/cec_starter.cpp
         src/cec_starter.h
+        src/cec_r_utils.cpp
+        src/cec_r_utils.h
         src/cluster.h
+        src/exceptions.h
         src/single_start_input.h
         src/models/cov_utils.h
+        src/models/cov_utils.cpp
         src/models/model.h
         src/models/all.h
         src/vec.h
@@ -26,7 +33,7 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -z defs -fopenmp")
 
 link_libraries(m R lapack blas)
 
-add_library(cec SHARED ${SOURCE_FILES} src/exceptions.h)
+add_library(cec SHARED ${SOURCE_FILES} src/exceptions.h src/models/cov_utils.cpp)
 add_executable(cec_test ${SOURCE_FILES} src/vec_test.cpp)
 
 set(MAKEVARS_PKG_CFLAGS "-DR_ALLOC -DR_RAND $(SHLIB_OPENMP_CFLAGS)")

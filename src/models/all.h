@@ -11,7 +11,7 @@ namespace cec {
         explicit all(int n) : temp_mat(n, n) {}
 
         double cross_entropy(mat &cov) const {
-            double det = utils::cec_cov_cholesky_det(cov, const_cast<mat&>(temp_mat));
+            double det = det_cholesky(cov, const_cast<mat &>(temp_mat));
             return (cov.n / 2.0) * log(2.0 * M_PI * M_E) + (1.0 / 2.0) * log(det);
         }
 
