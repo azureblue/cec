@@ -1,68 +1,50 @@
 #include "cec_params_r.h"
-#include "cec_r_utils.h"
+#include "r_utils.h"
 
-cec::cec_centers_param cec::get_centers_param(SEXP centers_param_r) {
-    centers_init_method im = parse_init_method(cec::r::get_named_element(centers_param_r, "init.method"));
-    mat centers = im == centers_init_method::NONE ? cec::r::get_named_element(centers_param_r, "mat") : mat(0, 0);
-    cec::cec_centers_param cent_param(im, centers, cec::r::get_named_element(centers_param_r, "var.centers"));
+using cec::r::r_wrapper;
 
+cec::centers_param cec::get_centers_param(SEXP centers_param_r) {
+    r_wrapper r_par = centers_param_r;
+    init_method im = parse_init_method(r_par.get<std::string>("init.method"));
+    mat centers = (im == init_method::NONE)
+                  ? r_par.get<mat>("mat")
+                  : mat(0, 0);
+    centers_param cent_param(im, centers, r_par.get<std::vector<int>>("var.centers"));
 }
-//
-//cec_centers_par * get_centers_param(SEXP centers_param_r) {
-//    cec_centers_par *centers = alloc(cec_centers_par);
-    if (!parse_init_method(CHAR(STRING_ELT(get_named_element(centers_param_r, "init.method"), 0)), &centers->init_m))
-//        defect_error_r("invalid init method");
-//    SEXP var_centers = get_named_element(centers_param_r, "var.centers");
-//    centers->var_centers = vec_i_create_from(LENGTH(var_centers), INTEGER(var_centers));
-//    centers->centers_mat = NULL;
-//    if (centers->init_m == NONE)
-//        centers->centers_mat = create_from_R_matrix(get_named_element(centers_param_r, "mat"));
-//    return centers;
-//}
-//
-//cec_control_par * get_control_param(SEXP control_param_r) {
-//    cec_control_par *control = alloc(cec_control_par);
-//    control->min_card = asInteger(get_named_element(control_param_r, "min.card"));
-//    control->max_iterations = asInteger(get_named_element(control_param_r, "max.iters"));
-//    control->starts = asInteger(get_named_element(control_param_r, "starts"));
-//    control->threads = asInteger(get_named_element(control_param_r, "threads"));
-//    return control;
-//}
-//
-//cec_models_par * get_models_param(SEXP models_param_r, int n) {
-//    int len = LENGTH(models_param_r);
-//    cec_models_par *model_par = alloc(cec_models_par);
-//    model_par->model_specs = alloc_n(cec_model_spec, len);
-//    model_par->len = len;
-//    for (int i = 0; i < len; i++) {
-//        SEXP model_r = VECTOR_ELT(models_param_r, i);
-//        enum density_family type;
-//        if (!cec_parse_type(CHAR(STRING_ELT(get_named_element(model_r, "type"), 0)), &type))
-//            defect_error_r("invalid type");
-//        SEXP params = get_named_element(model_r, "params");
-//        cec_model_spec *spec = &model_par->model_specs[i];
-//        spec->n = n;
-//        spec->type = type;
-//        switch (type) {
-//            case FIXED_R: {
-//                spec->r_params.r = asReal(get_named_element(params, "r"));
-//                break;
-//            }
-//            case COVARIANCE: {
-//                spec->covariances_params.cov = create_from_R_matrix(get_named_element(params, "cov"));
-//                spec->covariances_params.cov_inv = create_from_R_matrix(get_named_element(params, "cov.inv"));
-//                break;
-//            }
-//            case EIGENVALUES: {
-//                SEXP eigenvalues = get_named_element(params, "eigenvalues");
-//                spec->eigenvalues_params.given_eigenvalues = vec_d_create_from(LENGTH(eigenvalues), REAL(eigenvalues));
-//                break;
-//            }
-//            case SPHERICAL:break;
-//            case DIAGONAL:break;
-//            case ALL:break;
-//        }
-//    }
-//    return model_par;
-//}
+
+cec::control_param  cec::get_control_param(SEXP control_param_r) {
+    r_wrapper r_par = control_param_r;
+    return {
+            r_par.get<int>("starts"),
+            r_par.get<int>("max.iters"),
+            r_par.get<int>("min.card"),
+            r_par.get<int>("threads")
+    };
+}
+
+cec::models_param cec::get_models_param(SEXP models_param_r, int n) {
+    r_wrapper r_models = models_param_r;
+    int len = r_models.size();
+    std::vector<std::shared_ptr<model_spec>> specs;
+    for (int i = 0; i < len; i++) {
+        r_wrapper model_r = r_models.get<SEXP>(i);
+        const std::string &type_name = model_r.get<std::string>("type");
+        model_type type = parse_model_type(type_name);
+        r_wrapper params_r = r_models.get<SEXP>("params");
+        switch (type) {
+            case model_type::ALL:
+                specs.push_back(std::shared_ptr<model_spec>(
+                        new model_all_spec(n)
+                ));
+                break;
+            case model_type::COVARIANCE:
+            case model_type::DIAGONAL:
+            case model_type::EIGENVALUES:
+            case model_type::FIXED_R:
+            case model_type::SPHERICAL:
+                throw not_implemented(type_name);
+        }
+    }
+    return models_param(std::move(specs));
+}
 

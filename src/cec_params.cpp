@@ -1,28 +1,28 @@
 #include "cec_params.h"
 #include "exceptions.h"
 
-cec::centers_init_method cec::parse_init_method(const std::string &method) {
+cec::init_method cec::parse_init_method(const std::string &method) {
     if (method == "none")
-        return centers_init_method::NONE;
+        return init_method::NONE;
     if (method == "kmeanspp")
-        return centers_init_method::KMEANSPP;
+        return init_method::KMEANSPP;
     if (method == "random")
-        return centers_init_method::RANDOM;
+        return init_method::RANDOM;
     throw invalid_init_method(method);
 }
 
-cec::model_name cec::parse_model_name(const std::string &name) {
+cec::model_type cec::parse_model_type(const std::string &name) {
     if (name == "all")
-        return cec::model_name::ALL;
+        return cec::model_type::ALL;
     if (name == "covariance")
-        return cec::model_name::COVARIANCE;
+        return cec::model_type::COVARIANCE;
     if (name == "diagonal")
-        return cec::model_name::DIAGONAL;
+        return cec::model_type::DIAGONAL;
     if (name == "eigenvalues")
-        return cec::model_name::EIGENVALUES;
+        return cec::model_type::EIGENVALUES;
     if ((name == "fixed_r") || (name == "fixedr"))
-        return cec::model_name::FIXED_R;
+        return cec::model_type::FIXED_R;
     if (name == "spherical")
-        return cec::model_name::SPHERICAL;
+        return cec::model_type::SPHERICAL;
     throw invalid_model_name(name);
 }

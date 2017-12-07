@@ -1,5 +1,5 @@
 #include "result_r.h"
-#include "cec_r_utils.h"
+#include "r_utils.h"
 
 SEXP create_R_result(cec_out * out) {
     int m = out->clustering_vector->len;

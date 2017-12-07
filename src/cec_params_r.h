@@ -8,11 +8,11 @@ extern "C" {
 };
 
 namespace cec {
-    cec_centers_param get_centers_param(SEXP centers_param_r);
+    centers_param get_centers_param(SEXP centers_param_r);
 
-    cec_control_param get_control_param(SEXP control_param_r);
+    control_param get_control_param(SEXP control_param_r);
 
-    cec_models_param get_models_param(SEXP models_param_r, int n);
+    models_param get_models_param(SEXP models_param_r, int n);
 }
 
 #endif //CEC_PARAMS_R_H
