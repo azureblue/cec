@@ -31,6 +31,17 @@ namespace cec {
         }
     };
 
+    class not_implemented: public std::exception {
+    public:
+        const std::string desc;
+
+        explicit not_implemented(std::string desc) : desc(std::move(desc)) {}
+
+        const char *what() const noexcept override {
+            return ("not implemented: " + desc).c_str();
+        }
+    };
+
     class invalid_init_method: public std::exception {
     public:
         const std::string method;

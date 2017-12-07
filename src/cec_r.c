@@ -4,7 +4,7 @@
 #include "cec_context.h"
 #include "cec_params_r.h"
 #include "result_r.h"
-#include "cec_r_utils.h"
+#include "r_utils.h"
 #include "init_utils_r.h"
 #include "cec_starter_vc.h"
 
