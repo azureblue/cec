@@ -33,11 +33,13 @@ namespace cec {
         template<>
         std::vector<double> get<std::vector<double>>(SEXP);
 
-        template<typename T>
-        SEXP put(const T &);
+        SEXP put(const mat &ma);
 
-        template<>
-        SEXP put<mat>(const mat &ma);
+        SEXP put(int);
+
+        SEXP put(double);
+
+        SEXP put(std::vector<int>);
 
         template<typename T>
         T get_named(SEXP list, const std::string &name) {

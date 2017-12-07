@@ -23,7 +23,11 @@ set(SOURCE_FILES
         src/models/model.h
         src/models/all.h
         src/vec.h
-        )
+        src/result_r.h
+        src/result_r.cpp
+        src/cec_r.cpp
+        src/cec_r.h
+        src/init.h)
 
 
 set(CMAKE_C_FLAGS "-O0 -g")

@@ -5,9 +5,9 @@
 
 #include "vec.h"
 #include "models/all.h"
-#include "cec_starter.h"
 
 namespace cec {
+    class cec_starter;
     class single_start_results {
     friend class cec_starter;
     public:
