@@ -48,7 +48,7 @@ namespace cec {
     public:
         const model_type type;
 
-        virtual const model &create_model() = 0;
+        virtual std::unique_ptr<model> create_model() const = 0;
 
         explicit model_spec(const model_type type)
                 : type(type) {}
@@ -62,14 +62,14 @@ namespace cec {
                 : model_spec(model_type::ALL),
                   n(n) {}
 
-        const model &create_model() override {
-            return all(n);
+        std::unique_ptr<model> create_model() const override {
+            return std::unique_ptr<model>(new all(n));
         }
     };
 
     class models_param {
-        const std::vector<std::shared_ptr<model_spec>> specs;
     public:
+        const std::vector<std::shared_ptr<model_spec>> specs;
         explicit models_param(std::vector<std::shared_ptr<model_spec>> specs)
                 : specs(std::move(specs)) {}
     };

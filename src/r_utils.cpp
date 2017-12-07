@@ -55,7 +55,6 @@ std::vector<double> cec::r::get<std::vector<double>>(SEXP sexp) {
 }
 
 
-template<>
 SEXP cec::r::put(const cec::mat &ma) {
     int m = ma.m;
     int n = ma.n;
@@ -73,4 +72,31 @@ SEXP cec::r::put(const cec::mat &ma) {
     UNPROTECT(1);
 
     return r_ma;
+}
+
+SEXP cec::r::put(int val) {
+    SEXP ve;
+    PROTECT(ve = allocVector(INTSXP, 1));
+    INTEGER(ve)[0] = val;
+    UNPROTECT(1);
+
+    return ve;
+}
+
+SEXP cec::r::put(double val) {
+    SEXP ve;
+    PROTECT(ve = allocVector(REALSXP, 1));
+    REAL(ve)[0] = val;
+    UNPROTECT(1);
+
+    return ve;
+}
+
+SEXP cec::r::put(std::vector<int> val) {
+    SEXP ve;
+    PROTECT(ve = allocVector(INTSXP, val.size()));
+    std::copy(val.begin(), val.end(), INTEGER(ve));
+    UNPROTECT(1);
+
+    return ve;
 }

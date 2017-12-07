@@ -1,9 +1,14 @@
 #ifndef RESULT_R_H
 #define RESULT_R_H
 
-#include <Rdefines.h>
-#include "cec_context.h"
+#include "single_start_input.h"
 
-SEXP create_R_result(cec_out * out);
+extern "C" {
+#include <Rdefines.h>
+};
+
+namespace cec {
+    SEXP create_R_result(const single_start_results res);
+}
 
 #endif //RESULT_R_H

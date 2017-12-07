@@ -13,19 +13,19 @@ namespace cec {
     public:
         const int n;
 
-        explicit vec(int n): n(n), data_(new double[n]), data_wrapper_(data_) {};
+        explicit vec(int n) : n(n), data_(new double[n]), data_wrapper_(data_) {};
 
         vec(vec &&v) noexcept = default;
 
-        vec(const vec &v): vec(v.n) {
+        vec(const vec &v) : vec(v.n) {
             this->set(v);
         }
 
-        vec(std::initializer_list<double> vals): vec(vals.size()) {
+        vec(std::initializer_list<double> vals) : vec(vals.size()) {
             double *ptr = data_;
             auto it = vals.begin();
             auto end = vals.end();
-            while(it != end)
+            while (it != end)
                 *ptr++ = *it++;
         }
 
@@ -70,19 +70,28 @@ namespace cec {
                 data_[i] -= v[i];
         }
 
-        double * data() {
+        double *data() {
             return data_;
         }
 
-        const double * data() const{
+        const double *data() const {
             return data_;
         }
 
-        friend std::ostream &operator<<(std::ostream& os, const vec& v) {
+        friend std::ostream &operator<<(std::ostream &os, const vec &v) {
             os << "{";
             for (int i = 0; i < v.n; i++)
                 os << v[i] << (i == v.n - 1 ? "}" : ", ");
             return os;
+        }
+
+        static double dist(const vec& a, const vec& b) {
+            double acc = 0;
+            for (int i = 0; i < a.n; i++) {
+                double diff = b[i] - a[i];
+                acc += diff * diff;
+            }
+            return acc;
         }
 
     private:
@@ -101,6 +110,7 @@ namespace cec {
         mat(int m, int n) : vec(m * n), m(m), n(n) {}
 
         mat(const mat &ma) = default;
+
         mat(mat &&ma) noexcept = default;
 
         inline const vec operator[](int idx) const {
@@ -129,17 +139,62 @@ namespace cec {
             return ma;
         }
 
-        friend std::ostream &operator<<(std::ostream& os, const mat& m) {
+        friend std::ostream &operator<<(std::ostream &os, const mat &m) {
             for (int j = 0; j < m.m; j++) {
                 os << (j == 0 ? '(' : ' ');
                 for (int k = 0; k < m.n; k++)
-                     os << m[j][k] << (k < m.n - 1 ? ", " : "");
+                    os << m[j][k] << (k < m.n - 1 ? ", " : "");
                 os << (j == m.m - 1 ? ')' : '\n');
             }
             return os;
         }
 
+        class row_iterator {
+        friend class mat;
+        public:
+            const vec operator*() const {
+                return m_[r];
+            }
+
+            vec operator*() {
+                return m_[r];
+            }
+
+            void operator++() {
+                r++;
+            }
+
+            bool operator==(row_iterator &ri) {
+                return ri.r == r;
+            }
+
+            int operator-(row_iterator &ri) {
+                return ri.r - r;
+            }
+
+        private:
+            row_iterator(int r, mat& m_) : r(r), m_(m_) {}
+            int r;
+            mat &m_;
+        };
+
+        const row_iterator begin() const {
+            return row_iterator(0, const_cast<mat&>(*this));
+        }
+
+        const row_iterator end() const {
+            return row_iterator(m, const_cast<mat&>(*this));
+        }
+
+        row_iterator begin() {
+            return row_iterator(0, *this);
+        }
+
+        row_iterator end() {
+            return row_iterator(m, *this);
+        }
     };
+
 }
 
 #endif /* VEC_H */

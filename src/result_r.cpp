@@ -1,10 +1,11 @@
 #include "result_r.h"
 #include "r_utils.h"
 
-SEXP create_R_result(cec_out * out) {
-    int m = out->clustering_vector->len;
-    int k = out->centers->m;
-    int trimmed_size = out->iterations + 1;
+using cec::r::put;
+
+SEXP cec::create_R_result(const single_start_results out) {
+    int m = out.assignment.size();
+    int k = out.centers.m;
 
     SEXP energy_vector;
     SEXP clusters_number_vector;
@@ -13,26 +14,18 @@ SEXP create_R_result(cec_out * out) {
     SEXP centers_matrix;
     SEXP iterations;
 
-    vec_i *cluster_number_trimmed = vec_i_create_from(trimmed_size,
-                                                      out->clusters_number->ar);
-    vec_d *energy_trimmed = vec_d_create_from(trimmed_size, out->energy->ar);
-
-    PROTECT(energy_vector = allocVector(REALSXP, trimmed_size));
-    PROTECT(clusters_number_vector = allocVector(INTSXP, trimmed_size));
-    PROTECT(assignment_vector = allocVector(INTSXP, m));
+    PROTECT(energy_vector = put(out.energy));
+    PROTECT(clusters_number_vector = put(out.cluster_number));
+    PROTECT(assignment_vector = put(out.assignment));
     PROTECT(covariance_list = allocVector(VECSXP, k));
-    PROTECT(iterations = allocVector(INTSXP, 1));
-    PROTECT(centers_matrix = create_R_matrix(out->centers));
+    PROTECT(iterations = put(out.iterations));
+    PROTECT(centers_matrix = put(out.centers));
 
-    INTEGER(iterations)[0] = out->iterations;
-    vec_d_copy_to(energy_trimmed, REAL(energy_vector));
-    vec_i_copy_to(cluster_number_trimmed, INTEGER(clusters_number_vector));
-    vec_i_copy_to(out->clustering_vector, INTEGER(assignment_vector));
-    for (int i = 0; i < m; i++)
+   for (int i = 0; i < m; i++)
         INTEGER(assignment_vector)[i]++;
     for (int i = 0; i < k; i++) {
         SEXP covariance;
-        PROTECT(covariance = create_R_matrix(out->covriances->mats[i]));
+        PROTECT(covariance = put(out.covariances[i]));
         SET_VECTOR_ELT(covariance_list, i, covariance);
     }
 
