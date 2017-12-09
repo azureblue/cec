@@ -4,10 +4,10 @@
 #include "vec.h"
 #include "exceptions.h"
 
-extern "C" {
+
 #include <Rinternals.h>
 #include <Rdefines.h>
-};
+
 
 namespace cec {
     namespace r {
@@ -54,7 +54,7 @@ namespace cec {
                 return cec::r::get<T>(res);
             }
             throw missing_parameter(name);
-        };
+        }
         
         template<typename T>
         T get_n(SEXP vec, int idx){
@@ -91,7 +91,7 @@ namespace cec {
             }
         };
 
-    };
-};
+    }
+}
 #endif    /* CEC_R_UTILS_H */
 

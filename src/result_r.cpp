@@ -3,7 +3,8 @@
 
 using cec::r::put;
 
-SEXP cec::create_R_result(const single_start_results out) {
+SEXP cec::create_R_result(const single_start_results &out) {
+//    error(" ");
     int m = out.assignment.size();
     int k = out.centers.m;
 

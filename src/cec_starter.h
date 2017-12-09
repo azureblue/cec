@@ -10,7 +10,7 @@ namespace cec {
     public:
         cec_starter(int n): t_mean_matrix(n, n), t_matrix_nn(n, n), n_covariance_matrix(n, n) {}
         single_start_results start(const single_start_input &in);
-        std::vector<std::vector<vec>> split_points(const mat &points, const std::vector<int> &assignment);
+        std::vector<mat> split_points(const mat &points, const std::vector<int> &assignment, int k);
 
 
     private:

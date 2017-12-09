@@ -9,7 +9,8 @@ cec::centers_param cec::get_centers_param(SEXP centers_param_r) {
     mat centers = (im == init_method::NONE)
                   ? r_par.get<mat>("mat")
                   : mat(0, 0);
-    centers_param cent_param(im, centers, r_par.get<std::vector<int>>("var.centers"));
+    const std::vector<int> &var_centers = r_par.get<std::vector<int>>("var.centers");
+    return centers_param(im, centers, var_centers);
 }
 
 cec::control_param  cec::get_control_param(SEXP control_param_r) {
@@ -18,7 +19,7 @@ cec::control_param  cec::get_control_param(SEXP control_param_r) {
             r_par.get<int>("starts"),
             r_par.get<int>("max.iters"),
             r_par.get<int>("min.card"),
-            r_par.get<int>("threads")
+            0
     };
 }
 
@@ -30,7 +31,7 @@ cec::models_param cec::get_models_param(SEXP models_param_r, int n) {
         r_wrapper model_r = r_models.get<SEXP>(i);
         const std::string &type_name = model_r.get<std::string>("type");
         model_type type = parse_model_type(type_name);
-        r_wrapper params_r = r_models.get<SEXP>("params");
+//        r_wrapper params_r = model_r.get<SEXP>("params");
         switch (type) {
             case model_type::ALL:
                 specs.push_back(std::shared_ptr<model_spec>(

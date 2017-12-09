@@ -1,7 +1,6 @@
 #ifndef VEC_H
 #define VEC_H
 
-#include <cstddef>
 #include <algorithm>
 #include <iostream>
 #include <memory>
@@ -124,19 +123,11 @@ namespace cec {
 
         inline mat &operator=(mat &&ma) noexcept {
             vec::operator=(ma);
+            return *this;
         }
 
         vec operator[](int idx) {
             return vec(data_ + idx * n, n);
-        }
-
-        static mat outer_product(vec &v) {
-            int n = v.n;
-            mat ma(n, n);
-            for (int j = 0; j < n; j++)
-                for (int k = 0; k < n; k++)
-                    ma[j][k] = v[j] * v[k];
-            return ma;
         }
 
         friend std::ostream &operator<<(std::ostream &os, const mat &m) {
@@ -149,49 +140,57 @@ namespace cec {
             return os;
         }
 
-        class row_iterator {
-        friend class mat;
+        template <class M>
+        class rows_iterator {
+            friend class mat;
         public:
-            const vec operator*() const {
-                return m_[r];
+            inline typename std::conditional<std::is_const<M>::value, const vec, vec>::type
+            operator*() {
+                return ref[row];
             }
 
-            vec operator*() {
-                return m_[r];
+            inline void operator++() {
+                row++;
             }
 
-            void operator++() {
-                r++;
+            inline bool operator==(const rows_iterator &ri) {
+                return row == ri.row;
             }
 
-            bool operator==(row_iterator &ri) {
-                return ri.r == r;
+            inline bool operator!=(const rows_iterator &ri) {
+                return !operator==(ri);
             }
-
-            int operator-(row_iterator &ri) {
-                return ri.r - r;
-            }
-
         private:
-            row_iterator(int r, mat& m_) : r(r), m_(m_) {}
-            int r;
-            mat &m_;
+            rows_iterator(M &ref, int row)
+                    : ref(ref),
+                      row(row) {}
+            const mat &ref;
+            int row;
         };
 
-        const row_iterator begin() const {
-            return row_iterator(0, const_cast<mat&>(*this));
+        rows_iterator<mat> begin() {
+            return {*this, 0};
         }
 
-        const row_iterator end() const {
-            return row_iterator(m, const_cast<mat&>(*this));
+        rows_iterator<mat> end() {
+            return {*this, m};
         }
 
-        row_iterator begin() {
-            return row_iterator(0, *this);
+        rows_iterator<const mat> begin() const {
+            return {*this, 0};
         }
 
-        row_iterator end() {
-            return row_iterator(m, *this);
+        rows_iterator<const mat> end() const {
+            return {*this, m};
+        }
+
+        static mat outer_product(vec &v) {
+            int n = v.n;
+            mat ma(n, n);
+            for (int j = 0; j < n; j++)
+                for (int k = 0; k < n; k++)
+                    ma[j][k] = v[j] * v[k];
+            return ma;
         }
     };
 

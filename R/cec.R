@@ -14,7 +14,6 @@ cec <- function(
     readline      = T
 )
 {
-    on.exit(.Call(release_cec_mem_r));
     # check arguments  
     if (!hasArg(x)) stop("Missing requierd argument: 'x'.")
     if (!hasArg(centers)) stop("Missing requierd argument: 'centers'.")
@@ -103,7 +102,7 @@ cec <- function(
         min.card = as.integer(card.min),
         max.iters = as.integer(iter.max),
         starts = as.integer(nstart),
-        threads = threads
+        threads = as.integer(threads)
     )
 
     models.r = create.cec.params.for.models(k, n, type, param)

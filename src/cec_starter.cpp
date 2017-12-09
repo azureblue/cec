@@ -18,7 +18,7 @@ cec::single_start_results cec::cec_starter::start(const cec::single_start_input 
     const std::unique_ptr<model> *models = in.models.data();
     std::vector<int> assignment = in.initial_assignment;
 
-    std::vector<std::vector<vec>> split = split_points(in.x, in.initial_assignment);
+    std::vector<mat> split = split_points(in.x, in.initial_assignment, k);
     std::vector<bool> removed(k, false);
     int removed_k = 0;
 
@@ -28,8 +28,8 @@ cec::single_start_results cec::cec_starter::start(const cec::single_start_input 
     std::vector<std::unique_ptr<cluster>> clusters(k);
 
     for (int i = 0; i < k; i++) {
-        std::vector<vec> cluster_split = split[i];
-        if (cluster_split.size() < min_card) {
+        const mat &cluster_split = split[i];
+        if (cluster_split.m < min_card) {
             removed_k++;
             removed[i] = true;
             continue;
@@ -59,10 +59,10 @@ cec::single_start_results cec::cec_starter::start(const cec::single_start_input 
         std::cout << cl->covariance() << std::endl;
     }
 
-    if (removed_k == k) 
+    if (removed_k == k)
         throw all_clusters_removed();
 
-    int handle_removed_flag = (removed_k == 0) ? 0 : 1;
+    bool handle_removed_flag = removed_k != 0;
 
     for (int iter = (handle_removed_flag ? -1 : 0); iter < max_iter; iter++) {
         int transfer_flag = 0;
@@ -72,7 +72,7 @@ cec::single_start_results cec::cec_starter::start(const cec::single_start_input 
 
             const int cl_num = assignment[i];
             const bool cl_removed = removed[cl_num];
-            cluster &cl = *clusters[cl_num];            
+            cluster &cl = *clusters[cl_num];
 
             if (handle_removed_flag && !cl_removed)
                 continue;
@@ -83,7 +83,7 @@ cec::single_start_results cec::cec_starter::start(const cec::single_start_input 
                 throw invalid_covariance(cl, cl_num);
 
             int dest_cl_num = -1;
-            
+
             for (int j = 0; j < k; j++) {
                 if ((j == cl_num) || removed[j])
                     continue;
@@ -94,19 +94,15 @@ cec::single_start_results cec::cec_starter::start(const cec::single_start_input 
                 if (std::isnan(add_energy_gain))
                     throw invalid_covariance(cl_j, j);
 
-                if (cl_removed) {
-                    double gain = add_energy_gain;
-                    if (gain < best_gain) {
-                        dest_cl_num = j;
-                        best_gain = gain;
-                    }
-                } else {
-                    double gain = rem_energy_gain + add_energy_gain;
-                    if (gain < best_gain) {
-                        dest_cl_num = j;
-                        best_gain = gain;
-                    }
+                double gain = add_energy_gain;
+                if (!cl_removed)
+                    gain += rem_energy_gain;
+
+                if (gain < best_gain) {
+                    dest_cl_num = j;
+                    best_gain = gain;
                 }
+
             }
 
             if (dest_cl_num != -1) {
@@ -137,10 +133,10 @@ cec::single_start_results cec::cec_starter::start(const cec::single_start_input 
          */
 
         if (removed_last_iteration_flag) {
-            handle_removed_flag = 1;
+            handle_removed_flag = true;
             iter--;
         } else
-            handle_removed_flag = 0;
+            handle_removed_flag = false;
     }
 
     mat centers = in.c;
@@ -159,13 +155,20 @@ cec::single_start_results cec::cec_starter::start(const cec::single_start_input 
 
 }
 
-std::vector<std::vector<cec::vec>>
-cec::cec_starter::split_points(const mat &points, const std::vector<int> &assignment) {
-    int k = *std::max_element(assignment.begin(), assignment.end()) + 1;
-    std::vector<std::vector<cec::vec>> split(k, std::vector<vec>());
+std::vector<cec::mat>
+cec::cec_starter::split_points(const mat &points, const std::vector<int> &assignment, int k) {
+    std::vector<int> sizes(k, 0);
+    std::vector<int> indices(k, 0);
+    for (auto &&cl : assignment)
+        sizes[cl]++;
+    std::vector<mat> split;
+    for (auto &&size : sizes)
+        split.emplace_back(size, points.n);
     int m = points.m;
-    for (int i = 0; i < m; i++)
-        split[assignment[i]].push_back(points[i]);
+    for (int i = 0; i < m; i++) {
+        int cl = assignment[i];
+        split[cl][indices[cl]++] = points[i];
+    }
     return split;
 }
 
