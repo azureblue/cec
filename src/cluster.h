@@ -8,9 +8,8 @@ namespace cec {
 
     class mean : public vec {
     public:
-        explicit mean (const std::vector<vec> &sample): mean(sample.at(0).n) {
-            for (auto &&p : sample)
-                add_point(p);
+        explicit mean (const mat &sample): mean(sample.n) {
+            for (auto &&p : sample) add_point(p);
             update();
          }
 
@@ -78,11 +77,10 @@ namespace cec {
         }
     };
 
-
     class covariance_mle {
     public:
-        static mat estimate(const std::vector<vec> &sample, const mean &mean) {
-            int n = sample.at(0).n;
+        static mat estimate(const mat &sample, const mean &mean) {
+            int n = sample.n;
             mat acc(n, n);
             acc.fill(0);
             vec t_vec(acc.n);
@@ -91,7 +89,7 @@ namespace cec {
                 t_vec -= mean;
                 acc += mat::outer_product(t_vec);
             }
-            acc /= sample.size();
+            acc /= sample.m;
             return acc;
         }
     };
@@ -100,12 +98,12 @@ namespace cec {
 
     public:
         cluster(const model &mod, mean initial_mean, mat initial_covariance, const int m) :
+                m_(m),
                 model_(mod),
                 mean_(std::move(initial_mean)),
                 cov_(std::move(initial_covariance)),
                 t_cov_(cov_),
                 t_point_(initial_mean.n),
-                m_(m),
                 energy_(mod.energy(cov_, mean_.card(), m))
         {}
 
@@ -157,13 +155,14 @@ namespace cec {
             return model_.energy(t_cov_, mean_.card() + card_change_, m_);
         }
         const int m_;
-        int card_change_ = 0;
-        double t_energy_;
         const model &model_;
         cec::mean mean_;
-        mat cov_, t_cov_;
+        mat cov_;
+        mat t_cov_;
         vec t_point_;
         double energy_;
+        double t_energy_;
+        int card_change_ = 0;
     };
 
 

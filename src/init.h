@@ -55,6 +55,6 @@ namespace cec {
             return asgn;
         }
     };
-};
+}
 
 #endif //CEC_INIT_H

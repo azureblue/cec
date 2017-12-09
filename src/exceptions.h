@@ -77,12 +77,12 @@ namespace cec {
 
     class invalid_parameter_type: public std::exception {
     public:
-        const std::string name;
+        const std::string expected;
 
-        explicit invalid_parameter_type(std::string name): name(std::move(name)) {}
+        explicit invalid_parameter_type(std::string name): expected(std::move(name)) {}
 
         const char *what() const noexcept override {
-            return ("missing parameter: " + name).c_str();
+            return ("invalid parameter type, expected: " + expected).c_str();
         }
     };
 }
