@@ -30,7 +30,7 @@ cec::mat cec::r::get<cec::mat>(SEXP sexp) {
     double *m_data = ma.data();
     for (int i = 0; i < m; i++)
         for (int j = 0; j < n; j++)
-            m_data[i * m + j] = REAL(sexp)[j * m + i];
+            m_data[i * n + j] = REAL(sexp)[j * m + i];
     return ma;
 }
 
@@ -42,6 +42,7 @@ std::vector<int> cec::r::get<std::vector<int>>(SEXP sexp) {
     std::vector<int> vec_i(len);
     int *r_data = INTEGER(sexp);
     std::copy(&r_data[0], &r_data[len], vec_i.begin());
+    return vec_i;
 }
 
 template<>
@@ -49,9 +50,10 @@ std::vector<double> cec::r::get<std::vector<double>>(SEXP sexp) {
     if (TYPEOF(sexp) != REALSXP)
         throw invalid_parameter_type("real vector");
     int len = LENGTH(sexp);
-    std::vector<double> vec_i(len);
+    std::vector<double> vec_d(len);
     double *r_data = REAL(sexp);
-    std::copy(&r_data[0], &r_data[len], vec_i.begin());
+    std::copy(&r_data[0], &r_data[len], vec_d.begin());
+    return vec_d;
 }
 
 
@@ -67,7 +69,7 @@ SEXP cec::r::put(const cec::mat &ma) {
     double *r_data = REAL(r_ma);
     for (int i = 0; i < m; i++)
         for (int j = 0; j < n; j++)
-            r_data[j * m + i] = m_data[i * m + j];
+            r_data[j * m + i] = m_data[i * n + j];
 
     UNPROTECT(1);
 
