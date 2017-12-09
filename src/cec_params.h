@@ -13,17 +13,23 @@ namespace cec {
     };
 
     enum class model_type {
-        ALL, COVARIANCE, DIAGONAL, EIGENVALUES, FIXED_R, SPHERICAL
+        ALL,
+        COVARIANCE,
+        DIAGONAL,
+        EIGENVALUES,
+        FIXED_R,
+        SPHERICAL
     };
 
     init_method parse_init_method(const std::string &method);
 
     model_type parse_model_type(const std::string &name);
 
-    struct centers_param {
-        init_method init_m;
-        mat centers_mat;
-        std::vector<int> var_centers;
+    class centers_param {
+    public:
+        const init_method init_m;
+        const mat centers_mat;
+        const std::vector<int> var_centers;
 
         centers_param(init_method init_m, mat centers_mat, std::vector<int> var_centers)
                 : init_m(init_m),
@@ -31,17 +37,18 @@ namespace cec {
                   var_centers(std::move(var_centers)) {}
     };
 
-    struct control_param {
-        int starts;
-        int max_iterations;
-        int min_card;
-        int threads;
+    class control_param {
+    public:
+        const int starts;
+        const int max_iterations;
+        const int min_card;
+        const int threads;
 
-        control_param(int starts, int max_iter, int min_card, int threads) :
-                starts(starts),
-                max_iterations(max_iter),
-                min_card(min_card),
-                threads(threads) {}
+        control_param(int starts, int max_iter, int min_card, int threads)
+                : starts(starts),
+                  max_iterations(max_iter),
+                  min_card(min_card),
+                  threads(threads) {}
     };
 
     class model_spec {
@@ -70,6 +77,11 @@ namespace cec {
     class models_param {
     public:
         const std::vector<std::shared_ptr<model_spec>> specs;
+
+        virtual ~models_param() {
+            std::cout << "delete models_param " << std::endl;
+        }
+
         explicit models_param(std::vector<std::shared_ptr<model_spec>> specs)
                 : specs(std::move(specs)) {}
     };

@@ -1,5 +1,4 @@
 #include "r_utils.h"
-#include "exceptions.h"
 
 template<>
 std::string cec::r::get<std::string>(SEXP sexp) {
@@ -15,9 +14,9 @@ SEXP cec::r::get<SEXP>(SEXP sexp) {
 
 template<>
 int cec::r::get<int>(SEXP sexp) {
-    if (TYPEOF(sexp) != INTSXP)
+    if (TYPEOF(sexp) != INTSXP || LENGTH(sexp) != 1)
         throw invalid_parameter_type("integer");
-    return asInteger(sexp);
+    return INTEGER(sexp)[0];
 }
 
 template<>

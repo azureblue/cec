@@ -9,5 +9,6 @@ ByteCompile: true
 URL: https://github.com/azureblue/cec
 Encoding: UTF-8
 NeedsCompilation: yes
+SystemRequirements: C++11
 License: GPL-3
 Imports: graphics, methods, stats, utils

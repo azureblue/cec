@@ -5,7 +5,7 @@
 
 extern "C" {
 #include <Rdefines.h>
-};
+}
 
 namespace cec {
     centers_param get_centers_param(SEXP centers_param_r);
