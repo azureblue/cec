@@ -18,7 +18,7 @@ static inline double handle_cholesky_nan(double d) {
     return handle_zero(d);
 }
 
-static bool cec_cov_cholesky(const cec::mat &cov, cec::mat &temp_matrix) {
+static bool cholesky(const cec::mat &cov, cec::mat &temp_matrix) {
     int n = cov.n;
     int info;
     temp_matrix = cov;
@@ -26,7 +26,7 @@ static bool cec_cov_cholesky(const cec::mat &cov, cec::mat &temp_matrix) {
     return info == 0;
 }
 
-double cec::cec_cov_diagonal_product(const cec::mat &m) {
+double cec::diagonal_product(const cec::mat &m) {
     double res = 1.0;
     int n = m.n;
     for (int i = 0; i < n; i++)
@@ -34,11 +34,11 @@ double cec::cec_cov_diagonal_product(const cec::mat &m) {
     return res;
 }
 
-double cec::det_cholesky(cec::mat &cov, cec::mat &temp_mat) {
+double cec::det_cholesky(const cec::mat &cov, cec::mat &tmp_mat) {
     if (cov.n == 2)
         return cov[0][0] * cov[1][1] - cov[0][1] * cov[1][0];
-    else if (!cec_cov_cholesky(cov, temp_mat))
+    else if (!cholesky(cov, tmp_mat))
         return std::numeric_limits<double>::quiet_NaN();
-    double prod = cec_cov_diagonal_product(temp_mat);
+    double prod = diagonal_product(tmp_mat);
     return handle_cholesky_nan(prod * prod);
 }
