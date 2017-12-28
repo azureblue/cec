@@ -4,8 +4,8 @@
 #include "../vec.h"
 
 namespace cec {
-    double cec_cov_diagonal_product(const mat &m);
+    double diagonal_product(const mat &m);
 
-    double det_cholesky(mat &cov, mat &temp_mat);
+    double det_cholesky(const mat &cov, mat &tmp_mat);
 }
 #endif //CEC_COV_UTILS_H
