@@ -14,13 +14,17 @@ namespace cec {
 
     class model {
     public:
-        virtual double cross_entropy(mat &cov) const = 0;
+        const int n;
 
-        inline double energy(mat &cov, int card, int m) const {
-            double p = (card / (double) m);
+        explicit model(const int n):
+                n(n) {}
+
+        virtual double cross_entropy(const mat &cov) const noexcept = 0;
+
+        inline double energy(mat &cov, int card, int m) const noexcept {
+            double p = card / (double) m;
             return p * (-std::log(p) + cross_entropy(cov));
         }
-
     };
 }
 
