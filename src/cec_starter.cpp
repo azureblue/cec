@@ -15,11 +15,9 @@ cec::single_start_results cec::cec_starter::start(const cec::single_start_input 
     int max_iter = in.max_iter;
     int min_card = in.min_card;
 
-    const std::unique_ptr<model> *models = in.models.data();
     std::vector<int> assignment = in.initial_assignment;
 
     std::vector<mat> split = split_points(in.x, in.initial_assignment, k);
-    std::vector<bool> removed(k, false);
     int removed_k = 0;
 
     double energy_sum = 0;
@@ -28,19 +26,16 @@ cec::single_start_results cec::cec_starter::start(const cec::single_start_input 
     std::vector<std::unique_ptr<cluster>> clusters(k);
 
     for (int i = 0; i < k; i++) {
-        const mat &cluster_split = split[i];
-        if (cluster_split.m < min_card) {
-            removed_k++;
-            removed[i] = true;
-            continue;
+        mat &cluster_split = split[i];
+        if (cluster_split.m >= min_card) {
+            mean me(cluster_split);
+            mat cov = covariance_mle::estimate(cluster_split, me);
+            clusters[i].reset(new cluster(*in.models[i], me, cov, m));
         }
-        mean me(cluster_split);
-        mat cov = covariance_mle::estimate(cluster_split, me);
-        clusters[i].reset(new cluster(*models[i], me, cov, m));
     }
 
     for (int i = 0; i < k; i++) {
-        if (removed[i])
+        if (!clusters[i])
             continue;
 
         double energy = clusters[i]->energy();
@@ -51,52 +46,43 @@ cec::single_start_results cec::cec_starter::start(const cec::single_start_input 
         energy_sum += energy;
     }
 
-    std::cout << energy_sum << std::endl;
-
-    for (auto &cl : clusters) {
-
-        std::cout << cl->mean() << std::endl;
-        std::cout << cl->covariance() << std::endl;
-    }
-
-    if (removed_k == k)
+    int removed = std::count(clusters.begin(), clusters.end(), std::unique_ptr<cluster>());
+    if (removed == k)
         throw all_clusters_removed();
 
     bool handle_removed_flag = removed_k != 0;
 
     for (int iter = (handle_removed_flag ? -1 : 0); iter < max_iter; iter++) {
-        int transfer_flag = 0;
-        int removed_last_iteration_flag = 0;
+        bool transfer_flag = false;
+        bool removed_last_iteration_flag = false;
 
         for (int i = 0; i < m; i++) {
 
             const int cl_num = assignment[i];
-            const bool cl_removed = removed[cl_num];
-            cluster &cl = *clusters[cl_num];
+            std::unique_ptr<cluster> &cl_src = clusters[cl_num];
 
-            if (handle_removed_flag && !cl_removed)
+            if (handle_removed_flag && cl_src)
                 continue;
 
-            double rem_energy_gain = !cl_removed ? cl.rem_point(X[i]) : 0;
-            double best_gain = !cl_removed ? 0 : std::numeric_limits<double>::infinity();
+            double rem_energy_gain = cl_src ? cl_src->rem_point(X[i]) : 0;
+            double best_gain = cl_src ? 0 : std::numeric_limits<double>::infinity();
+
             if (std::isnan(rem_energy_gain))
-                throw invalid_covariance(cl, cl_num);
+                throw invalid_covariance(*cl_src, cl_num);
 
             int dest_cl_num = -1;
 
             for (int j = 0; j < k; j++) {
-                if ((j == cl_num) || removed[j])
+                if (j == cl_num || !clusters[j])
                     continue;
 
-                cluster &cl_j = *clusters[j];
-                double add_energy_gain = cl_j.add_point(X[i]);
+                cluster &cl_dst = *clusters[j];
+                double add_energy_gain = cl_dst.add_point(X[i]);
 
                 if (std::isnan(add_energy_gain))
-                    throw invalid_covariance(cl_j, j);
+                    throw invalid_covariance(cl_dst, j);
 
-                double gain = add_energy_gain;
-                if (!cl_removed)
-                    gain += rem_energy_gain;
+                double gain = add_energy_gain + rem_energy_gain;
 
                 if (gain < best_gain) {
                     dest_cl_num = j;
@@ -108,29 +94,22 @@ cec::single_start_results cec::cec_starter::start(const cec::single_start_input 
             if (dest_cl_num != -1) {
                 assignment[i] = dest_cl_num;
                 clusters[dest_cl_num]->apply_change();
-                if (!cl_removed) {
-                    cl.apply_change();
-                    if (cl.card() < min_card) {
-                        removed_last_iteration_flag = 1;
-
-                        energy_sum -= cl.energy();
-                        removed[cl_num] = true;
+                if (cl_src) {
+                    cl_src->apply_change();
+                    if (cl_src->card() < min_card) {
+                        removed_last_iteration_flag = true;
+                        energy_sum -= cl_src->energy();
+                        clusters[cl_num].reset(nullptr);
                     }
                 }
                 energy_sum += best_gain;
-                transfer_flag = 1;
+                transfer_flag = true;
             }
         }
 
         iterations = iter + 1;
-        std::cout << energy_sum << std::endl;
         if (!transfer_flag)
             break;
-
-        /*
-         * If cluster was removed in this iteration, we need to perform another iteration
-         * considering points that are not assigned. It will prevent energy dips.
-         */
 
         if (removed_last_iteration_flag) {
             handle_removed_flag = true;
@@ -144,15 +123,16 @@ cec::single_start_results cec::cec_starter::start(const cec::single_start_input 
 
     double energy_check = 0;
     for (int i = 0; i < k; i++) {
-        if (removed[i])
+        if (!clusters[i]) {
+            centers[i].fill(std::numeric_limits<double>::quiet_NaN());
+            covs[i].fill(std::numeric_limits<double>::quiet_NaN());
             continue;
+        }
         centers[i] = clusters[i]->mean();
         covs[i] = clusters[i]->covariance();
         energy_check += clusters[i]->energy();
     }
-    std::cout << energy_check << " - check" << std::endl;
     return single_start_results(centers, assignment, k, iterations, energy_sum, covs);
-
 }
 
 std::vector<cec::mat>

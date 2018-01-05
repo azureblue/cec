@@ -18,9 +18,6 @@ namespace cec {
         const double energy;
         const std::vector<mat> covariances;
         single_start_results(const single_start_results &res) = default;
-        ~single_start_results() {
-            std::cout << "asd" << std::endl;
-        }
 
     private:
         single_start_results(mat centers, std::vector<int> assignment, int cluster_number,

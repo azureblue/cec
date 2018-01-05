@@ -5,8 +5,7 @@ project(cec)
 #set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
-include_directories("K:/R/R-3.4.3/include")
-link_directories("K:/R/R-3.4.3/bin/x64")
+include_directories(/usr/share/R/include)
 
 set(SOURCE_FILES
         src/cec_params.cpp
@@ -15,7 +14,7 @@ set(SOURCE_FILES
         src/cec_params_r.h
         src/cec_starter.cpp
         src/cec_starter.h
-        src/r_utils.cpp
+        src/r_ext_ptr.h
         src/r_utils.h
         src/cluster.h
         src/exceptions.h
@@ -32,9 +31,9 @@ set(SOURCE_FILES
         src/init.h)
 
 
-link_libraries(m R Rlapack Rblas)
+link_libraries(m R lapack blas)
 set(CMAKE_CXX_FLAGS "-std=c++0x -pedantic -Wall")
-add_library(cec SHARED ${SOURCE_FILES} src/exceptions.h src/models/cov_utils.cpp)
+add_library(cec SHARED ${SOURCE_FILES})
 #add_executable(cec_test ${SOURCE_FILES} src/vec_test.cpp)
 
 set(MAKEVARS_PKG_CFLAGS "-DR_ALLOC -DR_RAND $(SHLIB_OPENMP_CFLAGS)")
@@ -54,11 +53,11 @@ string(REGEX REPLACE " +" " " SOURCE_FILES_STRING ${SOURCE_FILES_STRING})
 file(APPEND src/Makevars "OBJECTS = " ${SOURCE_FILES_STRING} "\n")
 
 add_custom_target(install_CEC
-        COMMAND K:/R/R-3.4.3/bin/R.exe CMD INSTALL --clean ${CMAKE_SOURCE_DIR}
+        COMMAND R CMD INSTALL --clean ${CMAKE_SOURCE_DIR}
         )
 
 add_custom_target(dist_lib
-        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:cec> K:/R/R-3.4.3/library/CEC/libs/x64/CEC.dll
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:cec> /home/konrad/R/x86_64-pc-linux-gnu-library/3.4/CEC/libs/CEC.so
         )
 
 add_dependencies(dist_lib cec)
