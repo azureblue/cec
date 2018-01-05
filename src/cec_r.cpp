@@ -36,8 +36,7 @@ SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models_param
                        });
 
         single_start_input in(x_mat, c_mat, asgn, models, control_par.max_iterations, control_par.min_card);
-        cec_starter starter(n);
-
+        cec_starter starter;
         const single_start_results &results = starter.start(in);
         start_results.reset(new single_start_results(results));
 

@@ -38,11 +38,15 @@ cec::models_param cec::get_models_param(SEXP models_param_r, int n) {
                         new model_all_spec(n)
                 ));
                 break;
+            case model_type::SPHERICAL:
+                specs.push_back(std::shared_ptr<model_spec>(
+                        new model_spherical_spec(n)
+                ));
+                break;
             case model_type::COVARIANCE:
             case model_type::DIAGONAL:
             case model_type::EIGENVALUES:
             case model_type::FIXED_R:
-            case model_type::SPHERICAL:
                 throw not_implemented(type_name);
         }
     }
