@@ -1,4 +1,5 @@
 #include "cov_utils.h"
+#include "constants.h"
 
 extern "C" {
 #include <R_ext/Lapack.h>
@@ -26,7 +27,7 @@ static bool cholesky(const cec::mat &cov, cec::mat &temp_matrix) {
     return info == 0;
 }
 
-double cec::diagonal_product(const cec::mat &m) {
+double cec::diagonal_product(const mat &m) {
     double res = 1.0;
     int n = m.n;
     for (int i = 0; i < n; i++)
@@ -34,11 +35,21 @@ double cec::diagonal_product(const cec::mat &m) {
     return res;
 }
 
-double cec::det_cholesky(const cec::mat &cov, cec::mat &tmp_mat) {
+double cec::trace(const mat &cov) {
+    int n = cov.n;
+    double tr = 0;
+    for (int i = 0; i < n; i++)
+        tr += cov[i][i];
+    return tr;
+}
+
+double cec::determinant(const mat &cov, mat &tmp_mat) {
+    if (cov.n == 1)
+        return cov[0][0];
     if (cov.n == 2)
         return cov[0][0] * cov[1][1] - cov[0][1] * cov[1][0];
-    else if (!cholesky(cov, tmp_mat))
-        return std::numeric_limits<double>::quiet_NaN();
+    if (!cholesky(cov, tmp_mat))
+        return constants::QNAN;
     double prod = diagonal_product(tmp_mat);
     return handle_cholesky_nan(prod * prod);
 }

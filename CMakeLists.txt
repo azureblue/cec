@@ -23,12 +23,13 @@ set(SOURCE_FILES
         src/models/cov_utils.cpp
         src/models/model.h
         src/models/all.h
+        src/models/spherical.h
         src/vec.h
         src/result_r.h
         src/result_r.cpp
         src/cec_r.cpp
         src/cec_r.h
-        src/init.h)
+        src/init.h src/models/constants.h)
 
 
 link_libraries(m R lapack blas)
