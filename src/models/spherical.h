@@ -13,8 +13,7 @@ namespace cec {
 
         double cross_entropy(const mat &cov) const noexcept {
             double tr = trace(cov);
-            return (std::log(2.0 * constants::PI * constants::E / n) + std::log(tr))
-                * (n / 2.0);
+            return std::log(2.0 * tr * constants::PI * constants::E / n) * (n / 2.0);
         }
     };
 }
