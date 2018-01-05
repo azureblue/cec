@@ -11,8 +11,8 @@ namespace cec {
     public:
         const int n;
 
-        explicit model(const int n):
-                n(n) {}
+        explicit model(const int n)
+                : n(n) {}
 
         virtual double cross_entropy(const mat &cov) const noexcept = 0;
 
