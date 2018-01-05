@@ -1,9 +1,7 @@
 #include "cov_utils.h"
 #include "constants.h"
 
-extern "C" {
 #include <R_ext/Lapack.h>
-}
 
 const double ZERO_EPSILON = 1.0e-32;
 

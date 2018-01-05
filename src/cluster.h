@@ -6,17 +6,21 @@
 
 namespace cec {
 
-    class mean : public vec {
+    class mean: public vec {
     public:
-        explicit mean (const mat &sample): mean(sample.n) {
+        explicit mean(const mat &sample)
+                : mean(sample.n) {
             for (auto &&p : sample) add_point(p);
             update();
-         }
+        }
 
         mean(const mean &initial) = default;
-        mean(mean && initial) noexcept = default;
 
-        explicit mean(int n) : vec(n), acc_(n) {
+        mean(mean &&initial) noexcept = default;
+
+        explicit mean(int n)
+                : vec(n),
+                  acc_(n) {
             acc_.fill(0);
             fill(0);
         }
@@ -49,30 +53,30 @@ namespace cec {
 
     class cluster_utils {
     public:
-        static void cec_cov_add_point(mat &dest_covariance, const mat &covariance,
+        static void cec_cov_add_point(mat &dst_cov, const mat &cov,
                                       const mean &mean, const vec &point) {
             int card = mean.card();
             double card_n = card + 1;
-            cec_cov_change(dest_covariance, covariance, mean, point, card / card_n, card / (card_n * card_n));
+            cec_cov_change(dst_cov, cov, mean, point, card / card_n, card / (card_n * card_n));
         }
 
-        static void cec_cov_remove_point(mat &dest_covariance, const mat &covariance,
+        static void cec_cov_remove_point(mat &dst_cov, const mat &cov,
                                          const mean &mean, const vec &point) {
             int card = mean.card();
             double card_n = card - 1;
-            cec_cov_change(dest_covariance, covariance, mean, point, card / card_n, -card / (card_n * card_n));
+            cec_cov_change(dst_cov, cov, mean, point, card / card_n, -card / (card_n * card_n));
         }
 
     private:
-        static inline void cec_cov_change(mat &dest_covariance, const mat &covariance,
+        static inline void cec_cov_change(mat &dst_cov, const mat &cov,
                                           const vec &mean, const vec &point, double cov_mul,
                                           double new_cov_point_mul) {
-            const int n = covariance.n;
+            const int n = cov.n;
 
             for (int j = 0; j < n; j++)
                 for (int k = 0; k < n; k++)
-                    dest_covariance[j][k] = covariance[j][k] * cov_mul
-                                 + (mean[j] - point[j]) * (mean[k] - point[k]) * new_cov_point_mul;
+                    dst_cov[j][k] = cov[j][k] * cov_mul
+                                            + (mean[j] - point[j]) * (mean[k] - point[k]) * new_cov_point_mul;
 
         }
     };
@@ -97,15 +101,15 @@ namespace cec {
     class cluster {
 
     public:
-        cluster(const model &mod, mean initial_mean, mat initial_covariance, const int m) :
+        cluster(const model &mod, mean initial_mean, mat initial_covariance, const int m)
+                :
                 m_(m),
                 model_(mod),
                 mean_(std::move(initial_mean)),
                 cov_(std::move(initial_covariance)),
                 t_cov_(cov_),
                 t_point_(initial_mean.n),
-                energy_(mod.energy(cov_, mean_.card(), m))
-        {}
+                energy_(mod.energy(cov_, mean_.card(), m)) {}
 
         double add_point(const vec &point) {
             t_point_ = point;
@@ -124,7 +128,7 @@ namespace cec {
 
         }
 
-        const vec& mean() const {
+        const vec &mean() const {
             return mean_;
         }
 
@@ -132,7 +136,7 @@ namespace cec {
             return mean_.card();
         }
 
-        const mat& covariance() const {
+        const mat &covariance() const {
             return cov_;
         }
 
@@ -154,6 +158,7 @@ namespace cec {
         double t_energy() {
             return model_.energy(t_cov_, mean_.card() + card_change_, m_);
         }
+
         const int m_;
         const model &model_;
         cec::mean mean_;
@@ -164,8 +169,6 @@ namespace cec {
         double t_energy_;
         int card_change_ = 0;
     };
-
-
 }
 
 #endif //CEC_CLUSTER_H
