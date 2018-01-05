@@ -46,8 +46,7 @@ cec::single_start_results cec::cec_starter::start(const cec::single_start_input 
         energy_sum += energy;
     }
 
-    int removed = std::count(clusters.begin(), clusters.end(), std::unique_ptr<cluster>());
-    if (removed == k)
+    if (std::count(clusters.begin(), clusters.end(), std::unique_ptr<cluster>()) == k)
         throw all_clusters_removed();
 
     bool handle_removed_flag = removed_k != 0;
@@ -65,7 +64,7 @@ cec::single_start_results cec::cec_starter::start(const cec::single_start_input 
                 continue;
 
             double rem_energy_gain = cl_src ? cl_src->rem_point(X[i]) : 0;
-            double best_gain = cl_src ? 0 : std::numeric_limits<double>::infinity();
+            double best_gain = cl_src ? 0 : constants::INF;
 
             if (std::isnan(rem_energy_gain))
                 throw invalid_covariance(*cl_src, cl_num);
@@ -88,7 +87,6 @@ cec::single_start_results cec::cec_starter::start(const cec::single_start_input 
                     dest_cl_num = j;
                     best_gain = gain;
                 }
-
             }
 
             if (dest_cl_num != -1) {
@@ -124,15 +122,16 @@ cec::single_start_results cec::cec_starter::start(const cec::single_start_input 
     double energy_check = 0;
     for (int i = 0; i < k; i++) {
         if (!clusters[i]) {
-            centers[i].fill(std::numeric_limits<double>::quiet_NaN());
-            covs[i].fill(std::numeric_limits<double>::quiet_NaN());
+            centers[i].fill(constants::QNAN);
+            covs[i].fill(constants::QNAN);
             continue;
         }
         centers[i] = clusters[i]->mean();
         covs[i] = clusters[i]->covariance();
         energy_check += clusters[i]->energy();
     }
-    return single_start_results(centers, assignment, k, iterations, energy_sum, covs);
+    int final_k = k - std::count(clusters.begin(), clusters.end(), std::unique_ptr<cluster>());
+    return single_start_results(centers, assignment, final_k, iterations, energy_sum, covs);
 }
 
 std::vector<cec::mat>
