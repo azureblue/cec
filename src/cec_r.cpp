@@ -10,19 +10,10 @@
 using namespace cec;
 using namespace cec::r;
 
-extern "C" void delete_results(SEXP r_ptr) {
-    void *ptr = R_ExternalPtrAddr(r_ptr);
-    if (ptr == nullptr)
-        return;
-    delete ((cec::single_start_results*) ptr);
-    R_ClearExternalPtr(r_ptr);
-}
 extern "C"
 SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models_param_r) {
-    SEXP res_ptr_r; 
-    PROTECT(res_ptr_r = R_MakeExternalPtr(nullptr, NULL, NULL));
-    R_RegisterCFinalizerEx(res_ptr_r, delete_results, TRUE);
-    single_start_results *start_results;
+
+    r_ext_ptr<single_start_results> start_results;
     try {
         mat x_mat = get<mat>(x);
         int n = x_mat.n;
@@ -48,8 +39,7 @@ SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models_param
         cec_starter starter(n);
 
         const single_start_results &results = starter.start(in);
-        start_results = new single_start_results(results);
-        R_SetExternalPtrAddr(res_ptr_r, start_results);
+        start_results.reset(new single_start_results(results));
 
     } catch (std::exception &ex) {
         error(ex.what());
@@ -58,8 +48,7 @@ SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models_param
     try {
         SEXP r_res;
         PROTECT(r_res = create_R_result(*start_results));
-        //delete_results(res_ptr_r);
-        UNPROTECT(2);
+        UNPROTECT(1);
         return r_res;
     } catch (std::exception &ex) {
         error(ex.what());

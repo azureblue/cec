@@ -5,7 +5,6 @@
 
 #include <Rdefines.h>
 
-
 namespace cec {
     SEXP create_R_result(const single_start_results &res);
 }

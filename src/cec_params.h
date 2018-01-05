@@ -78,10 +78,6 @@ namespace cec {
     public:
         const std::vector<std::shared_ptr<model_spec>> specs;
 
-        virtual ~models_param() {
-            std::cout << "delete models_param " << std::endl;
-        }
-
         explicit models_param(std::vector<std::shared_ptr<model_spec>> specs)
                 : specs(std::move(specs)) {}
     };
