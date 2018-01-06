@@ -5,6 +5,7 @@
 #include "models/model.h"
 #include "models/all.h"
 #include "models/spherical.h"
+#include "models/diagonal.h"
 
 namespace cec {
     enum class init_method {
@@ -85,6 +86,19 @@ namespace cec {
 
         std::unique_ptr<model> create_model() const override {
             return std::unique_ptr<model>(new spherical(n));
+        }
+    };
+
+    class model_diagonal_spec : public model_spec {
+    public:
+        const int n;
+
+        explicit model_diagonal_spec(int n)
+                : model_spec(model_type::ALL),
+                  n(n) {}
+
+        std::unique_ptr<model> create_model() const override {
+            return std::unique_ptr<model>(new diagonal(n));
         }
     };
 

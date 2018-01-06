@@ -4,7 +4,7 @@
 #include "../vec.h"
 
 namespace cec {
-    double diagonal_product(const mat &m);
+    double diagonal_product(const mat &cov);
 
     double determinant(const mat &cov, mat &tmp_mat);
 
