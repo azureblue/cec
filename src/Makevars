@@ -1,5 +1,4 @@
 CXX_STD = CXX11
-OBJECTS = cec_params.o cec_params_r.o cec_starter.o r_utils.o models/cov_utils.o result_r.o cec_r.o 
 PKG_CFLAGS = -DR_ALLOC -DR_RAND $(SHLIB_OPENMP_CFLAGS)
 PKG_LIBS = $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) $(SHLIB_OPENMP_CFLAGS)
 OBJECTS = cec_params.o cec_params_r.o cec_starter.o models/cov_utils.o result_r.o cec_r.o 

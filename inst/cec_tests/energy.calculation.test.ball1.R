@@ -14,7 +14,7 @@ test.type.covariance <- function()
     
     CE <- cec(B, centers=1, type="cov", param = given.cov, iter.max=0)
     
-    CEC:::checkNumericVectorEquals(expected.energy, CE$cost[1], msg="Energy")
+    CEC:::checkNumericVectorEquals(expected.energy, CE$cost, msg="Energy")
 }
 
 test.type.fixedr <- function()
@@ -25,7 +25,7 @@ test.type.fixedr <- function()
     
     CE <- cec(B, centers=1, type="fix", param = 1.5, iter.max=0)
     
-    CEC:::checkNumericVectorEquals(expected.energy, CE$cost[1], msg="Energy")
+    CEC:::checkNumericVectorEquals(expected.energy, CE$cost, msg="Energy")
 }
 
 test.type.spherical <- function()
@@ -34,7 +34,7 @@ test.type.spherical <- function()
     
     CE <- cec(B, centers=1, type="sp", iter.max=0)
     
-    CEC:::checkNumericVectorEquals(expected.energy, CE$cost[1], msg="Energy")
+    CEC:::checkNumericVectorEquals(expected.energy, CE$cost, msg="Energy")
 }
 
 
@@ -46,7 +46,7 @@ test.type.diagonal <- function()
     
     CE <- cec(B, centers=1, type="diag", iter.max=0)
     
-    CEC:::checkNumericVectorEquals(expected.energy, CE$cost[1], msg="Energy")
+    CEC:::checkNumericVectorEquals(expected.energy, CE$cost, msg="Energy")
 }
 
 test.type.eigenvalues <- function()
@@ -57,7 +57,7 @@ test.type.eigenvalues <- function()
     
     CE <- cec(B, centers=1, type="eigen", param=evals, iter.max=0)
     
-    CEC:::checkNumericVectorEquals(expected.energy, CE$cost[1], msg="Energy")
+    CEC:::checkNumericVectorEquals(expected.energy, CE$cost, msg="Energy")
 }
 
 test.type.all <- function()
@@ -66,7 +66,7 @@ test.type.all <- function()
     
     CE <- cec(B, centers=1, type="all", iter.max=0)
     
-    CEC:::checkNumericVectorEquals(expected.energy, CE$cost[1], msg="Energy")
+    CEC:::checkNumericVectorEquals(expected.energy, CE$cost, msg="Energy")
 }
 
 ####################################################################################################################
@@ -77,7 +77,7 @@ test.type.spherical.cluster.removing <- function()
     
     CE <- cec(B, C, type="sp", iter.max=20)
     
-    CEC:::checkNumericVectorEquals(expected.energy, CE$cost[CE$iterations], msg="Energy")
+    CEC:::checkNumericVectorEquals(expected.energy, CE$cost, msg="Energy")
     
 }
 
