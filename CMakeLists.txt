@@ -25,6 +25,7 @@ set(SOURCE_FILES
         src/models/all.h
         src/models/diagonal.h
         src/models/spherical.h
+        src/models/fixed_radius.h
         src/vec.h
         src/result_r.h
         src/result_r.cpp

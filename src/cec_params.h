@@ -6,6 +6,7 @@
 #include "models/all.h"
 #include "models/spherical.h"
 #include "models/diagonal.h"
+#include "models/fixed_radius.h"
 
 namespace cec {
     enum class init_method {
@@ -99,6 +100,21 @@ namespace cec {
 
         std::unique_ptr<model> create_model() const override {
             return std::unique_ptr<model>(new diagonal(n));
+        }
+    };
+
+    class model_fixed_radius_spec : public model_spec {
+    public:
+        const int n;
+        const double r;
+
+        explicit model_fixed_radius_spec(int n, double r)
+                : model_spec(model_type::FIXED_R),
+                  n(n),
+                  r(r) {}
+
+        std::unique_ptr<model> create_model() const override {
+            return std::unique_ptr<model>(new fixed_radius(n, r));
         }
     };
 
