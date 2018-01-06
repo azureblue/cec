@@ -9,7 +9,8 @@ namespace cec {
     class eigenvalues : public model {
     public:
         explicit eigenvalues(int n, std::vector<double> values)
-                : given_values(std::move(values)),
+                : n(n),
+                  given_values(std::move(values)),
                   eigenvalues_calc(n),
                   tmp_values(n),
                   ce_const(std::log(std::pow(2.0 * constants::PI, n)
@@ -19,12 +20,13 @@ namespace cec {
             if (!eigenvalues_calc.eigenvalues(cov, tmp_values.data()))
                 return constants::QNAN;
             double values_ratio_sum = 0;
-            for (int i = 0; i < cov.n; i++)
+            for (int i = 0; i < n; i++)
                 values_ratio_sum += tmp_values[i] / given_values[i];
             return ce_const + values_ratio_sum / 2.0;
         }
 
     private:
+        const int n;
         const std::vector<double> given_values;
         const eigenvalues_calculator eigenvalues_calc;
         mutable std::vector<double> tmp_values;
