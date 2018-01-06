@@ -54,6 +54,10 @@ cec::models_param cec::get_models_param(SEXP models_param_r, int n) {
                 ));
                 break;
             case model_type::COVARIANCE:
+                specs.push_back(std::shared_ptr<model_spec>(
+                        new model_covariance_spec(n, params_r["cov"].get<mat>())
+                ));
+                break;
             case model_type::EIGENVALUES:
                 throw not_implemented(type_name);
         }

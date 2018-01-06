@@ -24,6 +24,7 @@ namespace cec {
         }
     };
 
+
     class all_clusters_removed: public std::exception {
     public:
         const char *what() const noexcept override {
@@ -83,6 +84,17 @@ namespace cec {
 
         const char *what() const noexcept override {
             return ("invalid parameter type, expected: " + expected).c_str();
+        }
+    };
+
+    class invalid_model_parameter: public std::exception {
+    public:
+        const std::string desc;
+
+        explicit invalid_model_parameter(std::string desc): desc(std::move(desc)) {}
+
+        const char *what() const noexcept override {
+            return ("invalid model parameter: " + desc).c_str();
         }
     };
 }

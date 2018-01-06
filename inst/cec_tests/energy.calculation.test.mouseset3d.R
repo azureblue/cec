@@ -14,7 +14,7 @@ test.type.covariance <- function()
     
     CE <- cec(B, centers=C, type="cov", param = given.cov, iter.max=20)
 
-    CEC:::checkNumericVectorEquals(expected.energy, CE$cost[CE$iterations + 1], msg="Energy")
+    CEC:::checkNumericVectorEquals(expected.energy, CE$cost, msg="Energy")
 }
 
 test.type.fixedr.mixture <- function()
@@ -25,7 +25,7 @@ test.type.fixedr.mixture <- function()
     
     CE <- cec(B, centers=C, type=c("fi", "fi", "fi"), param = r)
     
-    CEC:::checkNumericVectorEquals(expected.energy, CE$cost[CE$iterations + 1], msg="Energy")
+    CEC:::checkNumericVectorEquals(expected.energy, CE$cost, msg="Energy")
 }
 
 
@@ -36,8 +36,8 @@ test.type.spherical.one.cluster.removed <- function()
      
     CE <- cec(B, C4, type="sp")
     
-    CEC:::checkNumericVectorEquals(expected.number.of.clusters, CE$final.nclusters, msg="Number of clusters")
-    CEC:::checkNumericVectorEquals(expected.energy, CE$cost[CE$iterations + 1], msg="Energy")
+    CEC:::checkNumericVectorEquals(expected.number.of.clusters, CE$nclusters, msg="Number of clusters")
+    CEC:::checkNumericVectorEquals(expected.energy, CE$cost, msg="Energy")
 }
 
 test.type.diagonal.spherical.mixture <- function()
@@ -47,8 +47,8 @@ test.type.diagonal.spherical.mixture <- function()
     
     CE <- cec(B, C, type=c("diag", "diag", "sp"))  
 
-    CEC:::checkNumericVectorEquals(expected.number.of.clusters, CE$final.nclusters, msg="Number of clusters")
-    CEC:::checkNumericVectorEquals(expected.energy, CE$cost[CE$iterations + 1], msg="Energy")
+    CEC:::checkNumericVectorEquals(expected.number.of.clusters, CE$nclusters, msg="Number of clusters")
+    CEC:::checkNumericVectorEquals(expected.energy, CE$cost, msg="Energy")
 }
 
 test.type.eigenvalues.all.fixedr.mixture <- function()
@@ -62,6 +62,6 @@ test.type.eigenvalues.all.fixedr.mixture <- function()
     
     CE <- cec(B, C4, type=c("all", "eigen", "fixedr", "eigen"), param=list(evals1, r, evals2))
     
-    CEC:::checkNumericVectorEquals(expected.number.of.clusters, CE$final.nclusters, msg="Number of clusters")
-    CEC:::checkNumericVectorEquals(expected.energy, CE$cost[CE$iterations + 1], msg="Energy")
+    CEC:::checkNumericVectorEquals(expected.number.of.clusters, CE$nclusters, msg="Number of clusters")
+    CEC:::checkNumericVectorEquals(expected.energy, CE$cost, msg="Energy")
 }

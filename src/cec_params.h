@@ -1,12 +1,15 @@
 #ifndef CEC_PARAMS_H
 #define CEC_PARAMS_H
 
+#include <utility>
+
 #include "vec.h"
 #include "models/model.h"
 #include "models/all.h"
 #include "models/spherical.h"
 #include "models/diagonal.h"
 #include "models/fixed_radius.h"
+#include "models/covariance.h"
 
 namespace cec {
     enum class init_method {
@@ -115,6 +118,21 @@ namespace cec {
 
         std::unique_ptr<model> create_model() const override {
             return std::unique_ptr<model>(new fixed_radius(n, r));
+        }
+    };
+
+    class model_covariance_spec : public model_spec {
+    public:
+        const int n;
+        const mat g_cov;
+
+        explicit model_covariance_spec(int n, mat g_cov)
+                : model_spec(model_type::FIXED_R),
+                  n(n),
+                  g_cov(std::move(g_cov)) {}
+
+        std::unique_ptr<model> create_model() const override {
+            return std::unique_ptr<model>(new covariance(n, g_cov));
         }
     };
 
