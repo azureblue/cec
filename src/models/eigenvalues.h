@@ -1,46 +1,42 @@
-#ifndef COVARIANCE_H
-#define COVARIANCE_H
+#ifndef EIGENVALUES_H
+#define EIGENVALUES_H
 
+#include "constants.h"
 #include "cov_utils.h"
 #include "model.h"
-#include "constants.h"
-#include "../exceptions.h"
 
 namespace cec {
-    class covariance : public model {
+    class eigenvalues : public model {
     public:
-        explicit covariance(int n, mat cov)
-                : model(n),
-                  cov_inv(std::move(inv(cov))),
-                  tmp(n, n),
-                  ce_const(std::log(std::pow(2.0 * constants::PI, n) * det(cov)) / 2.0) {}
+        explicit eigenvalues(int n, std::vector<double> values)
+                : given_values(std::move(values)),
+                  eigenvalues_calc(n),
+                  tmp_values(n),
+                  ce_const(std::log(std::pow(2.0 * constants::PI, n)
+                                    * product(eigenvalues::given_values)) / 2.0) {}
 
-        double cross_entropy(const mat &cov) const noexcept {
-            multiply(cov_inv, cov, tmp);
-            double tr = trace(tmp);
-            return ce_const + tr / 2;
+        double cross_entropy(const mat &cov) const noexcept override {
+            if (!eigenvalues_calc.eigenvalues(cov, tmp_values.data()))
+                return constants::QNAN;
+            double values_ratio_sum = 0;
+            for (int i = 0; i < cov.n; i++)
+                values_ratio_sum += tmp_values[i] / given_values[i];
+            return ce_const + values_ratio_sum / 2.0;
         }
 
     private:
-        const mat cov_inv;
-        mutable mat tmp;
+        const std::vector<double> given_values;
+        const eigenvalues_calculator eigenvalues_calc;
+        mutable std::vector<double> tmp_values;
         const double ce_const;
-        
-        static mat inv(const mat& cov) {
-            mat dst(cov);
-            if (!invert(cov, dst))
-                throw new invalid_model_parameter("invalid covariance (not positive definite)");
-            return dst;
-        }
 
-        static double det(const mat& cov) {
-            mat tmp(cov);
-            double det = determinant(cov, tmp);
-            if (std::isnan(det))
-                throw new invalid_model_parameter("invalid covariance (not positive definite)");
-            return det;
+        static double product(const std::vector<double> &values) {
+            double prod = 1;
+            for (auto &&v : values)
+                prod *= v;
+            return prod;
         }
     };
 }
-#endif /* COVARIANCE_H */
+#endif /* EIGENVALUES_H */
 
