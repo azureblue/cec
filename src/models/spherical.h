@@ -7,14 +7,19 @@
 #include "constants.h"
 
 namespace cec {
-    class spherical: public model {
+    class spherical : public model {
     public:
-        explicit spherical(int n) : model(n) {}
+        explicit spherical(int n)
+                : model(n),
+                  spherical_const(std::log(2.0 * constants::PI * constants::E / n)) {}
 
         double cross_entropy(const mat &cov) const noexcept {
             double tr = trace(cov);
-            return std::log(2.0 * tr * constants::PI * constants::E / n) * (n / 2.0);
+            return (spherical_const + std::log(tr)) * n / 2;
         }
+
+    private:
+        const double spherical_const;
     };
 }
 #endif /* SPHERICAL_H */

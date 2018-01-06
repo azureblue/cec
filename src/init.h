@@ -25,7 +25,6 @@ namespace cec {
     private:
         std::random_device rd;
         std::mt19937 mt;
-
     };
 
     class assignment_init {

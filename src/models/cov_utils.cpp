@@ -19,19 +19,19 @@ static inline double handle_cholesky_nan(double d) {
     return handle_zero(d);
 }
 
-static bool cholesky(const cec::mat &cov, cec::mat &temp_matrix) {
+static bool cholesky(const cec::mat &cov, cec::mat &tmp) {
     int n = cov.n;
     int info;
-    temp_matrix = cov;
-    F77_NAME(dpotrf)("U", &n, temp_matrix.data(), &n, &info);
+    tmp = cov;
+    dpotrf_("U", &n, tmp.data(), &n, &info);
     return info == 0;
 }
 
-double cec::diagonal_product(const mat &m) {
+double cec::diagonal_product(const mat &cov) {
+    int n = cov.n;
     double res = 1.0;
-    int n = m.n;
     for (int i = 0; i < n; i++)
-        res *= m[i][i];
+        res *= cov[i][i];
     return res;
 }
 
