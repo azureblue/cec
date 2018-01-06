@@ -10,7 +10,7 @@ namespace cec {
     class spherical : public model {
     public:
         explicit spherical(int n)
-                : model(n),
+                : n(n),
                   spherical_const(std::log(2.0 * constants::PI * constants::E / n)) {}
 
         double cross_entropy(const mat &cov) const noexcept {
@@ -19,6 +19,7 @@ namespace cec {
         }
 
     private:
+        const int n;
         const double spherical_const;
     };
 }

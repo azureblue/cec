@@ -59,7 +59,9 @@ cec::models_param cec::get_models_param(SEXP models_param_r, int n) {
                 ));
                 break;
             case model_type::EIGENVALUES:
-                throw not_implemented(type_name);
+                specs.push_back(std::shared_ptr<model_spec>(
+                        new model_eigenvalues_spec(n, params_r["eigenvalues"].get<vector<double>>())
+                ));
         }
     }
     return models_param(std::move(specs));
