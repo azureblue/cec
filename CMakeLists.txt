@@ -23,6 +23,7 @@ set(SOURCE_FILES
         src/models/cov_utils.cpp
         src/models/model.h
         src/models/all.h
+        src/models/diagonal.h
         src/models/spherical.h
         src/vec.h
         src/result_r.h
