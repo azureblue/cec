@@ -9,8 +9,7 @@ namespace cec {
     class diagonal : public model {
     public:
         explicit diagonal(int n)
-                : model(n),
-                  diagonal_const(n * std::log(2.0 * constants::PI * constants::E)) {}
+                : diagonal_const(n * std::log(2.0 * constants::PI * constants::E)) {}
 
         double cross_entropy(const mat &cov) const noexcept {
             double diag = diagonal_product(cov);

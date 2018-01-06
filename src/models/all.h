@@ -10,8 +10,7 @@ namespace cec {
     class all : public model {
     public:
         explicit all(int n)
-                : model(n),
-                  tmp(n, n),
+                : tmp(n, n),
                   all_const(n * std::log(2.0 * constants::PI * constants::E)) {}
 
         double cross_entropy(const mat &cov) const noexcept {

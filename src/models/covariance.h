@@ -10,8 +10,7 @@ namespace cec {
     class covariance : public model {
     public:
         explicit covariance(int n, mat cov)
-                : model(n),
-                  cov_inv(std::move(inv(cov))),
+                : cov_inv(std::move(inv(cov))),
                   tmp(n, n),
                   ce_const(std::log(std::pow(2.0 * constants::PI, n) * det(cov)) / 2.0) {}
 

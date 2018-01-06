@@ -78,3 +78,12 @@ double cec::determinant(const mat &cov, mat &tmp) {
     double prod = diagonal_product(tmp);
     return handle_cholesky_nan(prod * prod);
 }
+
+bool cec::eigenvalues_calculator::eigenvalues(const cec::mat &cov, double *res) const noexcept{
+    int n = cov.n;
+    int info;
+    tmp = cov;
+    int workspace_size = workspace.size();
+    dsyev_("N", "U", &n, tmp.data(), &n, res, workspace.data(), &workspace_size, &info);
+    return info == 0;
+}

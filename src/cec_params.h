@@ -10,6 +10,7 @@
 #include "models/diagonal.h"
 #include "models/fixed_radius.h"
 #include "models/covariance.h"
+#include "models/eigenvalues.h"
 
 namespace cec {
     enum class init_method {
@@ -133,6 +134,21 @@ namespace cec {
 
         std::unique_ptr<model> create_model() const override {
             return std::unique_ptr<model>(new covariance(n, g_cov));
+        }
+    };
+
+    class model_eigenvalues_spec : public model_spec {
+    public:
+        const int n;
+        const std::vector<double> values;
+
+        explicit model_eigenvalues_spec(int n, std::vector<double> values)
+                : model_spec(model_type::EIGENVALUES),
+                  n(n),
+                  values(std::move(values)) {}
+
+        std::unique_ptr<model> create_model() const override {
+            return std::unique_ptr<model>(new eigenvalues(n, values));
         }
     };
 
