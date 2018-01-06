@@ -31,7 +31,7 @@ cec::models_param cec::get_models_param(SEXP models_param_r, int n) {
         r_wrapper model_r = r_models[i];
         const std::string &type_name = model_r["type"].get<string>();
         model_type type = parse_model_type(type_name);
-        //r_wrapper params_r = model_r["params"];
+        r_wrapper params_r = model_r["params"];
         switch (type) {
             case model_type::ALL:
                 specs.push_back(std::shared_ptr<model_spec>(
@@ -48,9 +48,13 @@ cec::models_param cec::get_models_param(SEXP models_param_r, int n) {
                         new model_diagonal_spec(n)
                 ));
                 break;
+            case model_type::FIXED_R:
+                specs.push_back(std::shared_ptr<model_spec>(
+                        new model_fixed_radius_spec(n, params_r["r"].get<double>())
+                ));
+                break;
             case model_type::COVARIANCE:
             case model_type::EIGENVALUES:
-            case model_type::FIXED_R:
                 throw not_implemented(type_name);
         }
     }

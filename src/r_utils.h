@@ -31,6 +31,13 @@ namespace cec {
         }
 
         template<>
+        inline double get(SEXP sexp) {
+            if (TYPEOF(sexp) != REALSXP || LENGTH(sexp) != 1)
+                throw invalid_parameter_type("single integer");
+            return REAL(sexp)[0];
+        }
+
+        template<>
         inline mat get(SEXP sexp) {
             if (!isMatrix(sexp))
                 throw invalid_parameter_type("matrix");
