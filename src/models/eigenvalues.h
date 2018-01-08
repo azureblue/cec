@@ -13,7 +13,7 @@ namespace cec {
                   given_values(std::move(values)),
                   eigenvalues_calc(n),
                   tmp_values(n),
-                  ce_const(std::log(std::pow(2.0 * constants::PI, n)
+                  ce_constant(std::log(std::pow(2.0 * constants::PI, n)
                                     * product(eigenvalues::given_values)) / 2.0) {}
 
         double cross_entropy(const mat &cov) const noexcept override {
@@ -22,7 +22,7 @@ namespace cec {
             double values_ratio_sum = 0;
             for (int i = 0; i < n; i++)
                 values_ratio_sum += tmp_values[i] / given_values[i];
-            return ce_const + values_ratio_sum / 2.0;
+            return ce_constant + values_ratio_sum / 2.0;
         }
 
     private:
@@ -30,7 +30,7 @@ namespace cec {
         const std::vector<double> given_values;
         const eigenvalues_calculator eigenvalues_calc;
         mutable std::vector<double> tmp_values;
-        const double ce_const;
+        const double ce_constant;
 
         static double product(const std::vector<double> &values) {
             double prod = 1;

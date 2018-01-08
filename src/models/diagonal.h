@@ -9,15 +9,15 @@ namespace cec {
     class diagonal : public model {
     public:
         explicit diagonal(int n)
-                : diagonal_const(n * std::log(2.0 * constants::PI * constants::E)) {}
+                : ce_constant(n * std::log(2.0 * constants::PI * constants::E)) {}
 
-        double cross_entropy(const mat &cov) const noexcept {
+        double cross_entropy(const mat &cov) const noexcept override {
             double diag = diagonal_product(cov);
-            return (diagonal_const + std::log(diag)) / 2;
+            return (ce_constant + std::log(diag)) / 2;
         }
 
     private:
-        const double diagonal_const;
+        const double ce_constant;
     };
 }
 #endif /* DIAGONAL_H */

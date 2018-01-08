@@ -11,16 +11,16 @@ namespace cec {
     public:
         explicit all(int n)
                 : tmp(n, n),
-                  all_const(n * std::log(2.0 * constants::PI * constants::E)) {}
+                  ce_constant(n * std::log(2.0 * constants::PI * constants::E)) {}
 
-        double cross_entropy(const mat &cov) const noexcept {
+        double cross_entropy(const mat &cov) const noexcept override {
             double det = determinant(cov, tmp);
-            return (all_const + std::log(det)) / 2;
+            return (ce_constant + std::log(det)) / 2;
         }
 
     private:
         mutable mat tmp;
-        const double all_const;
+        const double ce_constant;
     };
 }
 #endif /* ALL_H */
