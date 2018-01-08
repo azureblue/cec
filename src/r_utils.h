@@ -9,10 +9,11 @@
 #include <Rdefines.h>
 
 namespace cec {
-    namespace r {
-        using std::vector;
-        using std::string;
 
+    using std::vector;
+    using std::string;
+
+    namespace r {
         template<typename T>
         inline T get(SEXP sexp);
 
@@ -103,7 +104,7 @@ namespace cec {
             return ve;
         }
 
-        inline SEXP put(std::vector<int> val) {
+        inline SEXP put(vector<int> val) {
             SEXP ve;
             PROTECT(ve = allocVector(INTSXP, val.size()));
             std::copy(val.begin(), val.end(), INTEGER(ve));
@@ -121,7 +122,7 @@ namespace cec {
                 return LENGTH(sexp);
             }
 
-            r_wrapper operator[](const std::string &name) {
+            r_wrapper operator[](const string &name) {
                 return r_wrapper(get_named(sexp, name));
             }
 
@@ -137,7 +138,7 @@ namespace cec {
         private:
             SEXP sexp;
 
-            SEXP get_named(SEXP list, const std::string &name) {
+            SEXP get_named(SEXP list, const string &name) {
                 int len = LENGTH(list);
                 SEXP elementNames = GET_NAMES(list);
                 for (int i = 0; i < len; i++) {

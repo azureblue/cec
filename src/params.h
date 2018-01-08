@@ -1,8 +1,6 @@
 #ifndef CEC_PARAMS_H
 #define CEC_PARAMS_H
 
-#include <utility>
-
 #include "vec.h"
 #include "models/model.h"
 #include "models/all.h"
@@ -13,6 +11,12 @@
 #include "models/eigenvalues.h"
 
 namespace cec {
+
+    using std::vector;
+    using std::string;
+    using std::unique_ptr;
+    using std::shared_ptr;
+
     enum class init_method {
         NONE,
         KMEANSPP,
@@ -28,17 +32,17 @@ namespace cec {
         SPHERICAL
     };
 
-    init_method parse_init_method(const std::string &method);
+    init_method parse_init_method(const string &method);
 
-    model_type parse_model_type(const std::string &name);
+    model_type parse_model_type(const string &name);
 
     class centers_param {
     public:
         const init_method init_m;
         const mat centers_mat;
-        const std::vector<int> var_centers;
+        const vector<int> var_centers;
 
-        centers_param(init_method init_m, mat centers_mat, std::vector<int> var_centers)
+        centers_param(init_method init_m, mat centers_mat, vector<int> var_centers)
                 : init_m(init_m),
                   centers_mat(std::move(centers_mat)),
                   var_centers(std::move(var_centers)) {}
@@ -62,7 +66,7 @@ namespace cec {
     public:
         const model_type type;
 
-        virtual std::unique_ptr<model> create_model() const = 0;
+        virtual unique_ptr<model> create_model() const = 0;
 
         explicit model_spec(const model_type type)
                 : type(type) {}
@@ -76,8 +80,8 @@ namespace cec {
                 : model_spec(model_type::ALL),
                   n(n) {}
 
-        std::unique_ptr<model> create_model() const override {
-            return std::unique_ptr<model>(new all(n));
+        unique_ptr<model> create_model() const override {
+            return unique_ptr<model>(new all(n));
         }
     };
 
@@ -89,8 +93,8 @@ namespace cec {
                 : model_spec(model_type::ALL),
                   n(n) {}
 
-        std::unique_ptr<model> create_model() const override {
-            return std::unique_ptr<model>(new spherical(n));
+        unique_ptr<model> create_model() const override {
+            return unique_ptr<model>(new spherical(n));
         }
     };
 
@@ -102,8 +106,8 @@ namespace cec {
                 : model_spec(model_type::ALL),
                   n(n) {}
 
-        std::unique_ptr<model> create_model() const override {
-            return std::unique_ptr<model>(new diagonal(n));
+        unique_ptr<model> create_model() const override {
+            return unique_ptr<model>(new diagonal(n));
         }
     };
 
@@ -117,8 +121,8 @@ namespace cec {
                   n(n),
                   r(r) {}
 
-        std::unique_ptr<model> create_model() const override {
-            return std::unique_ptr<model>(new fixed_radius(n, r));
+        unique_ptr<model> create_model() const override {
+            return unique_ptr<model>(new fixed_radius(n, r));
         }
     };
 
@@ -132,31 +136,31 @@ namespace cec {
                   n(n),
                   g_cov(std::move(g_cov)) {}
 
-        std::unique_ptr<model> create_model() const override {
-            return std::unique_ptr<model>(new covariance(n, g_cov));
+        unique_ptr<model> create_model() const override {
+            return unique_ptr<model>(new covariance(n, g_cov));
         }
     };
 
     class model_eigenvalues_spec : public model_spec {
     public:
         const int n;
-        const std::vector<double> values;
+        const vector<double> values;
 
-        explicit model_eigenvalues_spec(int n, std::vector<double> values)
+        explicit model_eigenvalues_spec(int n, vector<double> values)
                 : model_spec(model_type::EIGENVALUES),
                   n(n),
                   values(std::move(values)) {}
 
-        std::unique_ptr<model> create_model() const override {
-            return std::unique_ptr<model>(new eigenvalues(n, values));
+        unique_ptr<model> create_model() const override {
+            return unique_ptr<model>(new eigenvalues(n, values));
         }
     };
 
     class models_param {
     public:
-        const std::vector<std::shared_ptr<model_spec>> specs;
+        const vector<shared_ptr<model_spec>> specs;
 
-        explicit models_param(std::vector<std::shared_ptr<model_spec>> specs)
+        explicit models_param(vector<shared_ptr<model_spec>> specs)
                 : specs(std::move(specs)) {}
     };
 }

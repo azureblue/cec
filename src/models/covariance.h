@@ -12,18 +12,18 @@ namespace cec {
         explicit covariance(int n, mat cov)
                 : cov_inv(std::move(inv(cov))),
                   tmp(n, n),
-                  ce_const(std::log(std::pow(2.0 * constants::PI, n) * det(cov)) / 2.0) {}
+                  ce_constant(std::log(std::pow(2.0 * constants::PI, n) * det(cov)) / 2.0) {}
 
-        double cross_entropy(const mat &cov) const noexcept {
+        double cross_entropy(const mat &cov) const noexcept override {
             multiply(cov_inv, cov, tmp);
             double tr = trace(tmp);
-            return ce_const + tr / 2;
+            return ce_constant + tr / 2;
         }
 
     private:
         const mat cov_inv;
         mutable mat tmp;
-        const double ce_const;
+        const double ce_constant;
         
         static mat inv(const mat& cov) {
             mat dst(cov);

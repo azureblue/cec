@@ -11,16 +11,16 @@ namespace cec {
     public:
         explicit spherical(int n)
                 : n(n),
-                  spherical_const(std::log(2.0 * constants::PI * constants::E / n)) {}
+                  ce_constant(std::log(2.0 * constants::PI * constants::E / n)) {}
 
-        double cross_entropy(const mat &cov) const noexcept {
+        double cross_entropy(const mat &cov) const noexcept override {
             double tr = trace(cov);
-            return (spherical_const + std::log(tr)) * n / 2;
+            return (ce_constant + std::log(tr)) * n / 2;
         }
 
     private:
         const int n;
-        const double spherical_const;
+        const double ce_constant;
     };
 }
 #endif /* SPHERICAL_H */
