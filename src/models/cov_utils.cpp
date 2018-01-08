@@ -41,19 +41,19 @@ double cec::trace(const mat &cov) {
     return tr;
 }
 
-void cec::multiply(const mat &m1, const mat &m2, mat &dst) {
-    int n = m1.n;
-    double zero = 0;
-    double one = 1;
-    if (n < 5) {
+void cec::multiply(const mat &a, const mat &b, mat &dst) {
+    int n = a.n;
+    if (n < 8) {
         dst.fill(0.0);
         for (int i = 0; i < n; i++)
             for (int j = 0; j < n; j++)
                 for (int k = 0; k < n; k++)
-                    dst[i][j] += m1[k][i] * m2[j][k];
+                    dst[i][j] += a[k][i] * b[j][k];
         return;
     }
-    dsymm_("L", "L", &n, &n, &one, m1.data(), &n, m2.data(), &n, &zero, dst.data(), &n);
+    double zero = 0;
+    double one = 1;
+    dsymm_("L", "L", &n, &n, &one, a.data(), &n, b.data(), &n, &zero, dst.data(), &n);
 }
 
 bool cec::invert(const mat &cov, mat &dst) {
