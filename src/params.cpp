@@ -1,7 +1,7 @@
-#include "cec_params.h"
+#include "params.h"
 #include "exceptions.h"
 
-cec::init_method cec::parse_init_method(const std::string &method) {
+cec::init_method cec::parse_init_method(const string &method) {
     if (method == "none")
         return init_method::NONE;
     if (method == "kmeanspp")
@@ -11,7 +11,7 @@ cec::init_method cec::parse_init_method(const std::string &method) {
     throw invalid_init_method(method);
 }
 
-cec::model_type cec::parse_model_type(const std::string &name) {
+cec::model_type cec::parse_model_type(const string &name) {
     if (name == "all")
         return cec::model_type::ALL;
     if (name == "covariance")

@@ -1,11 +1,8 @@
 #ifndef CEC_PARAMS_R_H
 #define CEC_PARAMS_R_H
 
-#include "cec_params.h"
-
-extern "C" {
+#include "params.h"
 #include <Rdefines.h>
-}
 
 namespace cec {
     centers_param get_centers_param(SEXP centers_param_r);

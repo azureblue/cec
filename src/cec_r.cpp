@@ -1,14 +1,17 @@
 #include "cec_r.h"
 #include "r_utils.h"
-#include "cec_params.h"
-#include "cec_params_r.h"
-#include "single_start_input.h"
+#include "params.h"
+#include "r_params.h"
 #include "init.h"
-#include "cec_starter.h"
-#include "result_r.h"
+#include "starter.h"
+#include "r_result.h"
 
 using namespace cec;
 using namespace cec::r;
+using std::vector;
+using std::string;
+using std::unique_ptr;
+using std::shared_ptr;
 
 extern "C"
 SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models_param_r) {
@@ -27,17 +30,16 @@ SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models_param
                     ? centers_par.centers_mat
                     : random_init().init(x_mat, k);
 
-        const std::vector<int> &asgn = closest_assignment().init(x_mat, c_mat);
-        std::vector<std::unique_ptr<model>> models(k);
+        const vector<int> &asgn = closest_assignment().init(x_mat, c_mat);
+        vector<unique_ptr<model>> models(k);
 
         std::transform(models_par.specs.begin(), models_par.specs.end(), models.begin(),
-                       [&](const std::shared_ptr<cec::model_spec> &spec) {
+                       [&](const shared_ptr<cec::model_spec> &spec) {
                            return spec->create_model();
                        });
 
-        single_start_input in(x_mat, c_mat, asgn, models, control_par.max_iterations, control_par.min_card);
         cec_starter starter;
-        const single_start_results &results = starter.start(in);
+        const single_start_results &results = starter.start(x_mat, asgn, models, control_par.max_iterations, control_par.min_card);
         start_results.reset(new single_start_results(results));
 
     } catch (std::exception &ex) {
