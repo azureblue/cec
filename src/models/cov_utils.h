@@ -11,7 +11,7 @@ namespace cec {
 
     bool invert(const mat &cov, mat &dst);
 
-    void multiply(const mat &m1, const mat &m2, mat &dst);
+    void multiply(const mat &a, const mat &b, mat &dst);
 
     double trace(const mat &cov);
 
