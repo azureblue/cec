@@ -52,12 +52,10 @@ cec::mat cec::kmeanspp_init::init(const mat &x, int k) {
                        ? 0.0
                        : unif_real(mt, std::uniform_real_distribution<double>::param_type(0.0, upper));
         auto range = std::equal_range(sums.begin(), sums.end(), n_sum);
-        int ri_from = range.first - sums.begin();
-        int ri_to = range.second - sums.begin();
-        if (ri_to == m)
-            ri_to--;
-        unif_int.param(std::uniform_int_distribution<int>::param_type(ri_from, ri_to));
-        int idx = unif_int(mt);
+        int idx_from = range.first - sums.begin();
+        int idx_to = range.second - sums.begin();
+        idx_to = std::min(idx_to, m - 1);
+        int idx = unif_int(mt, std::uniform_int_distribution<int>::param_type(idx_from, idx_to));
         c[i] = x[idx];
         sums[0] = dists[0] = std::min(dists[0], vec::dist(x[0], c[i]));
         for (int j = 1; j < m; j++) {
