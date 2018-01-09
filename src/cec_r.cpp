@@ -38,8 +38,9 @@ SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models_param
                            return spec->create_model();
                        });
 
-        cec_starter starter;
-        const single_start_results &results = starter.start(x_mat, asgn, models, control_par.max_iterations, control_par.min_card);
+        const single_start_results &results = cec_starter().start(x_mat, asgn, models,
+                                                            control_par.max_iterations,
+                                                            control_par.min_card);
         start_results.reset(new single_start_results(results));
 
     } catch (std::exception &ex) {
