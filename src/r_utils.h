@@ -34,7 +34,7 @@ namespace cec {
         template<>
         inline double get(SEXP sexp) {
             if (TYPEOF(sexp) != REALSXP || LENGTH(sexp) != 1)
-                throw invalid_parameter_type("single integer");
+                throw invalid_parameter_type("single real");
             return REAL(sexp)[0];
         }
 
