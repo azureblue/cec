@@ -173,7 +173,7 @@ cec.interactive <- function(
     x, 
     centers,   
     type          = c("covariance", "fixedr", "spherical", "diagonal", "eigenvalues", "all"),  
-    iter.max      = 40,
+    iter.max      = 25,
     nstart        = 1,
     param,
     centers.init  = c("kmeans++", "random"), 
@@ -210,7 +210,7 @@ cec.interactive <- function(
         if (i == 0)
             desc = "(position of center means before first iteration)"      
         
-        cat("Iterations:", Z$iterations, desc, "cost function:", Z$cost[(Z$iterations + 1)]," \n ")
+        cat("Iterations:", Z$iterations, desc, "cost function:", Z$cost," \n ")
         
         plot(Z, ellipses = TRUE)
         
