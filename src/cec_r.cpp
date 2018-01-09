@@ -39,8 +39,8 @@ SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models_param
                        });
 
         const single_start_results &results = cec_starter().start(x_mat, asgn, models,
-                                                            control_par.max_iterations,
-                                                            control_par.min_card);
+                                                                  control_par.max_iterations,
+                                                                  control_par.min_card);
         start_results.reset(new single_start_results(results));
 
     } catch (std::exception &ex) {
@@ -59,5 +59,31 @@ SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models_param
 
 extern "C"
 SEXP cec_init_centers_r(SEXP x_r, SEXP k_r, SEXP method_r) {
-    return put(random_init().init(get<mat>(x_r), get<int>(k_r)));
+    r_ext_ptr<string> error_str;
+    try {
+        r_ext_ptr<mat> res;
+        try {
+            const string &method_str = get<string>(method_r);
+            const mat &x = get<mat>(x_r);
+            int k = get<int>(k_r);
+            init_method im = parse_init_method(method_str);
+            switch (im) {
+                case init_method::KMEANSPP:
+                    res.reset(new mat(kmeanspp_init(x.m).init(x, k)));
+                    break;
+                case init_method::RANDOM:
+                    res.reset(new mat(random_init().init(x, k)));
+                    break;
+                case init_method::NONE:
+                    break;
+            }
+        } catch (std::exception &ex) {
+            throw;
+        }
+        SEXP r_res = put(*res);
+        return r_res;
+    } catch (std::exception &ex) {
+        error_str.reset(new string(ex.what()));
+    }
+    error(error_str->c_str());
 }
