@@ -1,7 +1,6 @@
 #ifndef ALL_H
 #define ALL_H
 
-#include "../vec.h"
 #include "cov_utils.h"
 #include "model.h"
 #include "constants.h"

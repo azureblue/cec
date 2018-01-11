@@ -8,65 +8,55 @@
 namespace cec {
     class mat;
 
-    class vec {
+    class row {
     public:
-        const int n;
+        const int size;
 
-        explicit vec(int n) : n(n), data_(new double[n]), data_wrapper_(data_) {};
+        row(row &&r) noexcept = default;
 
-        vec(vec &&v) noexcept = default;
+        row(double *ptr, int n)
+                : size(n),
+                  data_(ptr) {}
 
-        vec(const vec &v) : vec(v.n) {
-            this->set(v);
-        }
-
-        vec(std::initializer_list<double> vals) : vec(vals.size()) {
-            double *ptr = data_;
-            auto it = vals.begin();
-            auto end = vals.end();
-            while (it != end)
-                *ptr++ = *it++;
-        }
-
-        double &operator[](int idx) {
+        inline double &operator[](int idx) {
             return data_[idx];
         }
 
-        const double &operator[](int idx) const {
+        inline const double &operator[](int idx) const {
             return data_[idx];
         }
 
         void fill(double value) {
-            std::fill(data_, data_ + n, value);
+            std::fill(data_, data_ + size, value);
         }
 
-        void set(const vec &v) {
-            this->operator=(v);
+        void set(const row &r) {
+            this->operator=(r);
         }
 
-        vec &operator=(const vec &v) {
-            std::copy(v.data_, v.data_ + v.n, data_);
+        inline row &operator=(const row &r) {
+            std::copy(r.data_, r.data_ + r.size, data_);
             return *this;
         }
 
         void operator*=(double value) {
-            for (int i = 0; i < n; i++)
+            for (int i = 0; i < size; i++)
                 data_[i] *= value;
         }
 
         void operator/=(double value) {
-            for (int i = 0; i < n; i++)
+            for (int i = 0; i < size; i++)
                 data_[i] /= value;
         }
 
-        void operator+=(const vec &v) {
-            for (int i = 0; i < n; i++)
-                data_[i] += v[i];
+        void operator+=(const row &r) {
+            for (int i = 0; i < size; i++)
+                data_[i] += r[i];
         }
 
-        void operator-=(const vec &v) {
-            for (int i = 0; i < n; i++)
-                data_[i] -= v[i];
+        void operator-=(const row &r) {
+            for (int i = 0; i < size; i++)
+                data_[i] -= r[i];
         }
 
         double *data() {
@@ -77,16 +67,16 @@ namespace cec {
             return data_;
         }
 
-        friend std::ostream &operator<<(std::ostream &os, const vec &v) {
+        friend std::ostream &operator<<(std::ostream &os, const row &r) {
             os << "{";
-            for (int i = 0; i < v.n; i++)
-                os << v[i] << (i == v.n - 1 ? "}" : ", ");
+            for (int i = 0; i < r.size; i++)
+                os << r[i] << (i == r.size - 1 ? "}" : ", ");
             return os;
         }
 
-        static double dist(const vec& a, const vec& b) {
+        static double dist(const row &a, const row &b) {
             double acc = 0;
-            for (int i = 0; i < a.n; i++) {
+            for (int i = 0; i < a.size; i++) {
                 double diff = b[i] - a[i];
                 acc += diff * diff;
             }
@@ -96,38 +86,114 @@ namespace cec {
     private:
         friend class mat;
 
-        vec(double *ptr, int n) : n(n), data_(ptr) {}
+        row(const row &r) = default;
+
+        row sub(int offset, int n) {
+            return row(data_ + offset, n);
+        }
 
         double *data_;
-        std::unique_ptr<double> data_wrapper_;
     };
 
-    class mat : public vec {
+    class mem {
+    public:
+        mem(int n)
+                : ptr(new double[n]) {}
+
+        mem(mem &&vm) = default;
+
+    protected:
+        std::unique_ptr<double[]> ptr;
+    };
+
+    class vec: private mem, public row {
+    public:
+        vec(int n)
+                : mem(n),
+                  row(ptr.get(), n) {}
+
+        explicit vec(const row &v)
+                : vec(v.size) {
+            (*this) = v;
+        }
+
+        explicit vec(const vec &v)
+                : vec(v.size) {
+            (*this) = v;
+        }
+
+        vec(vec &&v) = default;
+
+        using row::operator=;
+
+        vec &operator=(const vec &v) {
+            row::operator=(v);
+            return *this;
+        }
+    };
+
+    class mat {
     public:
         const int m, n;
+    private:
+        vec v;
+    public:
+        mat(int m, int n)
+                : m(m),
+                  n(n),
+                  v(m * n) {}
 
-        mat(int m, int n) : vec(m * n), m(m), n(n) {}
-
-        mat(const mat &ma) = default;
+        mat(const mat &ma)
+                : mat(ma.m, ma.n) {
+            (*this) = ma;
+        }
 
         mat(mat &&ma) noexcept = default;
 
-        inline const vec operator[](int idx) const {
+        inline const row operator[](int idx) const {
             return const_cast<mat *>(this)->operator[](idx);
         }
 
+        inline row operator[](int idx) {
+            return v.sub(n * idx, n);
+        }
+
         inline mat &operator=(const mat &ma) {
-            vec::operator=(ma);
+            v.operator=(ma.v);
             return *this;
         }
 
         inline mat &operator=(mat &&ma) noexcept {
-            vec::operator=(ma);
+            *this = (ma);
             return *this;
         }
 
-        vec operator[](int idx) {
-            return vec(data_ + idx * n, n);
+        double *data() {
+            return v.data();
+        }
+
+        const double *data() const {
+            return v.data();
+        }
+
+        void fill(double value) {
+            v.fill(value);
+        }
+
+        void operator*=(double value) {
+            v *= value;
+        }
+
+        void operator/=(double value) {
+            v /= value;
+        }
+
+        void operator+=(const mat &m) {
+            v += m.v;
+        }
+
+        void operator-=(const mat &m) {
+            v -= m.v;
         }
 
         friend std::ostream &operator<<(std::ostream &os, const mat &m) {
@@ -140,32 +206,35 @@ namespace cec {
             return os;
         }
 
-        template <class M>
+        template<class M>
         class rows_iterator {
             friend class mat;
+
         public:
-            inline typename std::conditional<std::is_const<M>::value, const vec, vec>::type
+            typename std::conditional<std::is_const<M>::value, const row, row>::type
             operator*() {
-                return ref[row];
+                return ref[r];
             }
 
-            inline void operator++() {
-                row++;
+            void operator++() {
+                r++;
             }
 
-            inline bool operator==(const rows_iterator &ri) {
-                return row == ri.row;
+            bool operator==(const rows_iterator &ri) {
+                return r == ri.r;
             }
 
-            inline bool operator!=(const rows_iterator &ri) {
+            bool operator!=(const rows_iterator &ri) {
                 return !operator==(ri);
             }
+
         private:
-            rows_iterator(M &ref, int row)
+            rows_iterator(M &ref, int r)
                     : ref(ref),
-                      row(row) {}
-            const mat &ref;
-            int row;
+                      r(r) {}
+
+            M &ref;
+            int r;
         };
 
         rows_iterator<mat> begin() {
@@ -184,8 +253,8 @@ namespace cec {
             return {*this, m};
         }
 
-        static mat outer_product(vec &v) {
-            int n = v.n;
+        static mat outer_product(row &v) {
+            int n = v.size;
             mat ma(n, n);
             for (int j = 0; j < n; j++)
                 for (int k = 0; k < n; k++)
