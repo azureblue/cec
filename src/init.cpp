@@ -6,10 +6,10 @@ std::vector<int> cec::closest_assignment::init(const cec::mat &x, const cec::mat
     std::vector<int> asgn(m);
     for (int i = 0; i < m; i++) {
         double b_dist = std::numeric_limits<double>::max();
-        const vec &point = x[i];
+        const row &point = x[i];
         int b_row = -1;
         for (int j = 0; j < k; j++) {
-            double dist = vec::dist(point, c[j]);
+            double dist = row::dist(point, c[j]);
             if (dist < b_dist) {
                 b_dist = dist;
                 b_row = j;
@@ -37,10 +37,10 @@ cec::mat cec::kmeanspp_init::init(const mat &x, int k) {
     dists[0] = 0.0;
     sums[0] = 0.0;
 
-    sums[0] = dists[0] = vec::dist(x[0], c[0]);
+    sums[0] = dists[0] = row::dist(x[0], c[0]);
 
     for (int i = 1; i < m; i++) {
-        double dist = vec::dist(x[i], c[0]);
+        double dist = row::dist(x[i], c[0]);
         dists[i] = dist;
         sums[i] = sums[i - 1] + dist;
     }
@@ -57,9 +57,9 @@ cec::mat cec::kmeanspp_init::init(const mat &x, int k) {
         idx_to = std::min(idx_to, m - 1);
         int idx = unif_int(mt, std::uniform_int_distribution<int>::param_type(idx_from, idx_to));
         c[i] = x[idx];
-        sums[0] = dists[0] = std::min(dists[0], vec::dist(x[0], c[i]));
+        sums[0] = dists[0] = std::min(dists[0], row::dist(x[0], c[i]));
         for (int j = 1; j < m; j++) {
-            dists[j] = std::min(dists[j], vec::dist(x[j], c[i]));
+            dists[j] = std::min(dists[j], row::dist(x[j], c[i]));
             sums[j] = sums[j - 1] + dists[j];
         }
     }

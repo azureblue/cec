@@ -1,7 +1,6 @@
 #ifndef SPHERICAL_H
 #define SPHERICAL_H
 
-#include "../vec.h"
 #include "cov_utils.h"
 #include "model.h"
 #include "constants.h"
