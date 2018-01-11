@@ -14,32 +14,31 @@ namespace cec {
             update();
         }
 
-        mean(const mean &initial) = default;
-
-        mean(mean &&initial) noexcept = default;
-
         explicit mean(int n)
                 : vec(n),
                   acc_(n) {
             acc_.fill(0);
-            fill(0);
         }
+
+        mean(const mean &initial) = default;
+
+        mean(mean &&initial) noexcept = default;
 
         mean &operator=(const mean &m) = default;
 
-        void add_point(const vec &point) {
+        void add_point(const row &point) {
             acc_ += point;
             card_++;
         }
 
-        void rem_point(const vec &point) {
+        void rem_point(const row &point) {
             acc_ -= point;
             card_--;
         }
 
         void update() {
             set(acc_);
-            *this /= card_;
+            (*this) /= card_;
         }
 
         int card() const {
@@ -54,14 +53,14 @@ namespace cec {
     class cluster_utils {
     public:
         static void cec_cov_add_point(mat &dst_cov, const mat &cov,
-                                      const mean &mean, const vec &point) {
+                                      const mean &mean, const row &point) {
             int card = mean.card();
             double card_n = card + 1;
             cec_cov_change(dst_cov, cov, mean, point, card / card_n, card / (card_n * card_n));
         }
 
         static void cec_cov_remove_point(mat &dst_cov, const mat &cov,
-                                         const mean &mean, const vec &point) {
+                                         const mean &mean, const row &point) {
             int card = mean.card();
             double card_n = card - 1;
             cec_cov_change(dst_cov, cov, mean, point, card / card_n, -card / (card_n * card_n));
@@ -69,14 +68,14 @@ namespace cec {
 
     private:
         static inline void cec_cov_change(mat &dst_cov, const mat &cov,
-                                          const vec &mean, const vec &point, double cov_mul,
+                                          const row &mean, const row &point, double cov_mul,
                                           double new_cov_point_mul) {
             const int n = cov.n;
 
             for (int j = 0; j < n; j++)
                 for (int k = 0; k < n; k++)
                     dst_cov[j][k] = cov[j][k] * cov_mul
-                                            + (mean[j] - point[j]) * (mean[k] - point[k]) * new_cov_point_mul;
+                                    + (mean[j] - point[j]) * (mean[k] - point[k]) * new_cov_point_mul;
 
         }
     };
@@ -108,10 +107,10 @@ namespace cec {
                 mean_(std::move(initial_mean)),
                 cov_(std::move(initial_covariance)),
                 t_cov_(cov_),
-                t_point_(initial_mean.n),
+                t_point_(initial_mean.size),
                 energy_(mod.energy(cov_, mean_.card(), m)) {}
 
-        double add_point(const vec &point) {
+        double add_point(const row &point) {
             t_point_ = point;
             card_change_ = 1;
             cluster_utils::cec_cov_add_point(t_cov_, cov_, mean_, point);
@@ -119,7 +118,7 @@ namespace cec {
             return t_energy_ - energy_;
         }
 
-        double rem_point(const vec &point) {
+        double rem_point(const row &point) {
             t_point_ = point;
             card_change_ = -1;
             cluster_utils::cec_cov_remove_point(t_cov_, cov_, mean_, point);
@@ -128,7 +127,7 @@ namespace cec {
 
         }
 
-        const vec &mean() const {
+        const row &mean() const {
             return mean_;
         }
 
