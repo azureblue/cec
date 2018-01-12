@@ -1,4 +1,5 @@
 #include "init.h"
+#include "random.h"
 
 std::vector<int> cec::closest_assignment::init(const cec::mat &x, const cec::mat &c) {
     int m = x.m;
@@ -24,7 +25,7 @@ cec::mat cec::random_init::init(const mat &x, int k) {
     mat c_mat(k, x.n);
     std::uniform_int_distribution<int> unif_int(0, x.m - 1);
     for (int i = 0; i < k; i++)
-        c_mat[i] = x[unif_int(mt)];
+        c_mat[i] = x[unif_int.operator()(mt)];
     return c_mat;
 }
 
@@ -64,4 +65,11 @@ cec::mat cec::kmeanspp_init::init(const mat &x, int k) {
         }
     }
     return c;
+}
+
+cec::mat cec::fixed_init::init(const cec::mat &x, int k) {
+    mat res(k, x.n);
+    for (int i = 0; i < k; ++i)
+        res[i] = c_mat[i];
+    return res;
 }
