@@ -20,7 +20,7 @@ cec::control_param cec::get_control_param(SEXP control_param_r) {
             r_par["starts"].get<int>(),
             r_par["max.iters"].get<int>(),
             r_par["min.card"].get<int>(),
-            0
+            r_par["threads"].get<int>()
     };
 }
 

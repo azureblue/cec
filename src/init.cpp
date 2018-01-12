@@ -29,9 +29,14 @@ cec::mat cec::random_init::init(const mat &x, int k) {
     return c_mat;
 }
 
+cec::random_init::random_init()
+        : mt(random::context::create_generator()) {}
+
 cec::mat cec::kmeanspp_init::init(const mat &x, int k) {
     int m = x.m;
     int n = x.n;
+    dists.resize(m);
+    sums.resize(m);
     mat c(k, n);
     std::uniform_int_distribution<int> unif_int(0, x.m - 1);
     c[0] = x[unif_int(mt)];
@@ -67,9 +72,54 @@ cec::mat cec::kmeanspp_init::init(const mat &x, int k) {
     return c;
 }
 
+cec::kmeanspp_init::kmeanspp_init()
+        : mt(random::context::create_generator()),
+          dists(),
+          sums() {}
+
 cec::mat cec::fixed_init::init(const cec::mat &x, int k) {
     mat res(k, x.n);
     for (int i = 0; i < k; ++i)
         res[i] = c_mat[i];
     return res;
 }
+
+cec::fixed_init::fixed_init(cec::mat c_mat)
+        : c_mat(c_mat) {}
+
+std::unique_ptr<cec::assignment_init> cec::closest_init_spec::create() {
+    return unique_ptr<assignment_init>(new closest_assignment);
+}
+
+std::unique_ptr<cec::centers_init> cec::random_init_spec::create() {
+    return unique_ptr<centers_init>(new random_init);
+}
+
+std::unique_ptr<cec::centers_init> cec::kmeanspp_init_spec::create() {
+    return unique_ptr<centers_init>(new kmeanspp_init());
+}
+
+cec::initializer::initializer(std::unique_ptr<cec::centers_init> &&c_init,
+                              std::unique_ptr<cec::assignment_init> &&a_init)
+        : c_init(std::move(c_init)),
+          a_init(std::move(a_init)) {}
+
+std::vector<int> cec::initializer::init(const cec::mat &x, int k) {
+    return a_init->init(x, c_init->init(x, k));
+}
+
+cec::init_spec::init_spec(std::shared_ptr<cec::centers_init_spec> ci,
+                          std::shared_ptr<cec::assignment_init_spec> ai)
+        : ci(std::move(ci)),
+          ai(std::move(ai)) {}
+
+std::unique_ptr<cec::initializer> cec::init_spec::create() {
+    return unique_ptr<initializer>(new initializer(ci->create(), ai->create()));
+}
+
+std::unique_ptr<cec::centers_init> cec::fixed_init_spec::create() {
+    return unique_ptr<cec::centers_init>(new fixed_init(c_mat));
+}
+
+cec::fixed_init_spec::fixed_init_spec(const cec::mat &c_mat)
+        : c_mat(c_mat) {}
