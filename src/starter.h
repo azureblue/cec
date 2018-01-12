@@ -12,12 +12,22 @@ namespace cec {
 
     class clustering_results;
 
+    struct starter_params {
+        starter_params(int max_iter, int min_card)
+                : max_iter(max_iter),
+                  min_card(min_card) {}
+
+        int max_iter;
+        int min_card;
+    };
+
     class cec_starter {
     public:
         cec_starter() = default;
 
-        std::unique_ptr<cec::clustering_results> start(const mat &x, const vector<int> &initial_assignment,
-                                   const vector<unique_ptr<model>> &models, int max_iter, int min_card);
+        unique_ptr<clustering_results>
+        start(const mat &x, const vector<int> &initial_assignment,
+              const vector<unique_ptr<model>> &models, const starter_params &params);
 
         vector<mat> split_points(const mat &points, const vector<int> &assignment, int k);
     };
@@ -34,11 +44,12 @@ namespace cec {
         vector<mat> covariances;
 
         clustering_results(const clustering_results &res) = default;
+
         clustering_results(clustering_results &&res) = default;
 
     private:
         clustering_results(mat centers, vector<int> assignment, int cluster_number,
-                             int iterations, double energy, vector<mat> covariances)
+                           int iterations, double energy, vector<mat> covariances)
                 : centers(std::move(centers)),
                   assignment(std::move(assignment)),
                   cluster_number(cluster_number),

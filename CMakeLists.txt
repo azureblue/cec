@@ -36,7 +36,7 @@ set(SOURCE_FILES
         src/cec_r.h
         src/init.h
         src/init.cpp
-        src/multi_starter.cpp src/multi_starter.h src/random.h src/random.cpp)
+        src/multi_starter.cpp src/multi_starter.h src/random.h src/random.cpp src/variable_starter.cpp src/variable_starter.h)
 
 
 link_libraries(m R Rlapack Rblas)

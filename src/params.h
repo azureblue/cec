@@ -54,13 +54,13 @@ namespace cec {
     class control_param {
     public:
         const int starts;
-        const int max_iterations;
+        const int max_iter;
         const int min_card;
         const int threads;
 
         control_param(int starts, int max_iter, int min_card, int threads)
                 : starts(starts),
-                  max_iterations(max_iter),
+                  max_iter(max_iter),
                   min_card(min_card),
                   threads(threads) {}
     };
@@ -78,6 +78,8 @@ namespace cec {
 
         static vector<unique_ptr<model>> create_models(vector<shared_ptr<model_spec>> specs);
     };
+
+    using model_specs = vector<shared_ptr<model_spec>>;
 
     class model_all_spec : public model_spec {
     public:
