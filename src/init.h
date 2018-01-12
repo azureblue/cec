@@ -4,6 +4,11 @@
 #include "vec.h"
 
 namespace cec {
+
+    using std::vector;
+    using std::unique_ptr;
+    using std::shared_ptr;
+
     class centers_init {
     public:
         virtual mat init(const mat &x, int k) = 0;
@@ -35,6 +40,12 @@ namespace cec {
         std::vector<double> sums;
     };
 
+    class centers_init_spec {
+        virtual unique_ptr<centers_init> create() = 0;
+    };
+
+
+
     class assignment_init {
     public:
         virtual std::vector<int> init(const mat &x, const mat &c) = 0;
@@ -43,6 +54,16 @@ namespace cec {
     class closest_assignment : public assignment_init {
     public:
         std::vector<int> init(const mat &x, const mat &c) override;
+    };
+
+    class assignment_init_spec {
+        virtual unique_ptr<assignment_init> create() = 0;
+    };
+
+    class closest_init_spec: public assignment_init_spec {
+        unique_ptr<assignment_init> create() override {
+            return unique_ptr<assignment_init>(new closest_assignment);
+        }
     };
 }
 
