@@ -108,12 +108,12 @@ std::vector<int> cec::initializer::init(const cec::mat &x, int k) {
     return a_init->init(x, c_init->init(x, k));
 }
 
-cec::init_spec::init_spec(std::shared_ptr<cec::centers_init_spec> ci,
+cec::initializer_spec::initializer_spec(std::shared_ptr<cec::centers_init_spec> ci,
                           std::shared_ptr<cec::assignment_init_spec> ai)
         : ci(std::move(ci)),
           ai(std::move(ai)) {}
 
-std::unique_ptr<cec::initializer> cec::init_spec::create() {
+std::unique_ptr<cec::initializer> cec::initializer_spec::create() const {
     return unique_ptr<initializer>(new initializer(ci->create(), ai->create()));
 }
 

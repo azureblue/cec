@@ -2,10 +2,10 @@
 #include "r_utils.h"
 #include "params.h"
 #include "r_params.h"
-#include "init.h"
 #include "starter.h"
 #include "r_result.h"
 #include "multi_starter.h"
+#include "variable_starter.h"
 #include<R_ext/Random.h>
 
 using namespace cec;
@@ -36,20 +36,26 @@ SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models_param
         control_param control_par = get_control_param(control_param_r);
         models_param models_par = get_models_param(models_param_r, n);
 
-        int k = centers_par.var_centers[0];
-        vector<unique_ptr<model>> models(k);
+        int max_k = *std::max_element(centers_par.var_centers.begin(), centers_par.var_centers.end());
+        vector<unique_ptr<model>> models(max_k);
 
         std::transform(models_par.specs.begin(), models_par.specs.end(), models.begin(),
                        [&](const shared_ptr<cec::model_spec> &spec) {
                            return spec->create_model();
                        });
-        multi_starter ms;
-        init_spec is(centers_par.get_centers_init(),
-                     shared_ptr<assignment_init_spec>(new closest_init_spec()));
 
-        unique_ptr<clustering_results> results = ms.start(x_mat, models_par.specs, is, control_par.max_iterations,
-                                                          control_par.min_card, control_par.starts,
-                                                          control_par.threads);
+
+        variable_starter vs_starter{};
+
+        initializer_spec init_spec(centers_par.get_centers_init(),
+                                   shared_ptr<assignment_init_spec>(new closest_init_spec()));
+
+        variable_starter_params vs_params({{control_par.max_iter, control_par.min_card},
+                                           control_par.starts, control_par.threads},
+                                          centers_par.var_centers);
+
+        unique_ptr<clustering_results> results = vs_starter.start(x_mat, models_par.specs, init_spec,
+                                                          vs_params);
         start_results.reset(results.release());
 
     } catch (std::exception &ex) {

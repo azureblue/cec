@@ -31,13 +31,13 @@ namespace cec {
     public:
         clustering_task(const mat &x, vector<unique_ptr<model>> &&models,
                        unique_ptr<initializer> &&init, int starts,
-                       int max_iter, int min_card)
+                       const starter_params &start_params)
                 : x(x),
                   models(std::move(models)),
                   init(std::move(init)),
                   starts(starts),
-                  max_iter(max_iter),
-                  min_card(min_card) {}
+                  start_params(start_params)
+        {}
 
         unique_ptr<clustering_results> operator()();
 
@@ -46,17 +46,27 @@ namespace cec {
         vector<unique_ptr<model>> models;
         unique_ptr<initializer> init;
         int starts;
-        int max_iter;
-        int min_card;
+        const starter_params &start_params;
         cec_starter starter;
         best_results_collector best;
+    };
+
+    struct multi_starter_params {
+        starter_params start_params;
+        int starts;
+        int threads;
+
+        multi_starter_params(const starter_params &start_params, int starts, int threads)
+                : start_params(start_params),
+                  starts(starts),
+                  threads(threads) {}
     };
 
     class multi_starter {
     public:
         unique_ptr<clustering_results>
-        start(const mat &x, vector<shared_ptr<model_spec>> models, init_spec init,
-              int max_iter, int min_card, int starts, int threads);
+        start(const mat &x, vector<shared_ptr<model_spec>> models, const initializer_spec &init,
+              const multi_starter_params &params);
     };
 }
 
