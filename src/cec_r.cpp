@@ -5,6 +5,8 @@
 #include "init.h"
 #include "starter.h"
 #include "r_result.h"
+#include "multi_starter.h"
+#include<R_ext/Random.h>
 
 using namespace cec;
 using namespace cec::r;
@@ -13,9 +15,18 @@ using std::string;
 using std::unique_ptr;
 using std::shared_ptr;
 
+static void seed_r() {
+    GetRNGstate();
+    double r = unif_rand();
+    PutRNGstate();
+    unsigned long seed;
+    memcpy(&seed, &r, sizeof(seed));
+    random::context::set_seed(seed);
+}
+
 extern "C"
 SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models_param_r) {
-
+    seed_r();
     r_ext_ptr<clustering_results> start_results;
     try {
         mat x_mat = get<mat>(x);
@@ -26,22 +37,20 @@ SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models_param
         models_param models_par = get_models_param(models_param_r, n);
 
         int k = centers_par.var_centers[0];
-        mat c_mat = centers_par.init_m == init_method::NONE
-                    ? centers_par.centers_mat
-                    : random_init().init(x_mat, k);
-
-        const vector<int> &asgn = closest_assignment().init(x_mat, c_mat);
         vector<unique_ptr<model>> models(k);
 
         std::transform(models_par.specs.begin(), models_par.specs.end(), models.begin(),
                        [&](const shared_ptr<cec::model_spec> &spec) {
                            return spec->create_model();
                        });
+        multi_starter ms;
+        init_spec is(shared_ptr<centers_init_spec>(new kmeanspp_init_spec(x_mat.m)),
+                     shared_ptr<assignment_init_spec>(new closest_init_spec()));
 
-        const clustering_results &results = cec_starter().start(x_mat, asgn, models,
-                                                                  control_par.max_iterations,
-                                                                  control_par.min_card);
-        start_results.reset(new clustering_results(results));
+        unique_ptr<clustering_results> results = ms.start(x_mat, models_par.specs, is, control_par.max_iterations,
+                                                          control_par.min_card, control_par.starts,
+                                                          control_par.threads);
+        start_results.reset(results.release());
 
     } catch (std::exception &ex) {
         error(ex.what());
@@ -59,6 +68,7 @@ SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models_param
 
 extern "C"
 SEXP cec_init_centers_r(SEXP x_r, SEXP k_r, SEXP method_r) {
+    seed_r();
     r_ext_ptr<string> error_str;
     try {
         r_ext_ptr<mat> res;

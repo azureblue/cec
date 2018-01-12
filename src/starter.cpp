@@ -2,7 +2,7 @@
 #include "cluster.h"
 #include "exceptions.h"
 
-cec::clustering_results cec::cec_starter::start(const mat &x, const vector<int> &initial_assignment,
+std::unique_ptr<cec::clustering_results> cec::cec_starter::start(const mat &x, const vector<int> &initial_assignment,
                                                   const vector<unique_ptr<model>> &models, int max_iter, int min_card) {
 
     int m = x.m;
@@ -118,7 +118,7 @@ cec::clustering_results cec::cec_starter::start(const mat &x, const vector<int> 
         cov_mats[i] = clusters[i]->covariance();
     }
     int final_k = k - std::count(clusters.begin(), clusters.end(), unique_ptr<cluster>());
-    return clustering_results(centers, assignment, final_k, iter + 1, energy_sum, cov_mats);
+    return unique_ptr<clustering_results>(new clustering_results(centers, assignment, final_k, iter + 1, energy_sum, cov_mats));
 }
 
 std::vector<cec::mat>

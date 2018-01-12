@@ -16,7 +16,7 @@ namespace cec {
     public:
         cec_starter() = default;
 
-        clustering_results start(const mat &x, const vector<int> &initial_assignment,
+        std::unique_ptr<cec::clustering_results> start(const mat &x, const vector<int> &initial_assignment,
                                    const vector<unique_ptr<model>> &models, int max_iter, int min_card);
 
         vector<mat> split_points(const mat &points, const vector<int> &assignment, int k);
@@ -34,6 +34,7 @@ namespace cec {
         vector<mat> covariances;
 
         clustering_results(const clustering_results &res) = default;
+        clustering_results(clustering_results &&res) = default;
 
     private:
         clustering_results(mat centers, vector<int> assignment, int cluster_number,
