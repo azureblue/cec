@@ -12,18 +12,16 @@ namespace cec {
     using std::unique_ptr;
     using std::shared_ptr;
 
-
     class centers_init {
     public:
+        virtual ~centers_init() = default;
         virtual mat init(const mat &x, int k) = 0;
     };
 
     class random_init : public centers_init {
     public:
+        random_init();
         mat init(const mat &x, int k) override;
-
-        random_init()
-                : mt(random::context::create_generator()) {}
 
     private:
         std::mt19937 mt;
@@ -31,10 +29,8 @@ namespace cec {
 
     class fixed_init : public centers_init {
     public:
+        explicit fixed_init(mat c_mat);
         mat init(const mat &x, int k) override;
-
-        fixed_init(mat c_mat)
-                : c_mat(c_mat) {}
 
     private:
         mat c_mat;
@@ -43,11 +39,7 @@ namespace cec {
     class kmeanspp_init : public centers_init {
     public:
         mat init(const mat &x, int k) override;
-
-        kmeanspp_init(int m_max)
-                : mt(random::context::create_generator()),
-                  dists(m_max),
-                  sums(m_max) {}
+        explicit kmeanspp_init();
 
     private:
         std::mt19937 mt;
@@ -57,11 +49,13 @@ namespace cec {
 
     class centers_init_spec {
     public:
+        virtual ~centers_init_spec() = default;
         virtual unique_ptr<centers_init> create() = 0;
     };
 
     class assignment_init {
     public:
+        virtual ~assignment_init() = default;
         virtual std::vector<int> init(const mat &x, const mat &c) = 0;
     };
 
@@ -72,43 +66,38 @@ namespace cec {
 
     class assignment_init_spec {
     public:
+        virtual ~assignment_init_spec() = default;
         virtual unique_ptr<assignment_init> create() = 0;
     };
 
     class closest_init_spec: public assignment_init_spec {
-        unique_ptr<assignment_init> create() override {
-            return unique_ptr<assignment_init>(new closest_assignment);
-        }
+        unique_ptr<assignment_init> create() override;
     };
 
     class random_init_spec: public centers_init_spec {
     public:
-        unique_ptr<centers_init> create() override {
-            return unique_ptr<centers_init>(new random_init);
-        }
+        unique_ptr<centers_init> create() override;
+    };
+
+    class fixed_init_spec: public centers_init_spec {
+    public:
+        const mat c_mat;
+
+        explicit fixed_init_spec(const mat &c_mat);
+
+        unique_ptr<centers_init> create() override;
     };
 
     class kmeanspp_init_spec: public centers_init_spec {
     public:
-        const int max_m;
-
-        kmeanspp_init_spec(const int max_m)
-                : max_m(max_m) {}
-
-        unique_ptr<centers_init> create() override {
-            return unique_ptr<centers_init>(new kmeanspp_init(max_m));
-        }
+        unique_ptr<centers_init> create() override;
     };
 
     class initializer {
     public:
-        initializer(unique_ptr<centers_init> &&c_init, unique_ptr<assignment_init> &&a_init)
-                : c_init(std::move(c_init)),
-                  a_init(std::move(a_init)) {}
+        initializer(unique_ptr<centers_init> &&c_init, unique_ptr<assignment_init> &&a_init);
 
-        vector<int> init(const mat &x, int k) {
-            return a_init->init(x, c_init->init(x, k));
-        }
+        vector<int> init(const mat &x, int k);
 
     private:
         unique_ptr<centers_init> c_init;
@@ -117,13 +106,9 @@ namespace cec {
 
     class init_spec {
     public:
-        init_spec(shared_ptr<centers_init_spec> ci, shared_ptr<assignment_init_spec> ai)
-                : ci(std::move(ci)),
-                  ai(std::move(ai)) {}
+        init_spec(shared_ptr<centers_init_spec> ci, shared_ptr<assignment_init_spec> ai);
 
-        unique_ptr<initializer> create() {
-            return unique_ptr<initializer>(new initializer(ci->create(), ai->create()));
-        }
+        unique_ptr<initializer> create();
 
         shared_ptr<centers_init_spec> ci;
         shared_ptr<assignment_init_spec> ai;
