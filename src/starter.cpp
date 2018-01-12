@@ -2,12 +2,15 @@
 #include "cluster.h"
 #include "exceptions.h"
 
-std::unique_ptr<cec::clustering_results> cec::cec_starter::start(const mat &x, const vector<int> &initial_assignment,
-                                                  const vector<unique_ptr<model>> &models, int max_iter, int min_card) {
+std::unique_ptr<cec::clustering_results>
+cec::cec_starter::start(const mat &x, const vector<int> &initial_assignment,
+                        const vector<unique_ptr<model>> &models, const starter_params &params) {
 
     int m = x.m;
     int k = models.size();
     int n = x.n;
+    int min_card = params.min_card;
+    int max_iter = params.max_iter;
     vector<int> assignment = initial_assignment;
     double energy_sum = 0;
 
@@ -35,7 +38,8 @@ std::unique_ptr<cec::clustering_results> cec::cec_starter::start(const mat &x, c
         energy_sum += energy;
     }
 
-    int removed_after_assignment = std::count(clusters.begin(), clusters.end(), unique_ptr<cluster>());
+    int removed_after_assignment = std::count(clusters.begin(), clusters.end(),
+                                              unique_ptr<cluster>());
     if (removed_after_assignment == k)
         throw all_clusters_removed();
 
@@ -118,7 +122,8 @@ std::unique_ptr<cec::clustering_results> cec::cec_starter::start(const mat &x, c
         cov_mats[i] = clusters[i]->covariance();
     }
     int final_k = k - std::count(clusters.begin(), clusters.end(), unique_ptr<cluster>());
-    return unique_ptr<clustering_results>(new clustering_results(centers, assignment, final_k, iter + 1, energy_sum, cov_mats));
+    return unique_ptr<clustering_results>(
+            new clustering_results(centers, assignment, final_k, iter + 1, energy_sum, cov_mats));
 }
 
 std::vector<cec::mat>

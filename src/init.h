@@ -104,11 +104,11 @@ namespace cec {
         unique_ptr<assignment_init> a_init;
     };
 
-    class init_spec {
+    class initializer_spec {
     public:
-        init_spec(shared_ptr<centers_init_spec> ci, shared_ptr<assignment_init_spec> ai);
+        initializer_spec(shared_ptr<centers_init_spec> ci, shared_ptr<assignment_init_spec> ai);
 
-        unique_ptr<initializer> create();
+        unique_ptr<initializer> create() const;
 
         shared_ptr<centers_init_spec> ci;
         shared_ptr<assignment_init_spec> ai;
