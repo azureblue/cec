@@ -1,7 +1,6 @@
 #ifndef EIGENVALUES_H
 #define EIGENVALUES_H
 
-#include "constants.h"
 #include "cov_utils.h"
 #include "model.h"
 
@@ -13,12 +12,12 @@ namespace cec {
                   given_values(std::move(values)),
                   eigenvalues_calc(n),
                   tmp_values(n),
-                  ce_constant(std::log(std::pow(2.0 * constants::PI, n)
+                  ce_constant(std::log(std::pow(2.0 * m::PI, n)
                                     * product(eigenvalues::given_values)) / 2.0) {}
 
         double cross_entropy(const mat &cov) const noexcept override {
             if (!eigenvalues_calc.eigenvalues(cov, tmp_values.data()))
-                return constants::QNAN;
+                return m::QNAN;
             double values_ratio_sum = 0;
             for (int i = 0; i < n; i++)
                 values_ratio_sum += tmp_values[i] / given_values[i];

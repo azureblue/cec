@@ -16,7 +16,7 @@ using std::shared_ptr;
 extern "C"
 SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models_param_r) {
 
-    r_ext_ptr<single_start_results> start_results;
+    r_ext_ptr<clustering_results> start_results;
     try {
         mat x_mat = get<mat>(x);
         int n = x_mat.n;
@@ -38,10 +38,10 @@ SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models_param
                            return spec->create_model();
                        });
 
-        const single_start_results &results = cec_starter().start(x_mat, asgn, models,
+        const clustering_results &results = cec_starter().start(x_mat, asgn, models,
                                                                   control_par.max_iterations,
                                                                   control_par.min_card);
-        start_results.reset(new single_start_results(results));
+        start_results.reset(new clustering_results(results));
 
     } catch (std::exception &ex) {
         error(ex.what());

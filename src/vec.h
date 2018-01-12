@@ -89,35 +89,33 @@ namespace cec {
         row(const row &r) = default;
 
         row sub(int offset, int n) {
-            return row(data_ + offset, n);
+            return {data_ + offset, n};
         }
 
         double *data_;
     };
 
     class mem {
-    public:
-        mem(int n)
+    protected:
+        explicit mem(int n)
                 : ptr(new double[n]) {}
 
         mem(mem &&vm) = default;
-
-    protected:
         std::unique_ptr<double[]> ptr;
     };
 
     class vec: private mem, public row {
     public:
-        vec(int n)
+        explicit vec(int n)
                 : mem(n),
                   row(ptr.get(), n) {}
 
-        explicit vec(const row &v)
+        vec(const row &v)
                 : vec(v.size) {
             (*this) = v;
         }
 
-        explicit vec(const vec &v)
+        vec(const vec &v)
                 : vec(v.size) {
             (*this) = v;
         }
@@ -262,7 +260,6 @@ namespace cec {
             return ma;
         }
     };
-
 }
 
 #endif /* VEC_H */
