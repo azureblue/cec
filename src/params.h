@@ -9,6 +9,7 @@
 #include "models/fixed_radius.h"
 #include "models/covariance.h"
 #include "models/eigenvalues.h"
+#include "init.h"
 
 namespace cec {
 
@@ -47,7 +48,7 @@ namespace cec {
                   centers_mat(std::move(centers_mat)),
                   var_centers(std::move(var_centers)) {}
 
-
+        shared_ptr<centers_init_spec> get_centers_init();
     };
 
     class control_param {
@@ -68,18 +69,14 @@ namespace cec {
     public:
         const model_type type;
 
-        virtual unique_ptr<model> create_model() const = 0;
-
         explicit model_spec(const model_type type)
                 : type(type) {}
-        
-        static vector<unique_ptr<model>> create_models(vector<shared_ptr<model_spec>> specs) {
-            int size = specs.size();
-            vector<unique_ptr<model>> models(size);
-            for (int i = 0; i < size; ++i)
-                models[i] = specs[i]->create_model();
-            return models;
-        }
+
+        virtual ~model_spec() = default;
+
+        virtual unique_ptr<model> create_model() const = 0;
+
+        static vector<unique_ptr<model>> create_models(vector<shared_ptr<model_spec>> specs);
     };
 
     class model_all_spec : public model_spec {

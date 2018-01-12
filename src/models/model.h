@@ -9,6 +9,7 @@ namespace cec {
     class model {
     public:
         explicit model() = default;
+        virtual ~model() = default;
 
         virtual double cross_entropy(const mat &cov) const noexcept = 0;
 

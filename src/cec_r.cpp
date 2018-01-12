@@ -44,7 +44,7 @@ SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models_param
                            return spec->create_model();
                        });
         multi_starter ms;
-        init_spec is(shared_ptr<centers_init_spec>(new kmeanspp_init_spec(x_mat.m)),
+        init_spec is(centers_par.get_centers_init(),
                      shared_ptr<assignment_init_spec>(new closest_init_spec()));
 
         unique_ptr<clustering_results> results = ms.start(x_mat, models_par.specs, is, control_par.max_iterations,
@@ -79,7 +79,7 @@ SEXP cec_init_centers_r(SEXP x_r, SEXP k_r, SEXP method_r) {
             init_method im = parse_init_method(method_str);
             switch (im) {
                 case init_method::KMEANSPP:
-                    res.reset(new mat(kmeanspp_init(x.m).init(x, k)));
+                    res.reset(new mat(kmeanspp_init().init(x, k)));
                     break;
                 case init_method::RANDOM:
                     res.reset(new mat(random_init().init(x, k)));
