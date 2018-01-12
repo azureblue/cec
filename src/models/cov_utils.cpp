@@ -1,5 +1,5 @@
 #include "cov_utils.h"
-#include "constants.h"
+#include "../m.h"
 
 #include <R_ext/Lapack.h>
 
@@ -12,7 +12,7 @@ static inline double handle_zero(double d) {
 }
 
 static inline double handle_cholesky_nan(double d) {
-    if (std::isnan(d))
+    if (cec::m::isnan(d))
         return handle_zero(0);
     return handle_zero(d);
 }
@@ -74,7 +74,7 @@ double cec::determinant(const mat &cov, mat &tmp) {
     if (cov.n == 2)
         return cov[0][0] * cov[1][1] - cov[0][1] * cov[1][0];
     if (!cholesky(cov, tmp))
-        return constants::QNAN;
+        return m::QNAN;
     double prod = diagonal_product(tmp);
     return handle_cholesky_nan(prod * prod);
 }

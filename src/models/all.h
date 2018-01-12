@@ -3,18 +3,18 @@
 
 #include "cov_utils.h"
 #include "model.h"
-#include "constants.h"
+#include "../m.h"
 
 namespace cec {
     class all : public model {
     public:
         explicit all(int n)
                 : tmp(n, n),
-                  ce_constant(n * std::log(2.0 * constants::PI * constants::E)) {}
+                  ce_constant(n * std::log(2.0 * m::PI * m::E)) {}
 
         double cross_entropy(const mat &cov) const noexcept override {
             double det = determinant(cov, tmp);
-            return (ce_constant + std::log(det)) / 2;
+            return (ce_constant + m::log(det)) / 2;
         }
 
     private:

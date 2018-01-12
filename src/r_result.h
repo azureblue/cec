@@ -5,7 +5,7 @@
 #include "starter.h"
 
 namespace cec {
-    SEXP create_R_result(const single_start_results &res);
+    SEXP create_R_result(const clustering_results &res);
 }
 
 #endif //RESULT_R_H

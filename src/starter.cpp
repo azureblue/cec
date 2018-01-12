@@ -1,9 +1,8 @@
 #include "starter.h"
 #include "cluster.h"
 #include "exceptions.h"
-#include "models/constants.h"
 
-cec::single_start_results cec::cec_starter::start(const mat &x, const vector<int> &initial_assignment,
+cec::clustering_results cec::cec_starter::start(const mat &x, const vector<int> &initial_assignment,
                                                   const vector<unique_ptr<model>> &models, int max_iter, int min_card) {
 
     int m = x.m;
@@ -11,7 +10,6 @@ cec::single_start_results cec::cec_starter::start(const mat &x, const vector<int
     int n = x.n;
     vector<int> assignment = initial_assignment;
     double energy_sum = 0;
-    int iters = 0;
 
     vector<unique_ptr<cluster>> clusters(k);
     vector<mat> split = split_points(x, assignment, k);
@@ -31,24 +29,24 @@ cec::single_start_results cec::cec_starter::start(const mat &x, const vector<int
 
         double energy = clusters[i]->energy();
 
-        if (std::isnan(energy))
+        if (m::isnan(energy))
             throw invalid_covariance(*clusters[i], i);
 
         energy_sum += energy;
     }
 
-    int removed_after_assignmenet = std::count(clusters.begin(), clusters.end(), unique_ptr<cluster>());
-    if (removed_after_assignmenet == k)
+    int removed_after_assignment = std::count(clusters.begin(), clusters.end(), unique_ptr<cluster>());
+    if (removed_after_assignment == k)
         throw all_clusters_removed();
 
-    bool handle_removed_flag = removed_after_assignmenet != 0;
+    bool handle_removed_flag = removed_after_assignment != 0;
 
-    for (int iter = (handle_removed_flag ? -1 : 0); iter < max_iter; iter++) {
+    int iter = (handle_removed_flag ? -1 : 0);
+    for (; iter < max_iter; iter++) {
         bool transfer_flag = false;
         bool removed_last_iteration_flag = false;
 
         for (int i = 0; i < m; i++) {
-
             const int cl_num = assignment[i];
             unique_ptr<cluster> &cl_src = clusters[cl_num];
 
@@ -56,12 +54,12 @@ cec::single_start_results cec::cec_starter::start(const mat &x, const vector<int
                 continue;
 
             double rem_energy_gain = cl_src ? cl_src->rem_point(x[i]) : 0;
-            double best_gain = cl_src ? 0 : constants::INF;
+            double best_gain = cl_src ? 0 : m::INF;
 
-            if (std::isnan(rem_energy_gain))
+            if (m::isnan(rem_energy_gain))
                 throw invalid_covariance(*cl_src, cl_num);
 
-            int dest_cl_num = -1;
+            int dst_cl_num = -1;
 
             for (int j = 0; j < k; j++) {
                 if (j == cl_num || !clusters[j])
@@ -70,20 +68,20 @@ cec::single_start_results cec::cec_starter::start(const mat &x, const vector<int
                 cluster &cl_dst = *clusters[j];
                 double add_energy_gain = cl_dst.add_point(x[i]);
 
-                if (std::isnan(add_energy_gain))
+                if (m::isnan(add_energy_gain))
                     throw invalid_covariance(cl_dst, j);
 
                 double gain = add_energy_gain + rem_energy_gain;
 
                 if (gain < best_gain) {
-                    dest_cl_num = j;
+                    dst_cl_num = j;
                     best_gain = gain;
                 }
             }
 
-            if (dest_cl_num != -1) {
-                assignment[i] = dest_cl_num;
-                clusters[dest_cl_num]->apply_change();
+            if (dst_cl_num != -1) {
+                assignment[i] = dst_cl_num;
+                clusters[dst_cl_num]->apply_change();
                 if (cl_src) {
                     cl_src->apply_change();
                     if (cl_src->card() < min_card) {
@@ -97,7 +95,6 @@ cec::single_start_results cec::cec_starter::start(const mat &x, const vector<int
             }
         }
 
-        iters = iter + 1;
         if (!transfer_flag)
             break;
 
@@ -109,19 +106,19 @@ cec::single_start_results cec::cec_starter::start(const mat &x, const vector<int
     }
 
     mat centers(k, n);
-    vector<mat> covs(k, mat(n, n));
+    vector<mat> cov_mats(k, mat(n, n));
 
     for (int i = 0; i < k; i++) {
         if (!clusters[i]) {
-            centers[i].fill(constants::QNAN);
-            covs[i].fill(constants::QNAN);
+            centers[i].fill(m::QNAN);
+            cov_mats[i].fill(m::QNAN);
             continue;
         }
         centers[i] = clusters[i]->mean();
-        covs[i] = clusters[i]->covariance();
+        cov_mats[i] = clusters[i]->covariance();
     }
     int final_k = k - std::count(clusters.begin(), clusters.end(), unique_ptr<cluster>());
-    return single_start_results(centers, assignment, final_k, iters, energy_sum, covs);
+    return clustering_results(centers, assignment, final_k, iter + 1, energy_sum, cov_mats);
 }
 
 std::vector<cec::mat>

@@ -3,13 +3,12 @@
 
 #include "cov_utils.h"
 #include "model.h"
-#include "constants.h"
 
 namespace cec {
     class diagonal : public model {
     public:
         explicit diagonal(int n)
-                : ce_constant(n * std::log(2.0 * constants::PI * constants::E)) {}
+                : ce_constant(n * std::log(2.0 * m::PI * m::E)) {}
 
         double cross_entropy(const mat &cov) const noexcept override {
             double diag = diagonal_product(cov);

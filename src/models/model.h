@@ -2,8 +2,7 @@
 #define CEC_MODEL_H
 
 #include "../vec.h"
-
-#include <cmath>
+#include "../m.h"
 
 namespace cec {
 
@@ -15,7 +14,7 @@ namespace cec {
 
         inline double energy(mat &cov, int card, int m) const noexcept {
             double p = card / (double) m;
-            return p * (-std::log(p) + cross_entropy(cov));
+            return p * (-m::log(p) + cross_entropy(cov));
         }
     };
 }
