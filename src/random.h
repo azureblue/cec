@@ -4,15 +4,16 @@
 #include <random>
 
 namespace cec {
-    namespace random {
-        class context {
-        public:
-            static std::mt19937 create_generator();
-            static void set_seed(unsigned long seed);
+    class random {
+    public:
+        typedef std::mt19937 rand_gen;
 
-        private:
-            static unsigned long seed;
-        };
-    }
+        static rand_gen create_generator();
+
+        static void set_seed(unsigned long seed);
+
+    private:
+        static unsigned long seed;
+    };
 }
 #endif //CEC_RANDOM_H

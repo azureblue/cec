@@ -1,52 +1,56 @@
 #include "multi_starter.h"
+#include <thread>
+#include <future>
 
-std::unique_ptr<cec::clustering_results> cec::clustering_task::operator()() {
-    int k = models.size();
-    for (int i = 0; i < starts; i++) {
-        best(starter.start(x, init->init(x, k), models, start_params));
-    }
-    return best();
-}
-
-std::unique_ptr<cec::clustering_results>
-cec::multi_starter::start(const cec::mat &x, std::vector<std::shared_ptr<cec::model_spec>> models,
-                          const initializer_spec &init,
-                          const multi_starter_params &param) {
-    int threads = param.threads;
-    int starts = param.starts;
-    if (threads == 0)
-        threads = std::thread::hardware_concurrency();
-    if (threads == 0)
-        threads = 4;
-    threads = std::min(starts, threads);
-    int starts_per_thread = starts / threads;
-    int remaining = starts - (starts_per_thread * threads);
-
-    vector<std::thread> cl_tasks;
-    vector<std::future<unique_ptr<clustering_results>>> cl_results;
-
-    clustering_task my_task(x, model_spec::create_models(models), init.create(),
-                            starts_per_thread + (remaining-- > 0 ? 1 : 0), param.start_params
-    );
-
-    for (int th = 1; th < threads; th++) {
-        std::packaged_task<unique_ptr<clustering_results>()> task(
-                clustering_task(x, model_spec::create_models(models), init.create(),
-                                starts_per_thread + (remaining-- > 0 ? 1 : 0), param.start_params
-                ));
-        cl_results.emplace_back(task.get_future());
-        cl_tasks.emplace_back(std::move(task));
+namespace cec {
+    unique_ptr<clustering_results> clustering_task::operator()() {
+        best_results_collector best;
+        int k = models.size();
+        for (int i = 0; i < starts; i++)
+            best(starter.start(x, init->init(x, k), models, start_params));
+        return best();
     }
 
-    best_results_collector best;
+    unique_ptr<clustering_results>
+    multi_starter::start(const mat &x,
+                         vector<shared_ptr<model_spec>> models,
+                         const initializer_spec &init,
+                         const multi_starter_params &param) {
+        int threads = param.threads;
+        int starts = param.starts;
+        if (threads == 0)
+            threads = std::thread::hardware_concurrency();
+        if (threads == 0)
+            threads = default_threads_number;
+        threads = std::min(starts, threads);
+        int starts_per_thread = starts / threads;
+        int remaining = starts - (starts_per_thread * threads);
 
-    best(my_task());
+        vector<std::thread> cl_tasks;
+        vector<std::future<unique_ptr<clustering_results>>> cl_results;
 
-    for (auto &&cl_task : cl_tasks)
-        cl_task.join();
+        clustering_task my_task(x, model_spec::create_models(models), init.create(),
+                                starts_per_thread + (remaining-- > 0 ? 1 : 0), param.start_params);
 
-    for (auto &&result : cl_results)
-        best(result.get());
+        for (int th = 1; th < threads; th++) {
+            std::packaged_task<unique_ptr<clustering_results>()> task(
+                    clustering_task(x, model_spec::create_models(models), init.create(),
+                                    starts_per_thread + (remaining-- > 0 ? 1 : 0),
+                                    param.start_params));
+            cl_results.emplace_back(task.get_future());
+            cl_tasks.emplace_back(std::move(task));
+        }
 
-    return best();
+        best_results_collector best;
+
+        best(my_task());
+
+        for (auto &&cl_task : cl_tasks)
+            cl_task.join();
+
+        for (auto &&result : cl_results)
+            best(result.get());
+
+        return best();
+    }
 }

@@ -2,14 +2,10 @@
 #define CEC_STARTER_H
 
 #include "vec.h"
+#include "common.h"
 #include "models/model.h"
 
 namespace cec {
-
-    using std::vector;
-    using std::unique_ptr;
-    using std::shared_ptr;
-
     class clustering_results;
 
     struct starter_params {

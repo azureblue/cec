@@ -1,12 +1,12 @@
 #include "random.h"
-unsigned long cec::random::context::seed = 0;
+unsigned long cec::random::seed = 0;
 
-std::mt19937 cec::random::context::create_generator() {
-    std::mt19937 gen(context::seed);
-    context::seed++;
-    return gen;
+cec::random::rand_gen cec::random::create_generator() {
+    std::mt19937 mt(seed);
+    seed++;
+    return mt;
 }
 
-void cec::random::context::set_seed(unsigned long seed) {
-    context::seed = seed;
+void cec::random::set_seed(unsigned long seed) {
+    random::seed = seed;
 }

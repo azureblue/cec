@@ -6,27 +6,24 @@
 #include "r_result.h"
 #include "multi_starter.h"
 #include "variable_starter.h"
+
 #include<R_ext/Random.h>
 
 using namespace cec;
 using namespace cec::r;
-using std::vector;
-using std::string;
-using std::unique_ptr;
-using std::shared_ptr;
 
-static void seed_r() {
+static void seed_from_r() {
     GetRNGstate();
     double r = unif_rand();
     PutRNGstate();
     unsigned long seed;
     memcpy(&seed, &r, sizeof(seed));
-    random::context::set_seed(seed);
+    random::set_seed(seed);
 }
 
 extern "C"
 SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models_param_r) {
-    seed_r();
+    seed_from_r();
     r_ext_ptr<clustering_results> start_results;
     try {
         mat x_mat = get<mat>(x);
@@ -36,7 +33,8 @@ SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models_param
         control_param control_par = get_control_param(control_param_r);
         models_param models_par = get_models_param(models_param_r, n);
 
-        int max_k = *std::max_element(centers_par.var_centers.begin(), centers_par.var_centers.end());
+        int max_k = *std::max_element(centers_par.var_centers.begin(),
+                                      centers_par.var_centers.end());
         vector<unique_ptr<model>> models(max_k);
 
         std::transform(models_par.specs.begin(), models_par.specs.end(), models.begin(),
@@ -54,8 +52,9 @@ SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models_param
                                            control_par.starts, control_par.threads},
                                           centers_par.var_centers);
 
-        unique_ptr<clustering_results> results = vs_starter.start(x_mat, models_par.specs, init_spec,
-                                                          vs_params);
+        unique_ptr<clustering_results> results = vs_starter.start(x_mat, models_par.specs,
+                                                                  init_spec,
+                                                                  vs_params);
         start_results.reset(results.release());
 
     } catch (std::exception &ex) {
@@ -74,7 +73,7 @@ SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models_param
 
 extern "C"
 SEXP cec_init_centers_r(SEXP x_r, SEXP k_r, SEXP method_r) {
-    seed_r();
+    seed_from_r();
     r_ext_ptr<string> error_str;
     try {
         r_ext_ptr<mat> res;
@@ -85,10 +84,10 @@ SEXP cec_init_centers_r(SEXP x_r, SEXP k_r, SEXP method_r) {
             init_method im = parse_init_method(method_str);
             switch (im) {
                 case init_method::KMEANSPP:
-                    res.reset(new mat(kmeanspp_init().init(x, k)));
+                    res.init(kmeanspp_init().init(x, k));
                     break;
                 case init_method::RANDOM:
-                    res.reset(new mat(random_init().init(x, k)));
+                    res.init(random_init().init(x, k));
                     break;
                 case init_method::NONE:
                     break;
@@ -99,7 +98,7 @@ SEXP cec_init_centers_r(SEXP x_r, SEXP k_r, SEXP method_r) {
         SEXP r_res = put(*res);
         return r_res;
     } catch (std::exception &ex) {
-        error_str.reset(new string(ex.what()));
+        error_str.init(ex.what());
     }
     error(error_str->c_str());
 }

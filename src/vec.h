@@ -74,7 +74,7 @@ namespace cec {
             return os;
         }
 
-        static double dist(const row &a, const row &b) {
+        static double dist_sq(const row &a, const row &b) {
             double acc = 0;
             for (int i = 0; i < a.size; i++) {
                 double diff = b[i] - a[i];
@@ -95,22 +95,28 @@ namespace cec {
         double *data_;
     };
 
-    class mem {
+    template<typename T>
+    class storage {
     protected:
-        explicit mem(int n)
-                : ptr(new double[n]) {}
+        explicit storage(int n)
+                : ptr(new T[n]) {}
 
-        mem(mem &&vm) = default;
-        std::unique_ptr<double[]> ptr;
+        storage(storage &&vm) noexcept = default;
+
+        inline T *get_storage() {
+            return ptr.get();
+        }
+    private:
+        std::unique_ptr<T[]> ptr;
     };
 
-    class vec: private mem, public row {
+    class vec: private storage<double>, public row {
     public:
         explicit vec(int n)
-                : mem(n),
-                  row(ptr.get(), n) {}
+                : storage<double>(n),
+                  row(get_storage(), n) {}
 
-        vec(const row &v)
+        explicit vec(const row &v)
                 : vec(v.size) {
             (*this) = v;
         }

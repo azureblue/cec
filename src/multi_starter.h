@@ -1,8 +1,6 @@
 #include "starter.h"
 #include "init.h"
 #include "params.h"
-#include <thread>
-#include <future>
 
 #ifndef CEC_MULTI_STARTER_H
 #define CEC_MULTI_STARTER_H
@@ -48,7 +46,6 @@ namespace cec {
         int starts;
         const starter_params &start_params;
         cec_starter starter;
-        best_results_collector best;
     };
 
     struct multi_starter_params {
@@ -67,6 +64,9 @@ namespace cec {
         unique_ptr<clustering_results>
         start(const mat &x, vector<shared_ptr<model_spec>> models, const initializer_spec &init,
               const multi_starter_params &params);
+
+    private:
+        static const int default_threads_number = 4;
     };
 }
 
