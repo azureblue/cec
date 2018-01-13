@@ -10,14 +10,9 @@
 #include "models/covariance.h"
 #include "models/eigenvalues.h"
 #include "init.h"
+#include "common.h"
 
 namespace cec {
-
-    using std::vector;
-    using std::string;
-    using std::unique_ptr;
-    using std::shared_ptr;
-
     enum class init_method {
         NONE,
         KMEANSPP,
@@ -90,7 +85,7 @@ namespace cec {
                   n(n) {}
 
         unique_ptr<model> create_model() const override {
-            return unique_ptr<model>(new all(n));
+            return make_unique<all>(n);
         }
     };
 
@@ -103,7 +98,7 @@ namespace cec {
                   n(n) {}
 
         unique_ptr<model> create_model() const override {
-            return unique_ptr<model>(new spherical(n));
+            return make_unique<spherical>(n);
         }
     };
 
@@ -116,7 +111,7 @@ namespace cec {
                   n(n) {}
 
         unique_ptr<model> create_model() const override {
-            return unique_ptr<model>(new diagonal(n));
+            return make_unique<diagonal>(n);
         }
     };
 
@@ -131,7 +126,7 @@ namespace cec {
                   r(r) {}
 
         unique_ptr<model> create_model() const override {
-            return unique_ptr<model>(new fixed_radius(n, r));
+            return make_unique<fixed_radius>(n, r);
         }
     };
 
@@ -146,7 +141,7 @@ namespace cec {
                   g_cov(std::move(g_cov)) {}
 
         unique_ptr<model> create_model() const override {
-            return unique_ptr<model>(new covariance(n, g_cov));
+            return make_unique<covariance>(n, g_cov);
         }
     };
 
@@ -161,7 +156,7 @@ namespace cec {
                   values(std::move(values)) {}
 
         unique_ptr<model> create_model() const override {
-            return unique_ptr<model>(new eigenvalues(n, values));
+            return make_unique<eigenvalues>(n, values);
         }
     };
 

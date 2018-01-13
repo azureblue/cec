@@ -23,7 +23,7 @@ namespace cec {
             template<typename ...Args>
             static r_ext_ptr<T> make(Args &&... args) {
                 r_ext_ptr<T> ptr;
-                ptr.reset(new T(std::forward<Args>(args)...));
+                ptr.init(std::forward<Args>(args)...);
                 return ptr;
             }
 
@@ -52,10 +52,17 @@ namespace cec {
                 UNPROTECT_PTR(r_ptr);
             }
 
+            template <typename ...Args>
+            void init(Args &&...args) {
+                finalize(r_ptr);
+                t_ptr = new T(std::forward<Args>(args)...);
+                R_SetExternalPtrAddr(r_ptr, t_ptr);
+            }
+
             void reset(T *ptr) {
                 finalize(r_ptr);
-                R_SetExternalPtrAddr(r_ptr, ptr);
                 t_ptr = ptr;
+                R_SetExternalPtrAddr(r_ptr, ptr);
             }
 
             const T *get() const {
