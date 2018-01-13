@@ -7,7 +7,7 @@ namespace cec {
         best_results_collector best;
         for (auto &&k : params.centers_number) {
             model_specs models_specs_subset(m_specs.begin(), m_specs.begin() + k);
-            best(ms.start(x, models_specs_subset, init_spec, params.msp));
+            best(ms.start(x, models_specs_subset, init_spec, params.ms_params));
         }
         return best();
     }

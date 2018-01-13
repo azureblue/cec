@@ -1,5 +1,6 @@
 # CLion IDE project
-set(ENV{Path} "" )
+#set(ENV{Path} "")
+
 cmake_minimum_required(VERSION 3.5)
 project(cec)
 set(CMAKE_CXX_STANDARD 11)
@@ -42,8 +43,8 @@ set(SOURCE_FILES
 link_libraries(m R Rlapack Rblas)
 set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -std=c++0x -pedantic -Wall")
 add_library(cec SHARED ${SOURCE_FILES})
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
-add_executable(cec_test ${SOURCE_FILES} src/test.cpp src/test.cpp)
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}" )
+add_executable(cec_test ${SOURCE_FILES} src/test.cpp)
 
 set(MAKEVARS_PKG_CFLAGS "-DR_ALLOC -DR_RAND $(SHLIB_OPENMP_CFLAGS)")
 set(MAKEVARS_PKG_LIBS "$(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) $(SHLIB_OPENMP_CFLAGS)")
