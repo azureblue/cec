@@ -1,8 +1,6 @@
 #ifndef CEC_VARIABLE_STARTER_H
 #define CEC_VARIABLE_STARTER_H
 
-#include <utility>
-
 #include "multi_starter.h"
 
 namespace cec {
