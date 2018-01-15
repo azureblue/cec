@@ -35,6 +35,10 @@ namespace cec {
                 return !(r_p == *this);
             }
 
+            explicit operator bool() {
+                return t_ptr != nullptr;
+            }
+
             r_ext_ptr &operator=(r_ext_ptr &r_p) = delete;
 
             r_ext_ptr &operator=(r_ext_ptr &&r_p) noexcept {
@@ -74,6 +78,18 @@ namespace cec {
             }
 
             const T &operator*() const {
+                return *t_ptr;
+            }
+
+            T *get() {
+                return t_ptr;
+            }
+
+            T *operator->() {
+                return t_ptr;
+            }
+
+            T &operator*() {
                 return *t_ptr;
             }
 

@@ -3,98 +3,117 @@
 
 #include <exception>
 #include <utility>
+#include "common.h"
 #include "vec.h"
 #include "cluster.h"
 
 namespace cec {
-    class invalid_covariance: public std::exception {
+    class cec_exception : public std::exception {
     public:
-        explicit invalid_covariance(const cluster &cl, int cluster_number):
-                cov(cl.covariance()),
-                mean(cl.mean()),
-                card(cl.card()),
-                number(cluster_number){}
-        const mat cov;
-        const vec mean;
-        const int card;
-        const int number;
+        const string &info() {
+            return info_msg;
+        }
 
+    protected:
+        string info_msg;
+
+        explicit cec_exception(string info)
+                : info_msg(std::move(info)) {}
+
+    public:
         const char *what() const noexcept override {
-            return "invalid covariance: probably not positive definite";
+            return "cec exception";
         }
     };
 
-
-    class all_clusters_removed: public std::exception {
+    class clustering_exception : public cec_exception {
     public:
+        explicit clustering_exception(string info)
+                : cec_exception(std::move(info)) {}
+
         const char *what() const noexcept override {
-            return "all clusters have been removed";
+            return "clustering failed";
         }
     };
 
-    class not_implemented: public std::exception {
+    class invalid_covariance : public clustering_exception {
     public:
-        const std::string desc;
+        explicit invalid_covariance(mat cov)
+                : clustering_exception("invalid covariance: probably not positive definite"),
+                  cov(std::move(cov)) {}
 
-        explicit not_implemented(std::string desc) : desc(std::move(desc)) {}
+        const mat &covariance() const {
+            return cov;
+        }
+
+    private:
+        mat cov;
+    };
+
+
+    class all_clusters_removed : public clustering_exception {
+    public:
+        all_clusters_removed()
+                : clustering_exception("all clusters have been removed") {}
+    };
+
+    class not_implemented : public cec_exception {
+    public:
+        explicit not_implemented(const string &info)
+                : cec_exception(info) {}
 
         const char *what() const noexcept override {
-            return ("not implemented: " + desc).c_str();
+            return "not implemented";
         }
     };
 
-    class invalid_init_method: public std::exception {
+    class invalid_init_method : public cec_exception {
     public:
-        const std::string method;
-
-        explicit invalid_init_method(std::string method): method(std::move(method)) {}
+        explicit invalid_init_method(string info)
+                : cec_exception(std::move(info)) {}
 
         const char *what() const noexcept override {
-            return ("invalid center initialization method: " + method).c_str();
+            return "invalid center method";
         }
     };
 
-    class invalid_model_name: public std::exception {
+    class invalid_model_name : public cec_exception {
     public:
-        const std::string name;
-
-        explicit invalid_model_name(std::string name): name(std::move(name)) {}
+        explicit invalid_model_name(string name)
+                : cec_exception(std::move(name)) {}
 
         const char *what() const noexcept override {
-            return ("invalid model name: " + name).c_str();
+            return "invalid model name";
         }
     };
 
-    class missing_parameter: public std::exception {
+    class missing_parameter : public cec_exception {
     public:
-        const std::string name;
-
-        explicit missing_parameter(std::string name): name(std::move(name)) {}
+        explicit missing_parameter(std::string name)
+                : cec_exception(std::move(name)) {}
 
         const char *what() const noexcept override {
-            return ("missing parameter: " + name).c_str();
+            return "missing parameter";
         }
     };
 
-    class invalid_parameter_type: public std::exception {
+    class invalid_parameter_type : public cec_exception {
     public:
-        const std::string expected;
-
-        explicit invalid_parameter_type(std::string name): expected(std::move(name)) {}
+        explicit invalid_parameter_type(string name)
+                : cec_exception(std::move(name)) {}
 
         const char *what() const noexcept override {
-            return ("invalid parameter type, expected: " + expected).c_str();
+            return "invalid parameter type, expected";
         }
     };
 
-    class invalid_model_parameter: public std::exception {
+    class invalid_model_parameter : public cec_exception {
     public:
-        const std::string desc;
-
-        explicit invalid_model_parameter(std::string desc): desc(std::move(desc)) {}
+        explicit invalid_model_parameter(string desc)
+                : cec_exception(std::move(desc)) {}
 
         const char *what() const noexcept override {
-            return ("invalid model parameter: " + desc).c_str();
+            return "invalid model parameter";
         }
     };
 }
