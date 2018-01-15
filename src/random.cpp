@@ -7,6 +7,6 @@ cec::random::rand_gen cec::random::create_generator() {
     return mt;
 }
 
-void cec::random::set_seed(unsigned long seed) {
+void cec::random::set_seed(result_type seed) noexcept {
     random::seed = seed;
 }
