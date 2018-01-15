@@ -21,8 +21,10 @@ SEXP cec::create_R_result(const clustering_results &out) {
     PROTECT(iterations = put(out.iterations));
     PROTECT(centers_matrix = put(out.centers));
 
-   for (int i = 0; i < m; i++)
-        INTEGER(assignment_vector)[i]++;
+   int *assignment_vector_data = INTEGER(assignment_vector);
+   for (int i = 0; i < m; i++) {
+       assignment_vector_data[i]++;
+   }
     for (int i = 0; i < k; i++) {
         SEXP covariance;
         PROTECT(covariance = put(out.covariances[i]));

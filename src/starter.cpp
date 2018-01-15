@@ -33,7 +33,7 @@ cec::cec_starter::start(const mat &x, const vector<int> &initial_assignment,
         double energy = clusters[i]->energy();
 
         if (m::isnan(energy))
-            throw invalid_covariance(*clusters[i], i);
+            throw invalid_covariance(clusters[i]->covariance());
 
         energy_sum += energy;
     }
@@ -61,7 +61,7 @@ cec::cec_starter::start(const mat &x, const vector<int> &initial_assignment,
             double best_gain = cl_src ? 0 : m::INF;
 
             if (m::isnan(rem_energy_gain))
-                throw invalid_covariance(*cl_src, cl_num);
+                throw invalid_covariance(cl_src->covariance());
 
             int dst_cl_num = -1;
 
@@ -73,7 +73,7 @@ cec::cec_starter::start(const mat &x, const vector<int> &initial_assignment,
                 double add_energy_gain = cl_dst.add_point(x[i]);
 
                 if (m::isnan(add_energy_gain))
-                    throw invalid_covariance(cl_dst, j);
+                    throw invalid_covariance(cl_dst.covariance());
 
                 double gain = add_energy_gain + rem_energy_gain;
 

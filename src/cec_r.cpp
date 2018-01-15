@@ -11,6 +11,7 @@
 
 using namespace cec;
 using namespace cec::r;
+using std::exception;
 
 static void seed_from_r() {
     GetRNGstate();
@@ -21,9 +22,23 @@ static void seed_from_r() {
     random::set_seed(seed);
 }
 
+#define ERR_STR_LEN 1024
 extern "C"
 SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models_param_r) {
+
     seed_from_r();
+    bool exception_thrown = false;
+    r_ext_ptr<std::array<char, ERR_STR_LEN + 1>> error_str_array;
+    try {
+        error_str_array.init();
+    } catch (exception &ex) {
+        exception_thrown = true;
+    }
+
+    if (exception_thrown) {
+        error("cec library error");
+    }
+
     r_ext_ptr<clustering_results> start_results;
     try {
         mat x_mat = get<mat>(x);
@@ -38,12 +53,11 @@ SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models_param
         vector<unique_ptr<model>> models(max_k);
 
         std::transform(models_par.specs.begin(), models_par.specs.end(), models.begin(),
-                       [&](const shared_ptr<cec::model_spec> &spec) {
+                       [&](const shared_ptr<model_spec> &spec) {
                            return spec->create_model();
                        });
 
-
-        variable_starter vs_starter{};
+        variable_starter vs_starter;
 
         initializer_spec init_spec(centers_par.get_centers_init(),
                                    shared_ptr<assignment_init_spec>(new closest_init_spec()));
@@ -57,8 +71,13 @@ SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models_param
                                                                   vs_params);
         start_results.reset(results.release());
 
-    } catch (std::exception &ex) {
-        error(ex.what());
+    } catch (exception &ex) {
+        exception_thrown = true;
+        std::strncat(error_str_array->data(), ex.what(), ERR_STR_LEN);
+    }
+
+    if (exception_thrown) {
+        error(error_str_array->data());
     }
 
     try {
@@ -67,16 +86,18 @@ SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models_param
         UNPROTECT(1);
         return r_res;
     } catch (std::exception &ex) {
-        error(ex.what());
+        std::strncat(error_str_array->data(), ex.what(), ERR_STR_LEN);
     }
+    error(error_str_array->data());
 }
 
 extern "C"
 SEXP cec_init_centers_r(SEXP x_r, SEXP k_r, SEXP method_r) {
     seed_from_r();
-    r_ext_ptr<string> error_str;
+    r_ext_ptr<std::array<char, ERR_STR_LEN>> error_str_array;
+    error_str_array.init();
+    r_ext_ptr<mat> res;
     try {
-        r_ext_ptr<mat> res;
         try {
             const string &method_str = get<string>(method_r);
             const mat &x = get<mat>(x_r);
@@ -89,16 +110,17 @@ SEXP cec_init_centers_r(SEXP x_r, SEXP k_r, SEXP method_r) {
                 case init_method::RANDOM:
                     res.init(random_init().init(x, k));
                     break;
-                case init_method::NONE:
-                    break;
+                default:
+                    throw invalid_init_method(method_str);
             }
         } catch (std::exception &ex) {
             throw;
         }
         SEXP r_res = put(*res);
         return r_res;
-    } catch (std::exception &ex) {
-        error_str.init(ex.what());
+    } catch (exception &ex) {
+        std::strncat(error_str_array->data(), ex.what(), ERR_STR_LEN);
     }
-    error(error_str->c_str());
+
+    error(error_str_array->data());
 }
