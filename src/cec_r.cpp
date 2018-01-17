@@ -60,8 +60,8 @@ SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models_param
 
         variable_starter vs_starter;
 
-        initializer_spec init_spec(centers_par.get_centers_init(),
-                                   shared_ptr<assignment_init_spec>(new closest_init_spec()));
+        const shared_ptr<centers_init_spec> &centers_init_ptr = centers_par.get_centers_init();
+        const centers_init_spec &init_spec = *centers_init_ptr;
 
         variable_starter_params vs_params({{control_par.max_iter, control_par.min_card},
                                            control_par.starts, control_par.threads},

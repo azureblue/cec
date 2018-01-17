@@ -37,6 +37,13 @@ namespace cec {
         return models;
     }
 
+    vector<unique_ptr<model>> model_spec::create_models(shared_ptr<model_spec> spec, int n) {
+        vector<unique_ptr<model>> models(n);
+        for (int i = 0; i < n; ++i)
+            models[i] = spec->create_model();
+        return models;
+    }
+
     shared_ptr<centers_init_spec> centers_param::get_centers_init() {
         switch (init_m) {
             case init_method::NONE:
