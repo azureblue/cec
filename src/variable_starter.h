@@ -17,7 +17,7 @@ namespace cec {
     class variable_starter {
     public:
         unique_ptr<clustering_results>
-        start(const mat &x, model_specs m_specs, initializer_spec init_spec,
+        start(const mat &x, model_specs m_specs, const centers_init_spec &init_spec,
               const variable_starter_params &params);
 
     private:

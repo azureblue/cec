@@ -5,16 +5,17 @@
 namespace cec {
     unique_ptr<clustering_results> clustering_task::operator()() {
         best_results_collector best;
+        closest_assignment ca;
         int k = models.size();
         for (int i = 0; i < starts; i++)
-            best(starter.start(x, init->init(x, k), models, start_params));
+            best(starter.start(x, ca.init(x, init->init(x, k)), models, start_params));
         return best();
     }
 
     unique_ptr<clustering_results>
     multi_starter::start(const mat &x,
                          vector<shared_ptr<model_spec>> models,
-                         const initializer_spec &init,
+                         const centers_init_spec &init,
                          const multi_starter_params &param) {
         int threads = param.threads;
         int starts = param.starts;

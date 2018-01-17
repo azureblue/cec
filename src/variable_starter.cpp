@@ -2,7 +2,7 @@
 
 namespace cec {
     unique_ptr<clustering_results>
-    variable_starter::start(const mat &x, model_specs m_specs, initializer_spec init_spec,
+    variable_starter::start(const mat &x, model_specs m_specs, const centers_init_spec &init_spec,
                             const variable_starter_params &params) {
         best_results_collector best;
         for (auto &&k : params.centers_number) {
