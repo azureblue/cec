@@ -139,8 +139,10 @@ namespace cec {
             SEXP sexp;
 
             SEXP get_named(SEXP list, const string &name) {
-                int len = LENGTH(list);
                 SEXP elementNames = GET_NAMES(list);
+                if (!isString(elementNames))
+                    throw invalid_parameter_type("named elements");
+                int len = LENGTH(elementNames);
                 for (int i = 0; i < len; i++) {
                     if (name != CHAR(STRING_ELT(elementNames, i)))
                         continue;

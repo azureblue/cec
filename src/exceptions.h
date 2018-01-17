@@ -103,7 +103,7 @@ namespace cec {
                 : cec_exception(std::move(name)) {}
 
         const char *what() const noexcept override {
-            return "invalid parameter type, expected";
+            return "invalid parameter type";
         }
     };
 
