@@ -1,6 +1,4 @@
 CXX_STD = CXX11
-PKG_LIBS = $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) $(SHLIB_OPENMP_CFLAGS)
 PKG_CFLAGS = -DR_ALLOC -DR_RAND $(SHLIB_OPENMP_CFLAGS)
-OBJECTS = params.o r_params.o starter.o models/cov_utils.o r_result.o cec_r.o init.o multi_starter.o random.o variable_starter.o 
 PKG_LIBS = $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) $(SHLIB_OPENMP_CFLAGS)
-OBJECTS = params.o r_params.o starter.o models/cov_utils.o r_result.o cec_r.o init.o multi_starter.o random.o variable_starter.o 
+OBJECTS = params.o r_params.o starter.o models/cov_utils.o r_result.o cec_r.o init.o multi_starter.o random.o variable_starter.o split_starter.o 
