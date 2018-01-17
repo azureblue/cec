@@ -8,6 +8,7 @@
 #include "variable_starter.h"
 
 #include<R_ext/Random.h>
+#include<R_ext/Rdynload.h>
 
 using namespace cec;
 using namespace cec::r;
@@ -134,4 +135,5 @@ R_CallMethodDef methods[] = {
 extern "C"
 void R_init_CEC(DllInfo *dllInfo) {
     R_registerRoutines(dllInfo, NULL, methods, NULL, NULL);
+    R_useDynamicSymbols(dllInfo, TRUE);
 }

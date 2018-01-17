@@ -15,10 +15,10 @@ cec::cec_starter::start(const mat &x, const vector<int> &initial_assignment,
     double energy_sum = 0;
 
     vector<unique_ptr<cluster>> clusters(k);
-    vector<mat> split = split_points(x, assignment, k);
+    vector<points_split> split = points_split::split_points(x, assignment, k);
 
     for (int i = 0; i < k; i++) {
-        mat &cluster_split = split[i];
+        const mat &cluster_split = split[i].points();
         if (cluster_split.m >= min_card) {
             mean me(cluster_split);
             mat cov = covariance_mle::estimate(cluster_split, me);
@@ -126,20 +126,23 @@ cec::cec_starter::start(const mat &x, const vector<int> &initial_assignment,
             new clustering_results(centers, assignment, final_k, iter + 1, energy_sum, cov_mats));
 }
 
-std::vector<cec::mat>
-cec::cec_starter::split_points(const mat &points, const vector<int> &assignment, int k) {
+std::vector<cec::points_split>
+cec::points_split::split_points(const mat &points, const vector<int> &assignment, int k) {
     vector<int> sizes(k, 0);
     vector<int> indices(k, 0);
     for (auto &&cl : assignment)
         sizes[cl]++;
-    vector<mat> split;
-    for (auto &&size : sizes)
-        split.emplace_back(size, points.n);
+    vector<points_split> split;
+    for (auto &&size : sizes) {
+        split.emplace_back(mat(size, points.n), vector<int>(size));
+    }
     int m = points.m;
     for (int i = 0; i < m; i++) {
         int cl = assignment[i];
-        split[cl][indices[cl]++] = points[i];
+        int idx = indices[cl];
+        split[cl].points_[idx] = points[i];
+        split[cl].mapping_[idx] = i;
+        indices[cl]++;
     }
     return split;
 }
-
