@@ -22,7 +22,7 @@ static void seed_from_r() {
     random::set_seed(seed);
 }
 
-#define ERR_STR_LEN 1024
+#define ERR_STR_LEN 1000
 extern "C"
 SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models_param_r) {
 
@@ -123,4 +123,15 @@ SEXP cec_init_centers_r(SEXP x_r, SEXP k_r, SEXP method_r) {
     }
 
     error(error_str_array->data());
+}
+
+R_CallMethodDef methods[] = {
+        {"cec_r", (DL_FUNC) &cec_r, 4},
+        {"cec_init_centers_r", (DL_FUNC) &cec_init_centers_r, 3},
+        {NULL, NULL, 0}
+};
+
+extern "C"
+void R_init_CEC(DllInfo *dllInfo) {
+    R_registerRoutines(dllInfo, NULL, methods, NULL, NULL);
 }
