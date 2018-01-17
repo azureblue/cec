@@ -1,6 +1,8 @@
 #ifndef CEC_STARTER_H
 #define CEC_STARTER_H
 
+#include <utility>
+
 #include "vec.h"
 #include "common.h"
 #include "models/model.h"
@@ -17,6 +19,27 @@ namespace cec {
         int min_card;
     };
 
+    class points_split {
+    public:
+        points_split(mat points, vector<int> mapping)
+                : points_(std::move(points)),
+                  mapping_(std::move(mapping)) {}
+
+        static vector<points_split> split_points(const mat &points, const vector<int> &assignment, int k);
+
+        const mat &points() const {
+            return points_;
+        }
+
+        const vector<int> &mapping() const {
+            return mapping_;
+        }
+
+    private:
+        mat points_;
+        vector<int> mapping_;
+    };
+
     class cec_starter {
     public:
         cec_starter() = default;
@@ -24,8 +47,6 @@ namespace cec {
         unique_ptr<clustering_results>
         start(const mat &x, const vector<int> &initial_assignment,
               const vector<unique_ptr<model>> &models, const starter_params &params);
-
-        vector<mat> split_points(const mat &points, const vector<int> &assignment, int k);
     };
 
     class clustering_results {

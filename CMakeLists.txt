@@ -47,7 +47,7 @@ set(SOURCE_FILES
 
 link_libraries(m R lapack blas)
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=core2")
-set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -std=c++0x -pedantic -Wall")
+set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -pipe -std=c++0x -pedantic -Wall")
 add_library(cec SHARED ${SOURCE_FILES})
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
 add_executable(cec_test ${SOURCE_FILES} src/test.cpp)
