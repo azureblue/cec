@@ -9,6 +9,8 @@ namespace cec {
     class best_results_collector {
     public:
         void operator()(unique_ptr<clustering_results> &&cr) {
+            if (!cr)
+                return;
             if (!best || cr->energy < best->energy)
                 best = std::move(cr);
         }
@@ -28,7 +30,7 @@ namespace cec {
     class clustering_task {
     public:
         clustering_task(const mat &x, vector<unique_ptr<model>> &&models,
-                       unique_ptr<initializer> &&init, int starts,
+                       unique_ptr<centers_init> &&init, int starts,
                        const starter_params &start_params)
                 : x(x),
                   models(std::move(models)),
@@ -42,7 +44,7 @@ namespace cec {
     private:
         const mat &x;
         vector<unique_ptr<model>> models;
-        unique_ptr<initializer> init;
+        unique_ptr<centers_init> init;
         int starts;
         const starter_params &start_params;
         cec_starter starter;
@@ -62,7 +64,7 @@ namespace cec {
     class multi_starter {
     public:
         unique_ptr<clustering_results>
-        start(const mat &x, vector<shared_ptr<model_spec>> models, const initializer_spec &init,
+        start(const mat &x, vector<shared_ptr<model_spec>> models, const centers_init_spec &init,
               const multi_starter_params &params);
 
     private:

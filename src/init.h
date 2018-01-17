@@ -59,7 +59,27 @@ namespace cec {
     public:
         virtual ~centers_init_spec() = default;
 
-        virtual unique_ptr<centers_init> create() = 0;
+        virtual unique_ptr<centers_init> create() const = 0;
+    };
+
+    class random_init_spec : public centers_init_spec {
+    public:
+        unique_ptr<centers_init> create() const override;
+    };
+
+    class fixed_init_spec : public centers_init_spec {
+    public:
+        const mat c_mat;
+
+        explicit fixed_init_spec(mat c_mat)
+                : c_mat(std::move(c_mat)) {}
+
+        unique_ptr<centers_init> create() const override;
+    };
+
+    class kmeanspp_init_spec : public centers_init_spec {
+    public:
+        unique_ptr<centers_init> create() const override;
     };
 
     class assignment_init {
@@ -72,62 +92,6 @@ namespace cec {
     class closest_assignment : public assignment_init {
     public:
         std::vector<int> init(const mat &x, const mat &c) override;
-    };
-
-    class assignment_init_spec {
-    public:
-        virtual ~assignment_init_spec() = default;
-
-        virtual unique_ptr<assignment_init> create() = 0;
-    };
-
-    class closest_init_spec : public assignment_init_spec {
-        unique_ptr<assignment_init> create() override;
-    };
-
-    class random_init_spec : public centers_init_spec {
-    public:
-        unique_ptr<centers_init> create() override;
-    };
-
-    class fixed_init_spec : public centers_init_spec {
-    public:
-        const mat c_mat;
-
-        explicit fixed_init_spec(mat c_mat)
-                : c_mat(std::move(c_mat)) {}
-
-        unique_ptr<centers_init> create() override;
-    };
-
-    class kmeanspp_init_spec : public centers_init_spec {
-    public:
-        unique_ptr<centers_init> create() override;
-    };
-
-    class initializer {
-    public:
-        initializer(unique_ptr<centers_init> &&c_init, unique_ptr<assignment_init> &&a_init)
-                : c_init(std::move(c_init)),
-                  a_init(std::move(a_init)) {}
-
-        vector<int> init(const mat &x, int k);
-
-    private:
-        unique_ptr<centers_init> c_init;
-        unique_ptr<assignment_init> a_init;
-    };
-
-    class initializer_spec {
-    public:
-        initializer_spec(shared_ptr<centers_init_spec> ci, shared_ptr<assignment_init_spec> ai)
-                : ci(std::move(ci)),
-                  ai(std::move(ai)) {};
-
-        unique_ptr<initializer> create() const;
-
-        shared_ptr<centers_init_spec> ci;
-        shared_ptr<assignment_init_spec> ai;
     };
 }
 

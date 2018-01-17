@@ -76,24 +76,14 @@ cec::mat cec::fixed_init::init(const cec::mat &x, int k) {
     return res;
 }
 
-std::unique_ptr<cec::assignment_init> cec::closest_init_spec::create() {
-    return make_unique<closest_assignment>();
-}
-
-std::unique_ptr<cec::centers_init> cec::random_init_spec::create() {
+std::unique_ptr<cec::centers_init> cec::random_init_spec::create() const {
     return make_unique<random_init>();
 }
 
-std::unique_ptr<cec::centers_init> cec::kmeanspp_init_spec::create() {
+std::unique_ptr<cec::centers_init> cec::kmeanspp_init_spec::create() const {
     return make_unique<kmeanspp_init>();
 }
-std::vector<int> cec::initializer::init(const cec::mat &x, int k) {
-    return a_init->init(x, c_init->init(x, k));
-}
-std::unique_ptr<cec::initializer> cec::initializer_spec::create() const {
-    return make_unique<initializer>(ci->create(), ai->create());
-}
 
-std::unique_ptr<cec::centers_init> cec::fixed_init_spec::create() {
+std::unique_ptr<cec::centers_init> cec::fixed_init_spec::create() const {
     return make_unique<fixed_init>(c_mat);
 }

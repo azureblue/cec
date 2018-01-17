@@ -215,7 +215,13 @@ namespace cec {
             friend class mat;
 
         public:
-            typename std::conditional<std::is_const<M>::value, const row, row>::type
+            using difference_type = long;
+            using value_type = typename std::conditional<std::is_const<M>::value, const row, row>::type;
+            using pointer = value_type*;
+            using reference = value_type&;
+            using iterator_category = std::forward_iterator_tag;
+
+            value_type
             operator*() {
                 return ref[r];
             }
