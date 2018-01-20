@@ -42,7 +42,7 @@ namespace cec {
 
     class cross_entropy_clustering {
     public:
-        cross_entropy_clustering(const cec_parameters &params)
+        explicit cross_entropy_clustering(const cec_parameters &params)
                 : params(params) {}
 
         unique_ptr<clustering_results>
