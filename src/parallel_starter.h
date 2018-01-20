@@ -8,7 +8,6 @@
 #include "cec_starter.h"
 #include "split_starter.h"
 
-
 namespace cec {
     class parallel_starter {
     public:
@@ -17,7 +16,9 @@ namespace cec {
                   starts(starts) {}
 
         template<class Task>
-        unique_ptr<clustering_results> start(Task task) {
+        unique_ptr<clustering_results> start(Task &task, const mat &x,
+                                             const vector<shared_ptr<model_spec>> &model_specs) {
+
             using subtask = typename Task::subtask;
 
             if (threads == 0)
@@ -34,15 +35,16 @@ namespace cec {
             subtask my = task(starts_per_thread + (remaining-- > 0 ? 1 : 0));
 
             for (int th = 1; th < threads; th++) {
-                std::packaged_task<unique_ptr<clustering_results>()> pt(
+                std::packaged_task<unique_ptr<clustering_results>(clustering_input &&)> pt(
                         task(starts_per_thread + (remaining-- > 0 ? 1 : 0)));
                 cl_results.emplace_back(pt.get_future());
-                cl_tasks.emplace_back(std::move(pt));
+                cl_tasks.emplace_back(std::move(pt),
+                                      clustering_input(x, model_spec::create_models(model_specs)));
             }
 
             best_results_collector best;
 
-            best(my());
+            best(my(clustering_input(x, model_spec::create_models(model_specs))));
 
             for (auto &&cl_task : cl_tasks)
                 cl_task.join();
@@ -59,47 +61,78 @@ namespace cec {
         static const int default_threads_number = 4;
     };
 
-    class multiple_starts_task {
+
+    class mp_start_subtask {
     public:
-        class mp_start_subtask {
-        public:
-            mp_start_subtask(mp_start_subtask &&) = default;
-            mp_start_subtask(mp_start_subtask &) = delete;
+        mp_start_subtask(mp_start_subtask &&) = default;
 
-            mp_start_subtask(cec_starter::parameters params, const mat &x, const vector <shared_ptr<model_spec>> &models)
-                    : ms(params),
-                      x(x),
-                      models(models) {}
+        mp_start_subtask(mp_start_subtask &) = delete;
 
-            unique_ptr<clustering_results> operator()() {
-                return ms.start(x, models);
+        mp_start_subtask(unique_ptr<clustering_starter> c_starter,
+                         vector<unique_ptr<clustering_processor>> &&c_procs, const int starts)
+                : c_starter(std::move(c_starter)),
+                  c_procs(std::move(c_procs)),
+                  starts(starts) {};
+
+        unique_ptr<clustering_results> operator()(clustering_input &&input_params) {
+            best_results_collector best;
+            for (int i = 0; i < starts; i++) {
+                unique_ptr<clustering_results> res = c_starter->start(input_params);
+                for (auto &&cp : c_procs)
+                    res = cp->start(res, input_params);
+
+                best(std::move(res));
             }
-
-        private:
-            cec_starter ms;
-            const mat &x;
-            const vector<shared_ptr<model_spec>> &models;
-        };
-
-        using subtask = mp_start_subtask;
-
-        multiple_starts_task(const mat &x, const vector <shared_ptr<model_spec>> &models, cec_parameters start_params,
-                                  const centers_init_spec &init_spec)
-                :  x(x),
-                  models(models),
-                  init_spec(init_spec),
-                  cec_params(start_params) {}
-
-
-        subtask operator()(int starts) {
-            return mp_start_subtask(cec_starter::parameters(cec_params, init_spec, starts), x, models);
+            return best();
         }
 
     private:
-        const mat &x;
-        const vector<shared_ptr<model_spec>> &models;
-        const centers_init_spec &init_spec;
-        cec_parameters cec_params;
+        unique_ptr<clustering_starter> c_starter;
+        vector<unique_ptr<clustering_processor>> c_procs;
+        const int starts;
+    };
+
+    class multiple_starts_task {
+    public:
+        using subtask = mp_start_subtask;
+
+        explicit multiple_starts_task(cec_starter::parameters params)
+                : params(params) {}
+
+        subtask operator()(int starts) {
+            unique_ptr<clustering_starter> starter = make_unique<cec_starter>(params);
+            return mp_start_subtask(
+                    std::move(starter), vector<unique_ptr<clustering_processor>>(), starts);
+        }
+
+    private:
+        cec_starter::parameters params;
+    };
+
+    class start_and_split_task {
+    public:
+        using subtask = mp_start_subtask;
+
+        explicit start_and_split_task(cec_starter::parameters init_cl_params,
+                                      split_starter::parameters split_params
+        )
+                : init_cl_params(init_cl_params),
+                  split_params(split_params) {}
+
+        subtask operator()(int starts) {
+            unique_ptr<clustering_starter> starter = make_unique<cec_starter>(init_cl_params);
+            vector<unique_ptr<clustering_processor>> cl_procs(1);
+            cl_procs[0] = make_unique<split_starter>(split_params);
+
+            return mp_start_subtask(
+                    std::move(starter),
+                    std::move(cl_procs),
+                    starts);
+        }
+
+    private:
+        cec_starter::parameters init_cl_params;
+        split_starter::parameters split_params;
     };
 }
 

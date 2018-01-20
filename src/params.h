@@ -72,7 +72,7 @@ namespace cec {
         virtual unique_ptr<model> create_model() const = 0;
 
         static vector<unique_ptr<model>> create_models(vector<shared_ptr<model_spec>> specs);
-        static vector<unique_ptr<model>> create_models(shared_ptr<model_spec> spec, int n = 1);
+        static vector<unique_ptr<model>> create_models(const model_spec &spec, int n = 1);
     };
 
 

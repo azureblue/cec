@@ -37,10 +37,10 @@ namespace cec {
         return models;
     }
 
-    vector<unique_ptr<model>> model_spec::create_models(shared_ptr<model_spec> spec, int n) {
+    vector<unique_ptr<model>> model_spec::create_models(const model_spec &spec, int n) {
         vector<unique_ptr<model>> models(n);
         for (int i = 0; i < n; ++i)
-            models[i] = spec->create_model();
+            models[i] = spec.create_model();
         return models;
     }
 

@@ -6,35 +6,46 @@
 
 namespace cec {
 
-    class split_starter {
+    class split_starter : public clustering_processor {
+    public:
         struct parameters {
             cec_parameters start_params;
+            const model_spec &model_sp;
             const centers_init_spec &init;
             int split_tries;
             int max_k;
             int max_depth;
+
+            parameters(const cec_parameters &start_params, const model_spec &model_sp,
+                       const centers_init_spec &init, int split_tries, int max_k, int max_depth)
+                    : start_params(start_params),
+                      model_sp(model_sp),
+                      init(init),
+                      split_tries(split_tries),
+                      max_k(max_k),
+                      max_depth(max_depth) {}
         };
 
-    public:
-        split_starter(const parameters &params)
-                : params(params),
-                  splitter(cec_starter::parameters(params.start_params, params.init,
-                                                        params.split_tries)),
-                  cec(params.start_params) {}
+        explicit split_starter(const parameters &params)
+                : splitter(cec_starter::parameters(params.start_params, params.init,
+                                                   params.split_tries)),
+                  cec(params.start_params),
+                  m_spec(params.model_sp),
+                  max_k(params.max_k),
+                  max_depth(params.max_depth) {}
 
         unique_ptr<clustering_results>
-        start(const unique_ptr<clustering_results> &cl_res, const mat &x_mat,
-              const shared_ptr<model_spec> &model_sp);
+        start(const unique_ptr<clustering_results> &cl_res,
+              const clustering_input &input_params) override;
 
     private:
-        parameters params;
         cec_starter splitter;
         cross_entropy_clustering cec;
-
+        const model_spec &m_spec;
+        const int max_k;
+        const int max_depth;
         unique_ptr<clustering_results>
-        try_split_cluster(const mat &x_mat, shared_ptr<model_spec> m_spec);
-
-
+        try_split_cluster(const mat &x_mat, const model_spec &m_spec);
     };
 }
 
