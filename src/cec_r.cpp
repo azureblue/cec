@@ -4,11 +4,10 @@
 #include "r_params.h"
 #include "starter.h"
 #include "r_result.h"
-#include "multi_starter.h"
+#include "multi_try_starter.h"
 #include "variable_starter.h"
 
 #include<R_ext/Random.h>
-#include<R_ext/Rdynload.h>
 
 using namespace cec;
 using namespace cec::r;
@@ -58,18 +57,15 @@ SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models_param
                            return spec->create_model();
                        });
 
-        variable_starter vs_starter;
-
         const shared_ptr<centers_init_spec> &centers_init_ptr = centers_par.get_centers_init();
         const centers_init_spec &init_spec = *centers_init_ptr;
 
-        variable_starter_params vs_params({{control_par.max_iter, control_par.min_card},
-                                           control_par.starts, control_par.threads},
-                                          centers_par.var_centers);
+        unique_ptr<clustering_starter> cs = make_unique<multi_try_starter>(
+                multi_try_starter::parameters({control_par.max_iter, control_par.min_card},
+                                              init_spec, control_par.starts));
 
-        unique_ptr<clustering_results> results = vs_starter.start(x_mat, models_par.specs,
-                                                                  init_spec,
-                                                                  vs_params);
+        variable_starter vs_starter(centers_par.var_centers, std::move(cs));
+        unique_ptr<clustering_results> results = vs_starter.start(x_mat, models_par.specs);
         start_results.reset(results.release());
 
     } catch (exception &ex) {
@@ -127,9 +123,9 @@ SEXP cec_init_centers_r(SEXP x_r, SEXP k_r, SEXP method_r) {
 }
 
 R_CallMethodDef methods[] = {
-        {"cec_r", (DL_FUNC) &cec_r, 4},
+        {"cec_r",              (DL_FUNC) &cec_r,              4},
         {"cec_init_centers_r", (DL_FUNC) &cec_init_centers_r, 3},
-        {NULL, NULL, 0}
+        {NULL, NULL,                                          0}
 };
 
 extern "C"

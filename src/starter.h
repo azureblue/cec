@@ -21,32 +21,36 @@ namespace cec {
 
     class points_split {
     public:
-        points_split(mat points, vector<int> mapping)
-                : points_(std::move(points)),
-                  mapping_(std::move(mapping)) {}
-
         static vector<points_split> split_points(const mat &points, const vector<int> &assignment, int k);
 
         const mat &points() const {
-            return points_;
+            return pts;
         }
 
         const vector<int> &mapping() const {
-            return mapping_;
+            return map;
         }
 
+        points_split(mat points, vector<int> mapping)
+                : pts(std::move(points)),
+                  map(std::move(mapping)) {}
+
     private:
-        mat points_;
-        vector<int> mapping_;
+        mat pts;
+        vector<int> map;
     };
 
     class cec_starter {
     public:
-        cec_starter() = default;
+        cec_starter(const starter_params &params)
+                : params(params) {}
 
         unique_ptr<clustering_results>
         start(const mat &x, const vector<int> &initial_assignment,
-              const vector<unique_ptr<model>> &models, const starter_params &params);
+              const vector<unique_ptr<model>> &models);
+
+    private:
+        starter_params params;
     };
 
     class clustering_results {
