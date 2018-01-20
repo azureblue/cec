@@ -1,5 +1,5 @@
-#ifndef CEC_STARTER_H
-#define CEC_STARTER_H
+#ifndef CROSS_ENTROPY_CLUSTERING_H
+#define CROSS_ENTROPY_CLUSTERING_H
 
 #include <utility>
 
@@ -10,8 +10,8 @@
 namespace cec {
     class clustering_results;
 
-    struct starter_params {
-        starter_params(int max_iter, int min_card)
+    struct cec_parameters {
+        cec_parameters(int max_iter, int min_card)
                 : max_iter(max_iter),
                   min_card(min_card) {}
 
@@ -40,9 +40,9 @@ namespace cec {
         vector<int> map;
     };
 
-    class cec_starter {
+    class cross_entropy_clustering {
     public:
-        cec_starter(const starter_params &params)
+        cross_entropy_clustering(const cec_parameters &params)
                 : params(params) {}
 
         unique_ptr<clustering_results>
@@ -50,11 +50,11 @@ namespace cec {
               const vector<unique_ptr<model>> &models);
 
     private:
-        starter_params params;
+        cec_parameters params;
     };
 
     class clustering_results {
-        friend class cec_starter;
+        friend class cross_entropy_clustering;
 
     public:
         mat centers;
@@ -82,4 +82,4 @@ namespace cec {
 
 }
 
-#endif //CEC_STARTER_H
+#endif //CROSS_ENTROPY_CLUSTERING_H

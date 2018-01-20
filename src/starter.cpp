@@ -3,7 +3,7 @@
 #include "exceptions.h"
 
 std::unique_ptr<cec::clustering_results>
-cec::cec_starter::start(const mat &x, const vector<int> &initial_assignment,
+cec::cross_entropy_clustering::start(const mat &x, const vector<int> &initial_assignment,
                         const vector<unique_ptr<model>> &models) {
 
     int m = x.m;

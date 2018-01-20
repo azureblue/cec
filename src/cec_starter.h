@@ -2,8 +2,8 @@
 #include "init.h"
 #include "params.h"
 
-#ifndef CEC_MULTI_STARTER_H
-#define CEC_MULTI_STARTER_H
+#ifndef CEC_STARTER_H
+#define CEC_STARTER_H
 
 namespace cec {
     class best_results_collector {
@@ -33,21 +33,21 @@ namespace cec {
         virtual unique_ptr<clustering_results> start(const mat &x, const vector<shared_ptr<model_spec>> &m_specs) = 0;
     };
 
-    class multi_try_starter: public clustering_starter {
+    class cec_starter: public clustering_starter {
     public:
         struct parameters {
-            starter_params start_params;
+            cec_parameters start_params;
             const centers_init_spec &init;
             int starts;
 
-            parameters(const starter_params &start_params, const centers_init_spec &init,
+            parameters(const cec_parameters &start_params, const centers_init_spec &init,
                        int starts)
                     : start_params(start_params),
                       init(init),
                       starts(starts) {}
         };
 
-        explicit multi_try_starter(const parameters &params)
+        explicit cec_starter(const parameters &params)
                 : params(params),
                   cec(params.start_params),
                   closest(),
@@ -58,7 +58,7 @@ namespace cec {
 
     private:
         parameters params;
-        cec_starter cec;
+        cross_entropy_clustering cec;
         closest_assignment closest;
         unique_ptr<centers_init> init;
     };

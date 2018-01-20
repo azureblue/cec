@@ -4,8 +4,9 @@
 #include "r_params.h"
 #include "starter.h"
 #include "r_result.h"
-#include "multi_try_starter.h"
+#include "cec_starter.h"
 #include "variable_starter.h"
+#include "parallel_starter.h"
 
 #include<R_ext/Random.h>
 
@@ -60,12 +61,19 @@ SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models_param
         const shared_ptr<centers_init_spec> &centers_init_ptr = centers_par.get_centers_init();
         const centers_init_spec &init_spec = *centers_init_ptr;
 
-        unique_ptr<clustering_starter> cs = make_unique<multi_try_starter>(
-                multi_try_starter::parameters({control_par.max_iter, control_par.min_card},
-                                              init_spec, control_par.starts));
+//        unique_ptr<clustering_starter> cs = make_unique<multi_try_starter>(
+//                multi_try_starter::parameters({control_par.max_iter, control_par.min_card},
+//                                              init_spec, control_par.starts));
 
-        variable_starter vs_starter(centers_par.var_centers, std::move(cs));
-        unique_ptr<clustering_results> results = vs_starter.start(x_mat, models_par.specs);
+//        variable_starter vs_starter(centers_par.var_centers, std::move(cs));
+//        unique_ptr<clustering_results> results = vs_starter.start(x_mat, models_par.specs);
+        
+        multiple_starts_task m_start_task(x_mat, models_par.specs, {control_par.max_iter, control_par.min_card}, init_spec);
+        
+        parallel_starter ps(control_par.threads, control_par.starts);
+
+        unique_ptr<clustering_results> results = ps.start(m_start_task);
+        
         start_results.reset(results.release());
 
     } catch (exception &ex) {

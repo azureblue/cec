@@ -1,8 +1,8 @@
-#include "multi_try_starter.h"
+#include "cec_starter.h"
 
 namespace cec {
     unique_ptr<clustering_results>
-    multi_try_starter::start(const mat &x, const vector<shared_ptr<model_spec>> &m_specs) {
+    cec_starter::start(const mat &x, const vector<shared_ptr<model_spec>> &m_specs) {
         int starts = params.starts;
         best_results_collector best;
         int k = m_specs.size();

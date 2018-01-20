@@ -2,13 +2,13 @@
 #define CEC_SPLIT_STARTER_H
 
 #include "starter.h"
-#include "multi_try_starter.h"
+#include "cec_starter.h"
 
 namespace cec {
 
     class split_starter {
         struct parameters {
-            starter_params start_params;
+            cec_parameters start_params;
             const centers_init_spec &init;
             int split_tries;
             int max_k;
@@ -18,7 +18,7 @@ namespace cec {
     public:
         split_starter(const parameters &params)
                 : params(params),
-                  splitter(multi_try_starter::parameters(params.start_params, params.init,
+                  splitter(cec_starter::parameters(params.start_params, params.init,
                                                         params.split_tries)),
                   cec(params.start_params) {}
 
@@ -28,8 +28,8 @@ namespace cec {
 
     private:
         parameters params;
-        multi_try_starter splitter;
-        cec_starter cec;
+        cec_starter splitter;
+        cross_entropy_clustering cec;
 
         unique_ptr<clustering_results>
         try_split_cluster(const mat &x_mat, shared_ptr<model_spec> m_spec);
