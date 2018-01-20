@@ -6,7 +6,7 @@ namespace cec {
         best_results_collector best;
         for (auto &&k : centers_number) {
             vector<shared_ptr<model_spec>> models_specs_subset(m_specs.begin(), m_specs.begin() + k);
-            best(cs->start(x, models_specs_subset));
+            best(cs->start(clustering_input(x, model_spec::create_models(models_specs_subset))));
         }
         return best();
     }
