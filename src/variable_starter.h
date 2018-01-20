@@ -1,27 +1,23 @@
 #ifndef CEC_VARIABLE_STARTER_H
 #define CEC_VARIABLE_STARTER_H
 
-#include "multi_starter.h"
+#include "cec_starter.h"
 
 namespace cec {
 
-    struct variable_starter_params {
-        multi_starter_params ms_params;
-        vector<int> centers_number;
-
-        variable_starter_params(const multi_starter_params &msp, vector<int> centers_number)
-                : ms_params(msp),
-                  centers_number(std::move(centers_number)) {}
-    };
-
     class variable_starter {
     public:
+
+        variable_starter(vector<int> centers_number, unique_ptr<clustering_starter> cs)
+                : centers_number(std::move(centers_number)),
+                cs(std::move(cs)) {}
+
         unique_ptr<clustering_results>
-        start(const mat &x, model_specs m_specs, const centers_init_spec &init_spec,
-              const variable_starter_params &params);
+        start(const mat &x, vector<shared_ptr<model_spec>> m_specs);
 
     private:
-        multi_starter ms;
+        vector<int> centers_number;
+        unique_ptr<clustering_starter> cs;
     };
 }
 

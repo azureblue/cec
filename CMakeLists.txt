@@ -36,13 +36,13 @@ set(SOURCE_FILES
         src/cec_r.h
         src/init.h
         src/init.cpp
-        src/multi_starter.cpp
-        src/multi_starter.h
+        src/cec_starter.cpp
+        src/cec_starter.h
         src/random.h
         src/random.cpp
         src/variable_starter.cpp
         src/variable_starter.h
-        src/common.h src/split_starter.cpp src/split_starter.h)
+        src/common.h src/split_starter.cpp src/split_starter.h src/parallel_starter.cpp src/parallel_starter.h)
 
 
 link_libraries(m R lapack blas)
