@@ -3,8 +3,8 @@
 #include "exceptions.h"
 
 std::unique_ptr<cec::clustering_results>
-cec::cec_starter::start(const mat &x, const vector<int> &initial_assignment,
-                        const vector<unique_ptr<model>> &models, const starter_params &params) {
+cec::cross_entropy_clustering::start(const mat &x, const vector<int> &initial_assignment,
+                        const vector<unique_ptr<model>> &models) {
 
     int m = x.m;
     int k = models.size();
@@ -140,8 +140,8 @@ cec::points_split::split_points(const mat &points, const vector<int> &assignment
     for (int i = 0; i < m; i++) {
         int cl = assignment[i];
         int idx = indices[cl];
-        split[cl].points_[idx] = points[i];
-        split[cl].mapping_[idx] = i;
+        split[cl].pts[idx] = points[i];
+        split[cl].map[idx] = i;
         indices[cl]++;
     }
     return split;
