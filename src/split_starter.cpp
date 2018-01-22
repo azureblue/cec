@@ -45,25 +45,25 @@ namespace cec {
             cluster = current_res->assignment;
             k = current_res->centers.m;
             const vector<points_split> &split = points_split::split_points(x, cluster, k);
-            mat split_centers = mat(k * 2, n);
             mat split_res_c_mat = mat(2, n);
             int k_s = 0;
-            vector<bool> is_split(k * 2);
+            int next_k = std::min(max_k, k * 2);
+            vector<bool> is_split(next_k);
             bool split_flag = false;
 
             for (int i = 0; i < k; i++) {
+                if (k_s >= max_k)
+                    break;
                 int split_m = split[i].points().m;
                 if (split_m == 0)
                     continue;
-                split_centers[k_s] = current_res->centers[i];
                 bool split_success = false;
 
                 const mat &split_x_mat = split[i].points();
                 const vector<int> mapping = split[i].mapping();
                 vector<int> split_assignment(split_x_mat.m);
                 if (moved[i]) {
-                    const unique_ptr<clustering_results> &split_res = try_split_cluster(
-                            split_x_mat, m_spec);
+                    auto const &split_res = try_split_cluster(split_x_mat, m_spec);
                     if (split_res) {
                         split_success = true;
                         split_res_c_mat = split_res->centers;
@@ -71,11 +71,12 @@ namespace cec {
                     }
                 }
                 split_flag = split_flag || split_success;
+                if (k_s == max_k - 1)
+                    split_flag = false;
+
                 if (split_success) {
                     is_split[k_s] = true;
                     is_split[k_s + 1] = true;
-                    split_centers[k_s] = split_res_c_mat[0];
-                    split_centers[k_s + 1] = split_res_c_mat[1];
 
                     for (int p = 0; p < split_m; p++) {
                         if (split_assignment[p] == 0)
@@ -87,7 +88,6 @@ namespace cec {
 
                 } else {
                     is_split[k_s] = false;
-                    split_centers[k_s] = current_res->centers[i];
                     for (int p = 0; p < split_m; p++)
                         cluster[mapping[p]] = k_s;
                     k_s++;
