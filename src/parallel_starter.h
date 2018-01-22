@@ -12,20 +12,21 @@ namespace cec {
     class parallel_starter {
     public:
         parallel_starter(int threads, int starts)
-                : threads(threads),
-                  starts(starts) {}
+                : starts(starts) {
+
+            if (threads == 0)
+                threads = std::thread::hardware_concurrency();
+            if (threads == 0)
+                threads = default_threads_number;
+
+            parallel_starter::threads = std::min(starts, threads);
+        }
 
         template<class Task>
         unique_ptr<clustering_results> start(Task &task, const mat &x,
                                              const vector<shared_ptr<model_spec>> &model_specs) {
 
             using subtask = typename Task::subtask;
-
-            if (threads == 0)
-                threads = std::thread::hardware_concurrency();
-            if (threads == 0)
-                threads = default_threads_number;
-            threads = std::min(starts, threads);
             int starts_per_thread = starts / threads;
             int remaining = starts - (starts_per_thread * threads);
 
@@ -99,14 +100,14 @@ namespace cec {
         explicit multiple_starts_task(cec_starter::parameters params)
                 : params(params) {}
 
-        subtask operator()(int starts) {
+        subtask operator()(int starts) const {
             unique_ptr<clustering_starter> starter = make_unique<cec_starter>(params);
-            return mp_start_subtask(
-                    std::move(starter), vector<unique_ptr<clustering_processor>>(), starts);
+            return mp_start_subtask(std::move(starter),
+                                    vector<unique_ptr<clustering_processor>>(), starts);
         }
 
     private:
-        cec_starter::parameters params;
+        const cec_starter::parameters params;
     };
 
     class start_and_split_task {
