@@ -8,6 +8,7 @@
 #include "variable_starter.h"
 
 #include<R_ext/Random.h>
+#include<R_ext/Rdynload.h>
 
 using namespace cec;
 using namespace cec::r;
