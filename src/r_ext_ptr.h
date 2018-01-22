@@ -20,13 +20,6 @@ namespace cec {
                 (*this) = std::move(r_p);
             }
 
-            template<typename ...Args>
-            static r_ext_ptr<T> make(Args &&... args) {
-                r_ext_ptr<T> ptr;
-                ptr.init(std::forward<Args>(args)...);
-                return ptr;
-            }
-
             bool operator==(const r_ext_ptr &r_p) const {
                 return t_ptr == r_p.t_ptr;
             }
@@ -105,6 +98,14 @@ namespace cec {
                 R_ClearExternalPtr(r_ptr);
             }
         };
+
+        template<typename T, typename ...Args>
+        static r_ext_ptr<T> make_r_ext(Args &&... args) {
+            r_ext_ptr<T> ptr;
+            ptr.init(std::forward<Args>(args)...);
+            return ptr;
+        }
+
     }
 }
 
