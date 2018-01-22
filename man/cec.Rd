@@ -13,7 +13,8 @@ Performs Cross-Entropy Clustering on a data matrix.
 cec(x, centers, type = c("covariance", "fixedr", "spherical", "diagonal",  
 "eigenvalues", "all"), iter.max = 25, nstart = 1, param, 
 centers.init = c("kmeans++", "random"), card.min = "5\%", keep.removed = F, 
-interactive = F, threads = "auto", readline = T)
+interactive = F, threads = "auto", split = F, split.depth = 8, split.tries = 5, 
+split.limit = 100, split.initial.starts = 1,readline = T)
 }
 
 \arguments{
