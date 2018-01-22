@@ -36,10 +36,10 @@ namespace cec {
             subtask my = task(starts_per_thread + (remaining-- > 0 ? 1 : 0));
 
             for (int th = 1; th < threads; th++) {
-                std::packaged_task<unique_ptr<clustering_results>(clustering_input &&)> pt(
-                        task(starts_per_thread + (remaining-- > 0 ? 1 : 0)));
-                cl_results.emplace_back(pt.get_future());
-                cl_tasks.emplace_back(std::move(pt),
+                std::packaged_task<unique_ptr<clustering_results>(clustering_input &&)>
+                        pt_subtask(task(starts_per_thread + (remaining-- > 0 ? 1 : 0)));
+                cl_results.emplace_back(pt_subtask.get_future());
+                cl_tasks.emplace_back(std::move(pt_subtask),
                                       clustering_input(x, model_spec::create_models(model_specs)));
             }
 
@@ -50,8 +50,13 @@ namespace cec {
             for (auto &&cl_task : cl_tasks)
                 cl_task.join();
 
-            for (auto &&result : cl_results)
-                best(result.get());
+            for (auto &&result : cl_results) {
+                try {
+                    best(result.get());
+                } catch (std::exception ex) {
+                    //ignore for now...
+                }
+            }
 
             return best();
         }
@@ -62,7 +67,6 @@ namespace cec {
         static const int default_threads_number = 4;
     };
 
-
     class mp_start_subtask {
     public:
         mp_start_subtask(mp_start_subtask &&) = default;
@@ -70,7 +74,7 @@ namespace cec {
         mp_start_subtask(mp_start_subtask &) = delete;
 
         mp_start_subtask(unique_ptr<clustering_starter> c_starter,
-                         vector<unique_ptr<clustering_processor>> &&c_procs, const int starts)
+                         vector<unique_ptr<clustering_processor>> c_procs, const int starts)
                 : c_starter(std::move(c_starter)),
                   c_procs(std::move(c_procs)),
                   starts(starts) {};
@@ -78,11 +82,11 @@ namespace cec {
         unique_ptr<clustering_results> operator()(clustering_input &&input_params) {
             best_results_collector best;
             for (int i = 0; i < starts; i++) {
-                unique_ptr<clustering_results> res = c_starter->start(input_params);
-                for (auto &&cp : c_procs)
-                    res = cp->start(res, input_params);
+                    unique_ptr<clustering_results> res = c_starter->start(input_params);
+                    for (auto &&cp : c_procs)
+                        res = cp->start(res, input_params);
 
-                best(std::move(res));
+                    best(std::move(res));
             }
             return best();
         }

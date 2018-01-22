@@ -25,7 +25,7 @@ namespace cec {
                 best = std::move(cr);
         }
 
-        unique_ptr<clustering_results> operator()() {
+        unique_ptr<clustering_results> operator()() noexcept {
             return std::move(best);
         }
 
@@ -44,11 +44,13 @@ namespace cec {
 
     class clustering_starter {
     public:
+        virtual ~clustering_starter() = default;
         virtual unique_ptr<clustering_results> start(const clustering_input &input_params) = 0;
     };
 
     class clustering_processor {
     public:
+        virtual ~clustering_processor() = default;
         virtual unique_ptr<clustering_results>
         start(const unique_ptr<clustering_results> &cl_res, const clustering_input &input_param) = 0;
     };
