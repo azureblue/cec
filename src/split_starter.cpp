@@ -33,6 +33,10 @@ namespace cec {
     unique_ptr<clustering_results>
     split_starter::start(const unique_ptr<clustering_results> &cl_res,
                          const clustering_input &input_params) {
+
+        if (cl_res->cluster_number >= max_k)
+            return make_unique<clustering_results>(*cl_res);
+
         const mat &x = input_params.x;
         int n = x.n;
         int k = cl_res->centers.m;
@@ -72,7 +76,7 @@ namespace cec {
                 }
                 split_flag = split_flag || split_success;
                 if (k_s == max_k - 1)
-                    split_flag = false;
+                    split_success = false;
 
                 if (split_success) {
                     is_split[k_s] = true;
@@ -96,7 +100,11 @@ namespace cec {
 
             bool need_another_split = false;
             if (split_flag) {
-                current_res = cec.start(x, cluster, model_spec::create_models(m_spec, k_s));
+                try {
+                    current_res = cec.start(x, cluster, model_spec::create_models(m_spec, k_s));
+                } catch (clustering_exception &ce) {
+                    return current_res;
+                }
 
                 for (int i = 0; i < x.m; i++) {
                     if (cluster[i] != current_res->assignment[i]) {

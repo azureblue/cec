@@ -20,7 +20,11 @@ cec <- function(
 {
     # check arguments  
     if (!hasArg(x)) stop("Missing requierd argument: 'x'.")
-    if (!hasArg(centers)) stop("Missing requierd argument: 'centers'.")
+
+    if (!hasArg(centers)) {
+        centers <- 1
+        split = T
+    }
     
     if (iter.max < 0) stop("Illegal argument: iter.max < 0.")
     if (!is.matrix(x)) stop("Illegal argument: 'x' is not a matrix.")
