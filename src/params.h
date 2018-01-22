@@ -48,16 +48,30 @@ namespace cec {
 
     class control_param {
     public:
-        const int starts;
-        const int max_iter;
-        const int min_card;
-        const int threads;
+        int starts;
+        int max_iter;
+        int min_card;
+        int threads;
 
         control_param(int starts, int max_iter, int min_card, int threads)
                 : starts(starts),
                   max_iter(max_iter),
                   min_card(min_card),
                   threads(threads) {}
+    };
+
+    class split_param {
+    public:
+        int max_k;
+        int max_depth;
+        int tries;
+        int initial_starts;
+
+        split_param(int max_k, int max_depth, int tries, int initial_starts)
+                : max_k(max_k),
+                  max_depth(max_depth),
+                  tries(tries),
+                  initial_starts(initial_starts) {}
     };
 
     class model_spec {

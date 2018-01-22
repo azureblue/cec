@@ -2,7 +2,6 @@
 #include "r_utils.h"
 
 using namespace cec::r;
-using std::shared_ptr;
 
 cec::centers_param cec::get_centers_param(SEXP centers_param_r) {
     r_wrapper r_par(centers_param_r);
@@ -58,4 +57,14 @@ cec::models_param cec::get_models_param(SEXP models_param_r, int n) {
         }
     }
     return models_param(std::move(specs));
+}
+
+cec::split_param cec::get_split_param(SEXP split_param_r) {
+    r_wrapper r_par(split_param_r);
+    return {
+            r_par["limit"].get<int>(),
+            r_par["depth"].get<int>(),
+            r_par["tries"].get<int>(),
+            r_par["initial_starts"].get<int>()
+    };
 }
