@@ -28,28 +28,28 @@ SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models_param
     const char *ex_what = nullptr;
     r_ext_ptr<clustering_results> start_results;
     try {
-        mat x_mat = get<mat>(x);
-        int n = x_mat.n;
+        auto x_mat = get<r_ext_ptr<mat>>(x);
+        int n = x_mat->n;
 
-        centers_param centers_par = get_centers_param(centers_param_r);
-        control_param control_par = get_control_param(control_param_r);
-        models_param models_par = get_models_param(models_param_r, n);
+        r_ext_ptr<centers_param> centers_par = get_centers_param(centers_param_r);
+        r_ext_ptr<control_param> control_par = get_control_param(control_param_r);
+        r_ext_ptr<models_param> models_par = get_models_param(models_param_r, n);
 
-        const shared_ptr<centers_init_spec> &centers_init_ptr = centers_par.get_centers_init();
+        const shared_ptr<centers_init_spec> &centers_init_ptr = centers_par->get_centers_init();
         const centers_init_spec &init_spec = *centers_init_ptr;
 
-        cec_parameters start_params(control_par.max_iter, control_par.min_card);
+        cec_parameters start_params(control_par->max_iter, control_par->min_card);
 
         multiple_starts_task m_start_task({start_params, init_spec});
-        parallel_starter ps(control_par.threads, control_par.starts);
+        parallel_starter ps(control_par->threads, control_par->starts);
 
         auto cl_function = std::bind(&parallel_starter::start<multiple_starts_task>, &ps,
                                      std::ref(m_start_task), std::placeholders::_1,
                                      std::placeholders::_2);
 
-        variable_starter var_start(cl_function, centers_par.var_centers);
+        variable_starter var_start(cl_function, centers_par->var_centers);
 
-        unique_ptr<clustering_results> results = var_start.start(x_mat, models_par.specs);
+        unique_ptr<clustering_results> results = var_start.start(*x_mat, models_par->specs);
 
         start_results.reset(results.release());
 
@@ -78,31 +78,31 @@ SEXP cec_split_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models
     const char *ex_what = nullptr;
     r_ext_ptr<clustering_results> start_results;
     try {
-        mat x_mat = get<mat>(x);
-        int n = x_mat.n;
+        auto x_mat = get<r_ext_ptr<mat>>(x);
+        int n = x_mat->n;
 
-        centers_param centers_par = get_centers_param(centers_param_r);
-        control_param control_par = get_control_param(control_param_r);
-        models_param models_par = get_models_param(models_param_r, n);
-        split_param split_par = get_split_param(split_param_r);
+        r_ext_ptr<centers_param> centers_par = get_centers_param(centers_param_r);
+        r_ext_ptr<control_param> control_par = get_control_param(control_param_r);
+        r_ext_ptr<models_param> models_par = get_models_param(models_param_r, n);
+        r_ext_ptr<split_param> split_par = get_split_param(split_param_r);
 
-        const shared_ptr<centers_init_spec> &centers_init_ptr = centers_par.get_centers_init();
+        const shared_ptr<centers_init_spec> &centers_init_ptr = centers_par->get_centers_init();
         const centers_init_spec &init_spec = *centers_init_ptr;
 
-        cec_parameters start_params(control_par.max_iter, control_par.min_card);
+        cec_parameters start_params(control_par->max_iter, control_par->min_card);
 
         cec_starter::parameters initial_cl_params(start_params, init_spec,
-                                                  split_par.initial_starts);
+                                                  split_par->initial_starts);
 
-        split_starter::parameters split_params(start_params, *models_par.specs[0], init_spec,
-                                               split_par.tries, split_par.max_k,
-                                               split_par.max_depth);
+        split_starter::parameters split_params(start_params, *models_par->specs[0], init_spec,
+                                               split_par->tries, split_par->max_k,
+                                               split_par->max_depth);
 
         start_and_split_task split_task(initial_cl_params, split_params);
 
-        parallel_starter ps(control_par.threads, control_par.starts);
+        parallel_starter ps(control_par->threads, control_par->starts);
 
-        unique_ptr<clustering_results> results = ps.start(split_task, x_mat, models_par.specs);
+        unique_ptr<clustering_results> results = ps.start(split_task, *x_mat, models_par->specs);
 
         start_results.reset(results.release());
 
@@ -131,19 +131,18 @@ SEXP cec_init_centers_r(SEXP x_r, SEXP k_r, SEXP method_r) {
     r_ext_ptr<mat> res;
     try {
         try {
-            const string &method_str = get<string>(method_r);
-            const mat &x = get<mat>(x_r);
+            auto x = get<r_ext_ptr<mat>>(x_r);
             int k = get<int>(k_r);
-            init_method im = parse_init_method(method_str);
+            init_method im = parse_init_method(get<const char*>(method_r));
             switch (im) {
                 case init_method::KMEANSPP:
-                    res.init(kmeanspp_init().init(x, k));
+                    res.init(kmeanspp_init().init(*x, k));
                     break;
                 case init_method::RANDOM:
-                    res.init(random_init().init(x, k));
+                    res.init(random_init().init(*x, k));
                     break;
                 default:
-                    throw invalid_init_method(method_str);
+                    throw invalid_init_method("invalid init method");
             }
         } catch (std::exception &ex) {
             throw;

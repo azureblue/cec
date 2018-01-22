@@ -13,7 +13,7 @@ cec <- function(
     split         = F,
     split.depth   = 8,
     split.tries   = 5,
-    split.limit,
+    split.limit   = 100,
     split.initial.starts = 1,
     readline      = T
 )
@@ -84,10 +84,7 @@ cec <- function(
     
     # card.min must be greater than the dimension of the data
     card.min = max(card.min, n + 1)
-    
-    Z <- NULL
-    ok.flag <- F    
-    
+
     # prepare input for C function cec_r
     k <- max(var.centers)
     
@@ -115,7 +112,7 @@ cec <- function(
     if (split) {
         split.r = list(
             depth = as.integer(split.depth),
-            limit = as.integer(2 ^ split.depth),
+            limit = as.integer(split.limit),
             tries = as.integer(split.tries),
             initial.starts = as.integer(split.initial.starts)
         )

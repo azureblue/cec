@@ -10,18 +10,15 @@
 
 namespace cec {
 
-    using std::vector;
-    using std::string;
-
     namespace r {
         template<typename T>
         inline T get(SEXP sexp);
 
         template<>
-        inline string get(SEXP sexp) {
+        inline const char* get(SEXP sexp) {
             if (!isString(sexp))
                 throw invalid_parameter_type("string vector");
-            return string(CHAR(STRING_ELT(sexp, 0)));
+            return CHAR(STRING_ELT(sexp, 0));
         }
 
         template<>
@@ -39,32 +36,32 @@ namespace cec {
         }
 
         template<>
-        inline mat get(SEXP sexp) {
+        inline r_ext_ptr<mat> get(SEXP sexp) {
             if (!isMatrix(sexp))
                 throw invalid_parameter_type("matrix");
             int m = Rf_nrows(sexp);
             int n = Rf_ncols(sexp);
             double *r_ma_data = REAL(sexp);
-            mat ma(m, n);
+            auto ma = make_r_ext<mat>(m, n);
             for (int i = 0; i < m; i++)
                 for (int j = 0; j < n; j++)
-                    ma[i][j] = r_ma_data[j * m + i];
+                    (*ma)[i][j] = r_ma_data[j * m + i];
 
             return ma;
         }
 
         template<>
-        inline vector<double> get(SEXP sexp) {
+        inline r_ext_ptr<vector<double>> get(SEXP sexp) {
             if (TYPEOF(sexp) != REALSXP)
                 throw invalid_parameter_type("real vector");
-            return vector<double>(REAL(sexp), REAL(sexp) + LENGTH(sexp));
+            return make_r_ext<vector<double>>(REAL(sexp), REAL(sexp) + LENGTH(sexp));
         }
 
         template<>
-        inline vector<int> get(SEXP sexp) {
+        inline r_ext_ptr<vector<int>> get(SEXP sexp) {
             if (TYPEOF(sexp) != INTSXP)
                 throw invalid_parameter_type("integer vector");
-            return vector<int>(INTEGER(sexp), INTEGER(sexp) + LENGTH(sexp));
+            return make_r_ext<vector<int>>(INTEGER(sexp), INTEGER(sexp) + LENGTH(sexp));
         }
 
         inline SEXP put(const mat &ma) {
@@ -122,7 +119,7 @@ namespace cec {
                 return LENGTH(sexp);
             }
 
-            r_wrapper operator[](const string &name) {
+            r_wrapper operator[](const char *name) {
                 return r_wrapper(get_named(sexp, name));
             }
 
@@ -138,13 +135,13 @@ namespace cec {
         private:
             SEXP sexp;
 
-            SEXP get_named(SEXP list, const string &name) {
+            SEXP get_named(SEXP list, const char *name) {
                 SEXP elementNames = GET_NAMES(list);
                 if (!isString(elementNames))
                     throw invalid_parameter_type("named elements");
                 int len = LENGTH(elementNames);
                 for (int i = 0; i < len; i++) {
-                    if (name != CHAR(STRING_ELT(elementNames, i)))
+                    if (strcmp(name, CHAR(STRING_ELT(elementNames, i))))
                         continue;
                     SEXP res = VECTOR_ELT(list, i);
                     if (!res || isNull(res))
