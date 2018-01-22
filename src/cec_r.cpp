@@ -50,6 +50,8 @@ SEXP cec_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models_param
         variable_starter var_start(cl_function, centers_par->var_centers);
 
         unique_ptr<clustering_results> results = var_start.start(*x_mat, models_par->specs);
+        if (!results)
+            throw clustering_exception("all starts failed");
 
         start_results.reset(results.release());
 
@@ -102,7 +104,13 @@ SEXP cec_split_r(SEXP x, SEXP centers_param_r, SEXP control_param_r, SEXP models
 
         parallel_starter ps(control_par->threads, control_par->starts);
 
-        unique_ptr<clustering_results> results = ps.start(split_task, *x_mat, models_par->specs);
+        auto cl_function = std::bind(&parallel_starter::start<start_and_split_task>, &ps,
+                                     std::ref(split_task), std::placeholders::_1,
+                                     std::placeholders::_2);
+
+        variable_starter var_start(cl_function, centers_par->var_centers);
+
+        unique_ptr<clustering_results> results = var_start.start(*x_mat, models_par->specs);
 
         start_results.reset(results.release());
 
@@ -133,7 +141,7 @@ SEXP cec_init_centers_r(SEXP x_r, SEXP k_r, SEXP method_r) {
         try {
             auto x = get<r_ext_ptr<mat>>(x_r);
             int k = get<int>(k_r);
-            init_method im = parse_init_method(get<const char*>(method_r));
+            init_method im = parse_init_method(get<const char *>(method_r));
             switch (im) {
                 case init_method::KMEANSPP:
                     res.init(kmeanspp_init().init(*x, k));

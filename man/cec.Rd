@@ -87,8 +87,29 @@ Interactive mode. If TRUE, the result of clustering will be plotted after every 
 Specifies the number of threads to use or "auto" to use default number of threads (usually
 the number of available processing units/cores) when performing multiple starts (\code{nstart} parameter).
 
-The execution of a single start is always performed by a single thread, thus for \code{nstart = 1} only one thread
-will be used regardless of the value of this parameter.
+The execution of a single start is always performed by a single thread, thus for \code{nstart = 1} only one thread will be used regardless of the value of this parameter.
+}
+
+\item{split}{
+Enables split mode. This mode discovers new clusters after initial clustering, by trying to split single clusters into two to lower the cost function.
+
+For each start (\code{nstart}), initial clustering will be performed and then split. The number of starts in the initial clustering before split is driven by the \code{split.initial.starts} parameter.
+}
+
+\item{split.depth}{
+Cluster subdivision depth used in split mode.
+}
+
+\item{split.tries}{
+The number of attempts that are made when trying to split a cluster in split mode.
+}
+
+\item{split.limit}{
+Maximum number of centers.
+}
+
+\item{split.initial.starts}{
+Number of starts performs before performing split. The number of 
 }
 
 \item{readline}{
