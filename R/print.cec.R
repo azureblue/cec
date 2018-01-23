@@ -1,8 +1,6 @@
 print.cec <- function(x, ...)
 {
-    cat("CEC clustering result: \n\n")
-    cat("Clustering vector: \n")
-    print(x$cluster)
+    cat("CEC clustering result: \n")
     cat("\nProbability vector:\n")
     print(x$probability)
     cat("\nMeans of clusters:\n")
@@ -16,5 +14,5 @@ print.cec <- function(x, ...)
     cat("\nComputation time:\n")
     print(x$time)
     cat("\nAvailable components:\n")
-    print(c("data", "cluster", "probabilities", "centers", "cost.function", "nclusters", "final.cost.function", "final.nclusters", "iterations", "covariances", "covariances.model", "time" ))
+    print(c("data", "cluster", "probabilities", "centers", "cost.function", "nclusters", "iterations", "covariances", "covariances.model", "time" ))
 }

@@ -1,4 +1,4 @@
- testname <- "Covariance calculation"
+testname <- "Covariance calculation"
 setup <- function()
 {
     B <- as.matrix(read.table(system.file("cec_tests", "ball1.data", package="CEC")))
