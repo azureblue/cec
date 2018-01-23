@@ -6,7 +6,9 @@ namespace cec {
         best_results_collector best;
         for (auto &&k : centers_number) {
             vector<shared_ptr<model_spec>> models_specs_subset(m_specs.begin(), m_specs.begin() + k);
-            best(cl_starter(x, models_specs_subset));
+            try {
+                best(cl_starter(x, models_specs_subset));
+            } catch (clustering_exception &ce) {}
         }
         return best();
     }
