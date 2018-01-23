@@ -13,7 +13,7 @@ Performs Cross-Entropy Clustering on a data matrix.
 cec(x, centers, type = c("covariance", "fixedr", "spherical", "diagonal",  
 "eigenvalues", "all"), iter.max = 25, nstart = 1, param, 
 centers.init = c("kmeans++", "random"), card.min = "5\%", keep.removed = F, 
-interactive = F, threads = "auto", split = F, split.depth = 8, split.tries = 5, 
+interactive = F, threads = 1, split = F, split.depth = 8, split.tries = 5, 
 split.limit = 100, split.initial.starts = 1,readline = T)
 }
 
@@ -122,8 +122,7 @@ plotting it will wait for the user to press <Return> instead of standard "before
 }
 \value{
   Returns an object of class "cec" with available components:
-  "data", "cluster", "probabilities", "centers", "cost.function", "nclusters", "final.cost.function", 
-  "final.nclusters", "iterations", "cost", "covariances", 
+  "data", "cluster", "probabilities", "centers", "cost.function", "nclusters", "iterations", "cost", "covariances", 
   "covariances.model", "time".
 }
 
@@ -192,12 +191,22 @@ Z = cec(m, centers, type="sp", iter.max = 100, nstart=4, card.min="5\%")
 plot(Z)
 # Result:
 Z
+
 ## Example of clustering data set "Tset" using "eigenvalues" clustering type.
 data(Tset)
 plot(Tset, cex = 0.5, pch = 19)
 centers = init.centers(Tset, 2)
 ## Clustering result:
 Z <- cec(Tset, 5, "eigenvalues", param=c(0.02,0.002), nstart=4)
+plot(Z)
+# Result:
+Z
+
+## Example of using CEC split method starting with single cluster.
+data(mixShapes)
+plot(mixShapes, cex = 0.5, pch = 19)
+## Clustering result:
+Z <- cec(mixShapes, 1, split=TRUE)
 plot(Z)
 # Result:
 Z
