@@ -1,8 +1,7 @@
 #include "cec_starter.h"
 
 namespace cec {
-    unique_ptr<clustering_results>
-    cec_starter::start(const clustering_input &ip) {
+    unique_ptr<clustering_results> cec_starter::start(const clustering_input &ip) {
         const mat &x = ip.x;
         const vector<unique_ptr<model>> &models = ip.models;
         int k = models.size();
