@@ -32,7 +32,8 @@ namespace cec {
                   cec(params.start_params),
                   m_spec(params.model_sp),
                   max_k(params.max_k),
-                  max_depth(params.max_depth) {}
+                  max_depth(params.max_depth),
+                  try_split_models(model_spec::create_models(m_spec, 2)) {}
 
         unique_ptr<clustering_results>
         start(const unique_ptr<clustering_results> &cl_res,
@@ -42,10 +43,10 @@ namespace cec {
         cec_starter splitter;
         cross_entropy_clustering cec;
         const model_spec &m_spec;
-        const int max_k;
-        const int max_depth;
-        unique_ptr<clustering_results>
-        try_split_cluster(const mat &x_mat, const model_spec &m_spec);
+        int max_k;
+        int max_depth;
+        vector<unique_ptr<model>> try_split_models;
+        unique_ptr<clustering_results> try_split_cluster(const mat &x_mat);
     };
 }
 

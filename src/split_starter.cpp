@@ -2,8 +2,7 @@
 
 namespace cec {
     unique_ptr<clustering_results>
-    split_starter::try_split_cluster(const mat &x_mat, const model_spec &m_spec) {
-
+    split_starter::try_split_cluster(const mat &x_mat) {
         try {
             const unique_ptr<clustering_results> &single_res
                     = cec.start(x_mat, vector<int>(x_mat.m, 0),
@@ -12,16 +11,10 @@ namespace cec {
             if (!single_res)
                 return unique_ptr<clustering_results>();
 
-            double single_cluster_energy = single_res->energy;
-            vector<unique_ptr<model>> models(2);
-            models[0] = m_spec.create_model();
-            models[1] = m_spec.create_model();
-
-            unique_ptr<clustering_results> split_res
-                    = splitter.start(clustering_input(x_mat, std::move(models)));
+            unique_ptr<clustering_results> split_res = splitter.start(clustering_input(x_mat, try_split_models));
 
             if (split_res && split_res->cluster_number == 2 &&
-                split_res->energy < single_cluster_energy)
+                split_res->energy < single_res->energy)
                 return split_res;
 
             return unique_ptr<clustering_results>();
@@ -67,7 +60,7 @@ namespace cec {
                 const vector<int> mapping = split[i].mapping();
                 vector<int> split_assignment(split_x_mat.m);
                 if (moved[i]) {
-                    auto const &split_res = try_split_cluster(split_x_mat, m_spec);
+                    auto const &split_res = try_split_cluster(split_x_mat);
                     if (split_res) {
                         split_success = true;
                         split_res_c_mat = split_res->centers;

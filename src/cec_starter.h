@@ -8,12 +8,12 @@
 namespace cec {
     struct clustering_input {
         const mat &x;
-        vector<unique_ptr<model>> models;
+        const vector<unique_ptr<model>> &models;
 
     public:
-        clustering_input(const mat &x, vector<unique_ptr<model>> &&models)
+        clustering_input(const mat &x, const vector<unique_ptr<model>> &models)
                 : x(x),
-                  models(std::move(models)) {}
+                  models(models) {}
     };
 
     class best_results_collector {
@@ -58,11 +58,11 @@ namespace cec {
     class cec_starter : public clustering_starter {
     public:
         struct parameters {
-            const cec_parameters &start_params;
+            const cec_parameters start_params;
             const centers_init_spec &init;
             int starts;
 
-            parameters(const cec_parameters &start_params,
+            parameters(cec_parameters start_params,
                        const centers_init_spec &init,
                        int starts = 1)
                     : start_params(start_params),
