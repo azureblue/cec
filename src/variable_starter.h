@@ -10,8 +10,8 @@ namespace cec {
         using clustering_function = std::function<unique_ptr<clustering_results>
                 (const mat&, const vector<shared_ptr<model_spec>>&)>;
 
-        variable_starter(clustering_function cl_starter, vector<int> centers_number)
-                : cl_starter(cl_starter),
+        variable_starter(clustering_function &&cl_starter, vector<int> centers_number)
+                : cl_starter(std::move(cl_starter)),
                   centers_number(centers_number) {}
 
         unique_ptr<clustering_results>

@@ -1,12 +1,32 @@
 # CLion IDE project
 #set(ENV{Path} "")
-
 cmake_minimum_required(VERSION 3.5)
 project(cec)
+
+set(LINUX_R_INCLUDE_PATH "/usr/share/R/include")
+set(LINUX_R "R")
+set(LINUX_CEC_LIB "/home/konrad/R/x86_64-pc-linux-gnu-library/3.4/CEC/libs/CEC.so")
+
+set(WINDOWS_R_INCLUDE_PATH "K:/R/R-3.4.3/include")
+set(WINDOWS_R_LINK_DIRECTORY_PATH "K:/R/R-3.4.3/bin/x64")
+set(WINDOWS_R "K:/R/R-3.4.3/bin/x64/R.exe")
+set(WINDOWS_CEC_LIB "K:/R/R-3.4.3/library/CEC/libs/x64/CEC.dll")
+
+if (WIN32)
+    include_directories(${WINDOWS_R_INCLUDE_PATH})
+    link_directories(${WINDOWS_R_LINK_DIRECTORY_PATH})
+    link_libraries(m R Rlapack Rblas)
+    set(R ${WINDOWS_R})
+    set(CEC_LIB ${WINDOWS_CEC_LIB})
+else(WIN32)
+    include_directories(${LINUX_R_INCLUDE_PATH})
+    link_libraries(m R lapack blas)
+    set(R ${LINUX_R})
+    set(CEC_LIB ${LINUX_CEC_LIB})
+endif(WIN32)
+
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
-
-include_directories(/usr/share/R/include)
 
 set(SOURCE_FILES
         src/params.cpp
@@ -45,18 +65,15 @@ set(SOURCE_FILES
         src/common.h src/split_starter.cpp src/split_starter.h src/parallel_starter.cpp src/parallel_starter.h)
 
 
-link_libraries(m R lapack blas)
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=core2")
 set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -pipe -std=c++0x -pedantic -Wall")
 add_library(cec SHARED ${SOURCE_FILES})
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
 add_executable(cec_test ${SOURCE_FILES} src/test.cpp)
 
-set(MAKEVARS_PKG_CFLAGS "-DR_ALLOC -DR_RAND $(SHLIB_OPENMP_CFLAGS)")
 set(MAKEVARS_PKG_LIBS "$(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) $(SHLIB_OPENMP_CFLAGS)")
 
 file(WRITE src/Makevars "CXX_STD = CXX11" "\n")
-file(APPEND src/Makevars "PKG_CFLAGS = " ${MAKEVARS_PKG_CFLAGS} "\n")
 file(APPEND src/Makevars "PKG_LIBS = " ${MAKEVARS_PKG_LIBS} "\n")
 
 string(REPLACE ";" " " SOURCE_FILES_STRING "${SOURCE_FILES}")
@@ -69,11 +86,11 @@ string(REGEX REPLACE " +" " " SOURCE_FILES_STRING ${SOURCE_FILES_STRING})
 file(APPEND src/Makevars "OBJECTS = " ${SOURCE_FILES_STRING} "\n")
 
 add_custom_target(install_CEC
-        COMMAND R CMD INSTALL --clean ${CMAKE_SOURCE_DIR}
+        COMMAND ${R} CMD INSTALL --clean ${CMAKE_SOURCE_DIR}
         )
 
 add_custom_target(dist_lib
-        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:cec> /home/konrad/R/x86_64-pc-linux-gnu-library/3.4/CEC/libs/CEC.so
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:cec> ${CEC_LIB}
         )
 
 add_dependencies(dist_lib cec)
