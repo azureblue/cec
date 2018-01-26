@@ -31,58 +31,64 @@ namespace cec {
 
     class parallel_starter {
     public:
-        parallel_starter(int threads, int starts)
+        parallel_starter(int max_threads, int starts)
                 : starts(starts) {
+            if (max_threads == 0)
+                max_threads = std::thread::hardware_concurrency();
+            if (max_threads == 0)
+                max_threads = default_threads_number;
 
-            if (threads == 0)
-                threads = std::thread::hardware_concurrency();
-            if (threads == 0)
-                threads = default_threads_number;
-
-            parallel_starter::threads = std::min(starts, threads);
+            parallel_starter::max_threads = std::min(starts, max_threads);
         }
 
         template<class Task>
         unique_ptr<clustering_results> start(Task &task) {
-
             using subtask = typename Task::subtask;
-            int starts_per_thread = starts / threads;
-            int remaining = starts - (starts_per_thread * threads);
+            int starts_per_thread = starts / max_threads;
+            int remaining = starts - (starts_per_thread * max_threads);
+            best_results_collector best;
 
             vector<std::thread> cl_tasks;
             vector<std::future<unique_ptr<clustering_results>>> cl_results;
 
             subtask my = task(starts_per_thread + (remaining-- > 0 ? 1 : 0));
+            try {
+                for (int th = 1; th < max_threads; th++) {
+                    std::packaged_task<unique_ptr<clustering_results>()>
+                            pt_subtask(task(starts_per_thread + (remaining-- > 0 ? 1 : 0)));
 
-            for (int th = 1; th < threads; th++) {
-                std::packaged_task<unique_ptr<clustering_results>()>
-                        pt_subtask(task(starts_per_thread + (remaining-- > 0 ? 1 : 0)));
-                cl_results.emplace_back(pt_subtask.get_future());
-                cl_tasks.emplace_back(std::move(pt_subtask));
-            }
-
-            best_results_collector best;
-
-            best(my());
-
-            for (auto &&cl_task : cl_tasks)
-                cl_task.join();
-
-            for (auto &&result : cl_results) {
-                try {
-                    best(result.get());
-                } catch (std::exception &ex) {
-                    //ignore for now...
+                    cl_results.emplace_back(pt_subtask.get_future());
+                    cl_tasks.emplace_back(std::move(pt_subtask));
                 }
+
+                best(my());
+
+                for (auto &&result : cl_results)
+                    try {
+                        best(result.get());
+                    } catch (clustering_exception &ex) {
+                        //ignore for now...
+                    }
+
+            } catch (std::exception &ex) {
+                join_all_threads(cl_tasks);
+                throw;
             }
+
+            join_all_threads(cl_tasks);
 
             return best();
         }
 
     private:
-        int threads;
+        int max_threads;
         int starts;
         static const int default_threads_number = 4;
+
+        static void join_all_threads(vector<std::thread> &threads) {
+            for (auto &&th : threads)
+                th.join();
+        }
     };
 
     class mp_start_subtask {
