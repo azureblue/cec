@@ -13,7 +13,7 @@ namespace cec {
 
         virtual double cross_entropy(const mat &cov) const noexcept = 0;
 
-        inline double energy(mat &cov, int card, int m) const noexcept {
+        inline double energy(const mat &cov, int card, int m) const noexcept {
             double p = card / (double) m;
             return p * (-m::log(p) + cross_entropy(cov));
         }
