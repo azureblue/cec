@@ -18,60 +18,67 @@ if (WIN32)
     link_libraries(m R Rlapack Rblas)
     set(R ${WINDOWS_R})
     set(CEC_LIB ${WINDOWS_CEC_LIB})
-else(WIN32)
+else (WIN32)
     include_directories(${LINUX_R_INCLUDE_PATH})
     link_libraries(m R lapack blas)
     set(R ${LINUX_R})
     set(CEC_LIB ${LINUX_CEC_LIB})
-endif(WIN32)
+endif (WIN32)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
 set(SOURCE_FILES
-        src/params.cpp
-        src/params.h
-        src/r_params.cpp
-        src/r_params.h
-        src/starter.cpp
-        src/starter.h
-        src/r_ext_ptr.h
-        src/r_utils.h
-        src/cluster.h
-        src/exceptions.h
-        src/models/cov_utils.h
-        src/models/cov_utils.cpp
-        src/models/model.h
-        src/models/all.h
-        src/models/diagonal.h
-        src/models/spherical.h
-        src/models/fixed_radius.h
-        src/models/covariance.h
-        src/models/eigenvalues.h
-        src/m.h
-        src/vec.h
-        src/r_result.h
-        src/r_result.cpp
         src/cec_r.cpp
         src/cec_r.h
-        src/init.h
-        src/init.cpp
         src/cec_starter.cpp
         src/cec_starter.h
-        src/random.h
+        src/cluster.h
+        src/common.h
+        src/exceptions.h
+        src/init.cpp
+        src/init.h
+        src/m.h
+        src/models/all.h
+        src/models/cov_utils.cpp
+        src/models/cov_utils.h
+        src/models/covariance.h
+        src/models/diagonal.h
+        src/models/eigenvalues.h
+        src/models/fixed_radius.h
+        src/models/model.h
+        src/models/spherical.h
+        src/parallel_starter.cpp
+        src/parallel_starter.h
+        src/params.cpp
+        src/params.h
+        src/r_ext_ptr.h
+        src/r_params.cpp
+        src/r_params.h
+        src/r_result.cpp
+        src/r_result.h
+        src/r_utils.h
         src/random.cpp
+        src/random.h
+        src/split_starter.cpp
+        src/split_starter.h
+        src/starter.cpp
+        src/starter.h
         src/variable_starter.cpp
         src/variable_starter.h
-        src/common.h src/split_starter.cpp src/split_starter.h src/parallel_starter.cpp src/parallel_starter.h)
-
+        src/vec.h)
 
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=core2")
-set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -pipe -std=c++0x -pedantic -Wall")
+
+set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -pipe -std=c++11 -pedantic -Wall")
+
+set(CMAKE_CXX_FLAGS_PROFILE "${CMAKE_CXX_FLAGS_RELEASE} -pg")
+set(CMAKE_EXE_LINKER_FLAGS_PROFILE "-pg")
+
 add_library(cec SHARED ${SOURCE_FILES})
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
 #add_executable(cec_test ${SOURCE_FILES} src/test.cpp)
 
-set(MAKEVARS_PKG_LIBS "$(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) $(SHLIB_OPENMP_CFLAGS)")
+set(MAKEVARS_PKG_LIBS "$(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)")
 
 file(WRITE src/Makevars "CXX_STD = CXX11" "\n")
 file(APPEND src/Makevars "PKG_LIBS = " ${MAKEVARS_PKG_LIBS} "\n")

@@ -118,12 +118,12 @@ namespace cec {
 
         explicit vec(const row &v)
                 : vec(v.size) {
-            (*this) = v;
+            operator=(v);
         }
 
         vec(const vec &v)
                 : vec(v.size) {
-            (*this) = v;
+            operator=(v);
         }
 
         vec(vec &&v) = default;
@@ -140,12 +140,12 @@ namespace cec {
     public:
         const int m, n;
     private:
-        vec v;
+        vec data_vec;
     public:
         mat(int m, int n)
                 : m(m),
                   n(n),
-                  v(m * n) {}
+                  data_vec(m * n) {}
 
         mat(const mat &ma)
                 : mat(ma.m, ma.n) {
@@ -159,45 +159,45 @@ namespace cec {
         }
 
         inline row operator[](int idx) {
-            return v.sub(n * idx, n);
+            return data_vec.sub(n * idx, n);
         }
 
         inline mat &operator=(const mat &ma) {
-            v.operator=(ma.v);
+            data_vec.operator=(ma.data_vec);
             return *this;
         }
 
         inline mat &operator=(mat &&ma) noexcept {
-            *this = (ma);
+            *this = ma;
             return *this;
         }
 
         double *data() {
-            return v.data();
+            return data_vec.data();
         }
 
         const double *data() const {
-            return v.data();
+            return data_vec.data();
         }
 
         void fill(double value) {
-            v.fill(value);
+            data_vec.fill(value);
         }
 
         void operator*=(double value) {
-            v *= value;
+            data_vec *= value;
         }
 
         void operator/=(double value) {
-            v /= value;
+            data_vec /= value;
         }
 
         void operator+=(const mat &m) {
-            v += m.v;
+            data_vec += m.data_vec;
         }
 
         void operator-=(const mat &m) {
-            v -= m.v;
+            data_vec -= m.data_vec;
         }
 
         friend std::ostream &operator<<(std::ostream &os, const mat &m) {
@@ -275,4 +275,3 @@ namespace cec {
 }
 
 #endif /* VEC_H */
-
