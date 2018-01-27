@@ -20,9 +20,8 @@ cec::cross_entropy_clustering::start(const mat &x, const vector<int> &initial_as
     for (int i = 0; i < k; i++) {
         const mat &cluster_split = split[i].points();
         if (cluster_split.m >= min_card) {
-            mean me(cluster_split);
-            mat cov = covariance_mle::estimate(cluster_split, me);
-            clusters[i].reset(new cluster(*models[i], me, cov, m));
+            covariance_mat cov = covariance_mat::estimate(cluster_split);
+            clusters[i].reset(new cluster(*models[i], cov, m));
         }
     }
 
