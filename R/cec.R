@@ -24,6 +24,7 @@ cec <- function(
     if (!hasArg(centers)) {
         centers <- 1
         split = T
+        message("Performing CEC Split")
     }
     
     if (iter.max < 0) stop("Illegal argument: iter.max < 0.")
@@ -114,6 +115,11 @@ cec <- function(
     
     # perform the clustering by calling C function cec_r
     if (split) {
+        for (i in 1:k)
+            if (models.r[[i]]$type != models.r[[1]]$type)
+                error("mixing model types is currently not supported in split mode")
+        
+        models.r
         split.r = list(
             depth = as.integer(split.depth),
             limit = as.integer(split.limit),
