@@ -55,6 +55,8 @@ only if the \code{centers} argument is a number or a vector.
 
 If the \code{centers} argument is a vector, \code{length(centers)} clusterings will be performed
 for each start and the total number of clusterings will be \code{length(centers) * nstart}.
+
+If the split mode is on (\code{split = T}), it's rarely desired use change this parameter as the whole procedure (initial clustering + split) will be performed \code{nstart} times.
 }
 
 \item{centers.init}{
