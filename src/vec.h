@@ -12,12 +12,6 @@ namespace cec {
     public:
         const int size;
 
-        row(row &&r) noexcept = default;
-
-        row(double *ptr, int n)
-                : size(n),
-                  data_(ptr) {}
-
         inline double &operator[](int idx) {
             return data_[idx];
         }
@@ -84,9 +78,17 @@ namespace cec {
         }
 
     private:
+        friend class vec;
         friend class mat;
 
         row(const row &r) = default;
+
+        row(row &&r) noexcept = default;
+
+        row(double *ptr, int n)
+                : size(n),
+                  data_(ptr) {}
+
 
         row sub(int offset, int n) {
             return {data_ + offset, n};
