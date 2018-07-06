@@ -235,7 +235,8 @@ plot(cec, asp = 1)
 ```
 ![](https://azureblue.github.io/cec/static/split_20_gaussians_all.png)
 
-Some data sets may require tuning of the split parameters. Using spherical densities (`type = 'spherical'`) the `split.depth`
+Some data sets may require tuning of the split parameters. 
+Using spherical densities (`type = 'spherical'`) on the same data, the `split.depth`
 needs to be increased significantly as well as `split.tries`. As in the previous example the `card.min` is changed.
 ```
 cec <- cec(twenty.gaussians,, "sp", split.depth = 25, split.tries=15, card.min="1%")

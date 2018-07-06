@@ -24,7 +24,6 @@ cec <- function(
     if (!hasArg(centers)) {
         centers <- 1
         split = T
-        message("Performing CEC Split")
     }
     
     if (iter.max < 0) stop("Illegal argument: iter.max < 0.")
