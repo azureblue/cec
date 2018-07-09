@@ -1,7 +1,10 @@
 CEC
 ===
 
-The R Package CEC performs clustering based on the cross–entropy clustering (CEC) method, which has been recently developed with the use of information theory. The main advantage of CEC is that it combines the speed and simplicity of k-means with the ability to use various Gaussian mixture models and reduce unnecessary clusters.
+The R Package CEC performs clustering based on the cross–entropy clustering (CEC) method, 
+which has been recently developed with the use of information theory. 
+The main advantage of CEC is that it combines the speed and simplicity of k-means with the ability 
+to use various Gaussian mixture models and reduce unnecessary clusters.
 
 The CEC package is a part of CRAN repository and it can be installed by the following command:
 
@@ -50,6 +53,13 @@ The CEC method, analogously to k-means, depends on the initial clusters membersh
 ```R
 cec <- cec(x = ...,  centers = ..., nstart = ...)
 ```
+
+**Multiple threads can be used to speed up clustering (when `nstart > 1` ).** 
+It's driven by the `threads` parameter (more details in the package manual).
+```R
+cec <- cec(..., nstart = 100, threads = 4)
+```
+
 The initial locations of the centers can be chosen either **randomly** or using the **k-means++** method and it's driven by the `centers.init` parameter which can take one of the two values: `"random"` or `"kmeans++"`.
 
 Two essential parameter, in the context of CEC method, are `card.min` and `iter.max` that express minimal cluster size - the number of points, below which, the cluster is removed and the maximum number of iterations at each start, respectively.
@@ -193,7 +203,9 @@ cec <- cec(x = ...,  centers = ..., split = T)
 
 There are four parameters (with their default values) that control the split mode:
 `split.depth = 8` , `split.tries   = 5`, `split.limit   = 100`, `split.initial.starts = 1`. 
-The description of those parameters is provided in the package manual.
+The description of those parameters is provided in the package manual. Using `nstart` parameter, 
+the whole procedure, from start to end (initial clustering and splitting), can be
+repeated multiple times. In this, case we can also use multiple threads (`threads` parameter).
 
 An example usage is presented  below:
 ```R
