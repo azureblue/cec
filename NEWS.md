@@ -1,3 +1,9 @@
+v0.10.1
+------
+- rewriting all C the code in C++11
+- adding split method
+- adding threads
+
 v0.9.4
 ------
 - adding README.md
