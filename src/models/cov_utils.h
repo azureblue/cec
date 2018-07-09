@@ -1,6 +1,8 @@
 #ifndef CEC_COV_UTILS_H
 #define CEC_COV_UTILS_H
 
+#include <vector>
+
 #include "../vec.h"
 
 namespace cec {

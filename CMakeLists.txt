@@ -48,7 +48,6 @@ set(SOURCE_FILES
         src/models/fixed_radius.h
         src/models/model.h
         src/models/spherical.h
-        src/parallel_starter.cpp
         src/parallel_starter.h
         src/params.cpp
         src/params.h

@@ -6,8 +6,8 @@
 #include <memory>
 
 namespace cec {
+    class vec;
     class mat;
-
     class row {
     public:
         const int size;

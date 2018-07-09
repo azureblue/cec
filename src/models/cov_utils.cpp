@@ -79,7 +79,7 @@ double cec::determinant(const mat &cov, mat &tmp) {
     return handle_cholesky_nan(prod * prod);
 }
 
-bool cec::eigenvalues_calculator::eigenvalues(const cec::mat &cov, double *res) const noexcept{
+bool cec::eigenvalues_calculator::eigenvalues(const cec::mat &cov, double *res) const noexcept {
     int n = cov.n;
     int info;
     tmp = cov;

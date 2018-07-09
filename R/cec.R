@@ -75,8 +75,12 @@ cec <- function(
         stop("Illegal argument: 'type' with length > 1 should be equal or greater than the length of the vector of variable number of centers ('centers' as a vector).")
     
     # run interactive mode if requested  
-    if (interactive)
+    if (interactive) {
+        if (split == T) stop("Interactive mode not available in split mode")
+        if (length(var.centers) > 1) stop("Interactive mode not available for variable centers")
+        if (nstart > 1) stop("Interactive mode not available for multiple starts")
         return(cec.interactive(x, centers, type, iter.max, 1, param, centers.init, card.min, keep.removed, readline))
+    }
     
     n = ncol(x)
     m = nrow(x)
@@ -116,7 +120,7 @@ cec <- function(
     if (split) {
         for (i in 1:k)
             if (models.r[[i]]$type != models.r[[1]]$type)
-                error("mixing model types is currently not supported in split mode")
+                stop("mixing model types is currently not supported in split mode")
         
         models.r
         split.r = list(
@@ -230,7 +234,7 @@ cec.interactive <- function(
             if (i == 0)
                 desc = "(position of center means before first iteration)"      
             
-            cat("Iterations:", Z$iterations, desc, "cost function:", Z$cost[(Z$iterations + 1)]," \n ")
+            cat("Iterations:", Z$iterations, desc, "cost function:", Z$cost," \n ")
             
             plot(Z, ellipses = TRUE)
             
