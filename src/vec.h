@@ -2,7 +2,6 @@
 #define VEC_H
 
 #include <algorithm>
-#include <iostream>
 #include <memory>
 
 namespace cec {
@@ -59,13 +58,6 @@ namespace cec {
 
         const double *data() const {
             return data_;
-        }
-
-        friend std::ostream &operator<<(std::ostream &os, const row &r) {
-            os << "{";
-            for (int i = 0; i < r.size; i++)
-                os << r[i] << (i == r.size - 1 ? "}" : ", ");
-            return os;
         }
 
         static double dist_sq(const row &a, const row &b) {
@@ -200,16 +192,6 @@ namespace cec {
 
         void operator-=(const mat &m) {
             data_vec -= m.data_vec;
-        }
-
-        friend std::ostream &operator<<(std::ostream &os, const mat &m) {
-            for (int j = 0; j < m.m; j++) {
-                os << (j == 0 ? '(' : ' ');
-                for (int k = 0; k < m.n; k++)
-                    os << m[j][k] << (k < m.n - 1 ? ", " : "");
-                os << (j == m.m - 1 ? ')' : '\n');
-            }
-            return os;
         }
 
         template<class M>

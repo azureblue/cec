@@ -20,14 +20,12 @@ namespace cec {
     class eigenvalues_calculator {
     public:
         explicit eigenvalues_calculator(const int n)
-                : n(n),
-                  tmp(n, n),
+                : tmp(n, n),
                   workspace(WORKSPACE_SIZE_MUL * n) {}
 
         bool eigenvalues(const mat &cov, double *res) const noexcept;
 
     private:
-        const int n;
         mutable mat tmp;
         mutable std::vector<double> workspace;
         static const int WORKSPACE_SIZE_MUL = 130;

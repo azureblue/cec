@@ -1,11 +1,12 @@
-#include "cec_r.h"
-#include "r_utils.h"
 #include "params.h"
-#include "r_params.h"
 #include "starter.h"
-#include "r_result.h"
 #include "cec_starter.h"
 #include "variable_starter.h"
+
+#include "r_result.h"
+#include "r_utils.h"
+#include "r_params.h"
+#include "cec_r.h"
 
 #include<R_ext/Random.h>
 

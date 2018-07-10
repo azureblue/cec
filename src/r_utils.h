@@ -154,7 +154,7 @@ namespace cec {
             SEXP get_n(SEXP vec, int idx) {
                 int len = LENGTH(vec);
                 if (idx >= len)
-                    throw missing_parameter("out of range: " + idx);
+                    throw missing_parameter("out of range: " + std::to_string(idx));
                 SEXP el = VECTOR_ELT(vec, idx);
                 return el;
             }
