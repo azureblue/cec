@@ -1,4 +1,4 @@
-model.covariance <- function(type, cov, param)
+model.covariance <- function(type, cov, mean, param)
 {
     if (length(which(is.na(cov))) > 0)
         matrix(NA, nrow(cov), ncol(cov))
@@ -15,6 +15,12 @@ model.covariance <- function(type, cov, param)
         V <- eigen(cov)$vec
         D <- diag(sort(param$eigenvalues, decreasing=T))
         V %*% D %*% t(V)
+    }
+    else if (type == resolve.type("mean"))
+    {    
+        m = param$mean
+        mean_diff = m - mean
+        cov + (mean_diff %*% t(mean_diff))
     }
     else if (type == resolve.type("all"))
         cov

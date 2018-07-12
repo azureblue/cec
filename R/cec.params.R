@@ -1,7 +1,7 @@
 # maps clustering type to int
 resolve.type <- function(type)
 {
-    types <- c("covariance", "fixedr", "spherical", "diagonal", "eigenvalues", "all")
+    types <- c("covariance", "fixedr", "spherical", "diagonal", "eigenvalues", "mean", "all")
     match.arg(type, types)
 }
 
@@ -14,7 +14,6 @@ create.cec.params.for.models <- function(k, n, type.arg, param.arg)
     params <- NULL
     if (hasArg(param.arg))
         params <- param.arg
-
     if (length(types) == 1) {
         types <- rep(types, k)
         if (hasArg(param.arg)) {
@@ -77,6 +76,18 @@ create.cec.params.for.models <- function(k, n, type.arg, param.arg)
             if (length(evals) != n) stop("Illegal argument: illegal parameter for \"eigenvalues\" type: invalid length.")
             if (!all(evals != 0)) stop("Illegal argument: illegal parameter for \"eigenvalues\" type: all values must be greater than 0.")
             models[[i]]$params = list(eigenvalues = sort(evals))
+        }
+        else if (type == resolve.type("mean"))
+        {
+            idx <- idx + 1
+            
+            if (length(params) < idx)
+                stop("Illegal argument: illegal param length.")         
+            
+            mean <- params[[idx]]
+            
+            if (length(mean) != n) stop("Illegal argument: illegal parameter for \"mean\" type: invalid length.")
+            models[[i]]$params = list(mean = mean)
         }
     }
     models

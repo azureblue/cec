@@ -5,13 +5,13 @@
 #include "model.h"
 
 namespace cec {
-    class fixed_radius : public model {
+    class fixed_radius: public model {
     public:
         explicit fixed_radius(int n, double r)
                 : r(r),
                   ce_constant(n * m::log(2.0 * m::PI * r) / 2.0) {}
 
-        double cross_entropy(const mat &cov) const noexcept override {
+        double cross_entropy(const covariance &cov) const noexcept override {
             double tr = trace(cov);
             return ce_constant + tr / (2.0 * r);
         }

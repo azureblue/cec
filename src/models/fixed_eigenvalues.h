@@ -1,21 +1,21 @@
-#ifndef EIGENVALUES_H
-#define EIGENVALUES_H
+#ifndef FIXED_EIGENVALUES_H
+#define FIXED_EIGENVALUES_H
 
 #include "cov_utils.h"
 #include "model.h"
 
 namespace cec {
-    class eigenvalues : public model {
+    class fixed_eigenvalues: public model {
     public:
-        explicit eigenvalues(int n, std::vector<double> values)
+        explicit fixed_eigenvalues(int n, std::vector<double> values)
                 : n(n),
                   given_values(std::move(values)),
                   eigenvalues_calc(n),
                   tmp_values(n),
                   ce_constant(std::log(std::pow(2.0 * m::PI, n)
-                                    * product(eigenvalues::given_values)) / 2.0) {}
+                                       * product(fixed_eigenvalues::given_values)) / 2.0) {}
 
-        double cross_entropy(const mat &cov) const noexcept override {
+        double cross_entropy(const covariance &cov) const noexcept override {
             if (!eigenvalues_calc.eigenvalues(cov, tmp_values.data()))
                 return m::QNAN;
             double values_ratio_sum = 0;
@@ -39,5 +39,5 @@ namespace cec {
         }
     };
 }
-#endif /* EIGENVALUES_H */
+#endif /* FIXED_EIGENVALUES_H */
 

@@ -1,7 +1,7 @@
 cec <- function(
     x, 
     centers,   
-    type          = c("covariance", "fixedr", "spherical", "diagonal", "eigenvalues", "all"),  
+    type          = c("covariance", "fixedr", "spherical", "diagonal", "eigenvalues", "mean", "all"),  
     iter.max      = 25,
     nstart        = 1,
     param,
@@ -177,7 +177,7 @@ cec <- function(
     
     # obtain the covariances of the model
     for(i in 1:covs)
-        covariances.model[[i]] = model.covariance(models.r[[i]]$type, Z$covariances[[i]], models.r[[i]]$params)
+        covariances.model[[i]] = model.covariance(models.r[[i]]$type, Z$covariances[[i]], Z$centers[i, ], models.r[[i]]$params)
     
     structure(list(
         data                = x,

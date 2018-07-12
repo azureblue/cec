@@ -3,12 +3,6 @@
 
 #include "vec.h"
 #include "models/model.h"
-#include "models/all.h"
-#include "models/spherical.h"
-#include "models/diagonal.h"
-#include "models/fixed_radius.h"
-#include "models/covariance.h"
-#include "models/eigenvalues.h"
 #include "init.h"
 #include "common.h"
 
@@ -25,6 +19,7 @@ namespace cec {
         DIAGONAL,
         EIGENVALUES,
         FIXED_R,
+        MEAN,
         SPHERICAL
     };
 
@@ -98,9 +93,7 @@ namespace cec {
                 : model_spec(model_type::ALL),
                   n(n) {}
 
-        unique_ptr<model> create_model() const override {
-            return make_unique<all>(n);
-        }
+        unique_ptr<model> create_model() const override;
     };
 
     class model_spherical_spec : public model_spec {
@@ -111,9 +104,7 @@ namespace cec {
                 : model_spec(model_type::ALL),
                   n(n) {}
 
-        unique_ptr<model> create_model() const override {
-            return make_unique<spherical>(n);
-        }
+        unique_ptr<model> create_model() const override;
     };
 
     class model_diagonal_spec : public model_spec {
@@ -124,9 +115,7 @@ namespace cec {
                 : model_spec(model_type::ALL),
                   n(n) {}
 
-        unique_ptr<model> create_model() const override {
-            return make_unique<diagonal>(n);
-        }
+        unique_ptr<model> create_model() const override;
     };
 
     class model_fixed_radius_spec : public model_spec {
@@ -139,9 +128,7 @@ namespace cec {
                   n(n),
                   r(r) {}
 
-        unique_ptr<model> create_model() const override {
-            return make_unique<fixed_radius>(n, r);
-        }
+        unique_ptr<model> create_model() const override;
     };
 
     class model_covariance_spec : public model_spec {
@@ -154,9 +141,7 @@ namespace cec {
                   n(n),
                   g_cov(std::move(g_cov)) {}
 
-        unique_ptr<model> create_model() const override {
-            return make_unique<covariance>(n, g_cov);
-        }
+        unique_ptr<model> create_model() const override;
     };
 
     class model_eigenvalues_spec : public model_spec {
@@ -169,9 +154,20 @@ namespace cec {
                   n(n),
                   values(std::move(values)) {}
 
-        unique_ptr<model> create_model() const override {
-            return make_unique<eigenvalues>(n, values);
-        }
+        unique_ptr<model> create_model() const override;
+    };
+
+    class model_mean_spec : public model_spec {
+    public:
+        const int n;
+        const vector<double> mean;
+
+        explicit model_mean_spec(int n, vector<double> mean)
+                : model_spec(model_type::MEAN),
+                  n(n),
+                  mean(std::move(mean)) {}
+
+        unique_ptr<model> create_model() const override;
     };
 
     class models_param {

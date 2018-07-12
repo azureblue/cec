@@ -1,4 +1,5 @@
 #include "split_starter.h"
+#include "exceptions.h"
 
 namespace cec {
     unique_ptr<clustering_results>
