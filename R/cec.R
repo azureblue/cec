@@ -170,6 +170,7 @@ cec <- function(
     }
     covs = length(Z$covariances)
     covariances.model = rep(list(NA), covs)
+    means.model = Z$centers
     
     #TODO: change this temporary hack
     if (split)
@@ -178,6 +179,9 @@ cec <- function(
     # obtain the covariances of the model
     for(i in 1:covs)
         covariances.model[[i]] = model.covariance(models.r[[i]]$type, Z$covariances[[i]], Z$centers[i, ], models.r[[i]]$params)
+    
+    for(i in 1:covs)
+        means.model[i, ] = model.mean(models.r[[i]]$type, Z$centers[i, ], models.r[[i]]$params)
     
     structure(list(
         data                = x,
@@ -189,7 +193,8 @@ cec <- function(
         iterations          = Z$iterations, 
         time                = execution.time,
         covariances         = Z$covariances,
-        covariances.model   = covariances.model
+        covariances.model   = covariances.model,
+        means.model         = means.model
     ), class = "cec");    
 }
 

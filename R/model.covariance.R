@@ -1,3 +1,12 @@
+model.mean <- function(type, center, param)
+{
+    if (length(which(is.na(center))) > 0)
+        matrix(NA, 1, ncol(center))
+    else if (type == resolve.type("mean"))
+        param$mean
+    else center
+}
+
 model.covariance <- function(type, cov, mean, param)
 {
     if (length(which(is.na(cov))) > 0)

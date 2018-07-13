@@ -143,19 +143,22 @@ The energy function \emph{\strong{E}} is given by:
 E(Y1, F1; ...; Yk, Fk) = \sum(p(Yi) * (-ln(p(Yi)) + H(Yi | Fi)))}
 where \emph{Yi} denotes the \emph{i}-th cluster, \emph{p(Yi)} is the ratio of the number of points in \emph{i}-th cluster to the total number points, \emph{\strong{H}(Yi|Fi)} is the value of cross-entropy, which represents the internal cluster energy function of data \emph{Yi} defined with respect to a certain Gaussian density family \emph{Fi}, which encodes the type of clustering we consider.
 
-The value of the internal energy function \emph{\strong{H}} depends only on the covariance matrix of the points in the cluster (computed using maximum-likelihood method). Five implementations of \emph{\strong{H}} have been proposed (expressed as a type - model - of the clustering):
+The value of the internal energy function \emph{\strong{H}} depends on the covariance matrix (computed using maximum-likelihood method) and the mean (in case of the \emph{mean} model) of the points in the cluster.
+Seven implementations of \emph{\strong{H}} have been proposed (expressed as a type - model - of the clustering):
 
 \itemize{
-\item"covariance" - Gaussian densities with a fixed given covariance. The shapes of clusters depend on the given covariance 
+\item"all" - All Gaussian densities. Data will form ellipsoids with arbitrary radiuses.
+\item"covariance" - Gaussian densities with a fixed given covariance. The shapes of clusters depend on the given covariance
 matrix (additional parameter).
-\item"fixedr" - Special case of "covariance", where the covariance matrix equals \emph{rI} for the given \emph{r} 
-(additional parameter). The clustering will have a tendency to divide data into balls with approximate radius proportional to the square 
+\item"fixedr" - Special case of "covariance", where the covariance matrix equals \emph{rI} for the given \emph{r}
+(additional parameter). The clustering will have a tendency to divide data into balls with approximate radius proportional to the square
 root of \emph{r}.
-\item"spherical" - Spherical (radial) Gaussian densities (covariance proportional to the indentity). 
+\item"spherical" - Spherical (radial) Gaussian densities (covariance proportional to the identity).
 Clusters will have a tendency to form balls of arbitrary sizes.
 \item"diagonal" - Gaussian densities with diagonal covariane. Data will form ellipsoids with radiuses parallel to the coordinate axes.
-\item"eigenvalues" - Gaussian densities with covariance matrix having fixed eigenvalues (additional parameter). The clustering will try to divide the data into ellipsoids with fixed shape rotated by an arbitrary angle. 
-\item"all" - All Gaussian densities. Data will form ellipsoids with arbitrary radiuses. 
+\item"eigenvalues" - Gaussian densities with covariance matrix having fixed eigenvalues (additional parameter).
+The clustering will try to divide the data into fixed-shaped ellipsoids rotated by an arbitrary angle.
+\item"mean" Gaussian densities with a fixed mean. Data will be covered with ellipsoids with fixed centers. 
 }
 
 The implementation of \code{cec} function allows mixing of clustering types.
