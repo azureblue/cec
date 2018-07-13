@@ -3,6 +3,8 @@ testname <- "Split method"
 setup <- function() {
     data("fourGaussians", package = "CEC")
     data("mixShapes", package = "CEC")
+    
+    three.cross.gausses = as.matrix(read.table(system.file("cec_tests", "three.crossing.gausses.data", package="CEC")))
 
     mixShapesReduced = mixShapes[seq(1, nrow(mixShapes), 2),]
 }
@@ -26,4 +28,10 @@ test.should.split.to.7.cluster <- function() {
 test.should.limit.split.to.4.cluster <- function() {
     C = cec(mixShapesReduced, 1, split = T, split.limit = 4)
     CEC:::checkNumericEquals(4, C$nclusters)
+}
+
+test.should.split.to.3.cluster.fixed.mean <- function() {
+    C = cec(three.cross.gausses,, "mean", param = c(0, 0), nstart = 8)
+    CEC:::checkNumericEquals(3, C$nclusters)
+    CEC:::checkNumericEquals(1.23252, C$cost, tolerance = 0.00001)
 }
