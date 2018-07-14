@@ -27,7 +27,7 @@ namespace cec {
 
     private:
         mutable mat tmp;
-        mutable std::vector<double> workspace;
+        mutable vec workspace;
         static const int WORKSPACE_SIZE_MUL = 130;
     };
 

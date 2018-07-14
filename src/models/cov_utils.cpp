@@ -72,8 +72,7 @@ bool cec::eigenvalues_calculator::eigenvalues(const cec::mat &cov, double *res) 
     int n = cov.n;
     int info;
     tmp = cov;
-    int workspace_size = workspace.size();
-    dsyev_("N", "U", &n, tmp.data(), &n, res, workspace.data(), &workspace_size, &info);
+    dsyev_("N", "U", &n, tmp.data(), &n, res, workspace.data(), &workspace.size, &info);
     return info == 0;
 }
 
@@ -91,12 +90,12 @@ double cec::determinant_calculator::determinant(const cec::mat &cov) const noexc
 double
 cec::mahalanobis_dist_calculator::mahalanobis2(const mat &cov_inv, const row &mean, const row &x) const {
     int n = cov_inv.n;
-    for (int i = 0; i < n; ++i)
+    for (int i = 0; i < n; i++)
         tmp[i] = x[i] - mean[i];
     double res = 0;
-    for (int i = 0; i < n; ++i) {
+    for (int i = 0; i < n; i++) {
         double acc = 0.0;
-        for (int j = 0; j < n; ++j)
+        for (int j = 0; j < n; j++)
             acc += tmp[j] * cov_inv[j][i];
         res += acc * tmp[i];
     }
