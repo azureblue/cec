@@ -151,8 +151,7 @@ Seven implementations of \emph{\strong{H}} have been proposed (expressed as a ty
 \item"covariance" - Gaussian densities with a fixed given covariance. The shapes of clusters depend on the given covariance
 matrix (additional parameter).
 \item"fixedr" - Special case of "covariance", where the covariance matrix equals \emph{rI} for the given \emph{r}
-(additional parameter). The clustering will have a tendency to divide data into balls with approximate radius proportional to the square
-root of \emph{r}.
+(additional parameter). The clustering will have a tendency to divide data into balls with approximate radius proportional to the square root of \emph{r}.
 \item"spherical" - Spherical (radial) Gaussian densities (covariance proportional to the identity).
 Clusters will have a tendency to form balls of arbitrary sizes.
 \item"diagonal" - Gaussian densities with diagonal covariane. Data will form ellipsoids with radiuses parallel to the coordinate axes.
@@ -175,7 +174,7 @@ Konrad Kamieniecki, Jacek Tabor, Przemysław Spurek
 # Cross-Entropy Clustering
 #
 
-## Example of clustering random dataset of 3 Gaussians using spherical Gaussian densities, 
+## Example of clustering random data set of 3 Gaussians, 
 ## 10 random initial centers and 7\% as minimal cluster size.
 
 m1 = matrix(rnorm(2000, sd=1), ncol=2)
@@ -183,21 +182,19 @@ m2 = matrix(rnorm(2000, mean = 3, sd = 1.5), ncol = 2)
 m3 = matrix(rnorm(2000, mean = 3, sd = 1), ncol = 2)
 m3[,2] = m3[,2] - 5
 m = rbind(m1, m2, m3)
-centers = init.centers(m, 10)
 par(ask = TRUE)
 plot(m, cex = 0.5, pch = 19)
 ## Clustering result:
-Z = cec(m, centers, type="sp", iter.max = 100, card.min="7\%")
+Z = cec(m, 10, iter.max = 100, card.min="7\%")
 plot(Z)
 # Result:
 Z
-## Example of clustering mouse-like set.
+## Example of clustering mouse-like set using spherical Gaussian densities.
 m = mouseset(n=7000, r.head=2, r.left.ear=1.1, r.right.ear=1.1, left.ear.dist=2.5,
 right.ear.dist=2.5, dim=2)
 plot(m, cex = 0.5, pch = 19)
-centers = init.centers(m, 3)
 ## Clustering result:
-Z = cec(m, centers, type="sp", iter.max = 100, nstart=4, card.min="5\%")
+Z = cec(m, 3, type="sp", iter.max = 100, nstart=4, card.min="5\%")
 plot(Z)
 # Result:
 Z
@@ -212,7 +209,7 @@ plot(Z)
 # Result:
 Z
 
-## Example of using CEC split method starting with single cluster.
+## Example of using CEC split method starting with a single cluster.
 data(mixShapes)
 plot(mixShapes, cex = 0.5, pch = 19)
 ## Clustering result:
