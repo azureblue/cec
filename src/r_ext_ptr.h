@@ -21,7 +21,7 @@ namespace cec {
             }
 
             bool operator==(const r_ext_ptr &r_p) const {
-                return t_ptr == r_p.t_ptr;
+                return get() == r_p.get();
             }
 
             bool operator!=(const r_ext_ptr &r_p) const {
@@ -29,16 +29,14 @@ namespace cec {
             }
 
             explicit operator bool() {
-                return t_ptr != nullptr;
+                return get() != nullptr;
             }
 
             r_ext_ptr &operator=(r_ext_ptr &r_p) = delete;
 
             r_ext_ptr &operator=(r_ext_ptr &&r_p) noexcept {
                 r_ptr = r_p.r_ptr;
-                t_ptr = r_p.t_ptr;
                 r_p.r_ptr = NULL;
-                r_p.t_ptr = nullptr;
                 return *this;
             }
 
@@ -52,42 +50,42 @@ namespace cec {
             template <typename ...Args>
             void init(Args &&...args) {
                 finalize(r_ptr);
-                t_ptr = new T(std::forward<Args>(args)...);
+                T *t_ptr = new T(std::forward<Args>(args)...);
+
+                // assume this will always return...
                 R_SetExternalPtrAddr(r_ptr, t_ptr);
             }
 
             void reset(T *ptr) {
                 finalize(r_ptr);
-                t_ptr = ptr;
                 R_SetExternalPtrAddr(r_ptr, ptr);
             }
 
             const T *get() const {
-                return t_ptr;
+                return (T *) R_ExternalPtrAddr(r_ptr);
             }
 
             const T *operator->() const {
-                return t_ptr;
+                return get();
             }
 
             const T &operator*() const {
-                return *t_ptr;
+                return *get();
             }
 
             T *get() {
-                return t_ptr;
+                return (T *) R_ExternalPtrAddr(r_ptr);
             }
 
             T *operator->() {
-                return t_ptr;
+                return get();
             }
 
             T &operator*() {
-                return *t_ptr;
+                return *get();
             }
 
         private:
-            T *t_ptr = nullptr;
             SEXP r_ptr = NULL;
 
             static void finalize(SEXP r_ptr) {
@@ -105,7 +103,6 @@ namespace cec {
             ptr.init(std::forward<Args>(args)...);
             return ptr;
         }
-
     }
 }
 
