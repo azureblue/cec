@@ -11,7 +11,7 @@ Performs Cross-Entropy Clustering on a data matrix.
 
 \usage{
 cec(x, centers, type = c("covariance", "fixedr", "spherical", "diagonal",  
-"eigenvalues", "all"), iter.max = 25, nstart = 1, param, 
+"eigenvalues", "mean", "all"), iter.max = 25, nstart = 1, param,
 centers.init = c("kmeans++", "random"), card.min = "5\%", keep.removed = F, 
 interactive = F, threads = 1, split = F, split.depth = 8, split.tries = 5, 
 split.limit = 100, split.initial.starts = 1,readline = T)
