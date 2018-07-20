@@ -132,7 +132,7 @@ plot(cec, asp = 1)
 ### Fixed covariance CEC
 **`type = "covariance"`**
 
-This model contains Gaussians with an arbitrary fixed covariance matrix.
+This model contains Gaussians with fixed covariance matrix.
 
 ```R
 data("Tset")
@@ -155,7 +155,7 @@ In the above example, the following covariance matrix has been used, which resul
 ### Fixed eigenvalues CEC
 **`type = "eigenvalues"`**
 
-The last model is based on Gaussians with arbitrary fixed eigenvalues.
+Model based on Gaussians with arbitrary fixed eigenvalues.
 
 ```R
 data("Tset")
@@ -167,6 +167,25 @@ plot(cec, asp = 1)
 ![](https://azureblue.github.io/cec/static/eigen.png)
 
 In the above example, two eigenvalues: **λ₁=0.01** and **λ₂=0.001** are used, which results in covering the data with ellipses having fixed semi axes (corresponding to the eigenvalues). 
+
+### Fixed mean CEC
+**`type = "mean"`**
+
+Model based on Gaussians with fixed means.
+
+```R
+data("Tset")
+data("threeGaussians")
+
+cec <- cec(Tset, 4, "mean", param = c(0.48, 0.48), nstart = 5)
+plot(cec, asp = 1)
+
+cec <- cec(threeGaussians,4, "mean", param = c(0, 0), nstart = 10)
+plot(cec)
+```
+![](https://azureblue.github.io/cec/static/mean1.png) 
+![](https://azureblue.github.io/cec/static/mean2.png)
+
 
 A mix of the Gaussian models
 ----------------------------
