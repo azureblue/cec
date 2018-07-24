@@ -11,7 +11,7 @@ setup <- function() {
 test.should.split.to.4.cluster <- function() {
     expected.cost = 2.530237
     tolerance = 0.001
-    C = cec(fourGaussians, nstart = 2)
+    C = cec(fourGaussians, nstart = 5)
     CEC:::checkNumericEquals(4, C$nclusters)
     CEC:::checkNumericEquals(expected.cost, C$cost, msg = "cost", tolerance = tolerance)
 }
