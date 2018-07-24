@@ -1,10 +1,10 @@
 Package: CEC
 Title: Cross-Entropy Clustering
-Version: 0.10.1
-Date: 2018-07-09
+Version: 0.10.2
+Date: 2018-07-24
 Author: Konrad Kamieniecki [aut, cre], Przemyslaw Spurek [ctb]
 Maintainer: Konrad Kamieniecki <konrad.kamieniecki@alumni.uj.edu.pl>
-Description: Cross-Entropy Clustering (CEC) divides the data into Gaussian type clusters. It performs the automatic reduction of unnecessary clusters, while at the same time allows the simultaneous use of various type Gaussian mixture models.
+Description: CEC divides data into Gaussian type clusters. It allows the simultaneous use of various type Gaussian mixture models, performs the reduction of unnecessary clusters and it's able to discover new groups.
 ByteCompile: true
 URL: https://github.com/azureblue/cec
 Encoding: UTF-8
