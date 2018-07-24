@@ -1,3 +1,8 @@
+v0.10.2
+- adding fixed mean model
+- adding data set: threeGaussians
+- fixing compilation issues on some platforms
+
 v0.10.1
 ------
 - rewriting all C the code in C++11
