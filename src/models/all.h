@@ -6,19 +6,19 @@
 #include "../m.h"
 
 namespace cec {
-    class all : public model {
+    class all: public model {
     public:
         explicit all(int n)
-                : tmp(n, n),
+                : det_calc(n),
                   ce_constant(n * std::log(2.0 * m::PI * m::E)) {}
 
-        double cross_entropy(const mat &cov) const noexcept override {
-            double det = determinant(cov, tmp);
+        double cross_entropy(const covariance &cov) const noexcept override {
+            double det = det_calc.determinant(cov);
             return (ce_constant + m::log(det)) / 2;
         }
 
     private:
-        mutable mat tmp;
+        determinant_calculator det_calc;
         const double ce_constant;
     };
 }

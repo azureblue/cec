@@ -11,7 +11,7 @@ Performs Cross-Entropy Clustering on a data matrix.
 
 \usage{
 cec(x, centers, type = c("covariance", "fixedr", "spherical", "diagonal",  
-"eigenvalues", "all"), iter.max = 25, nstart = 1, param, 
+"eigenvalues", "mean", "all"), iter.max = 25, nstart = 1, param,
 centers.init = c("kmeans++", "random"), card.min = "5\%", keep.removed = F, 
 interactive = F, threads = 1, split = F, split.depth = 8, split.tries = 5, 
 split.limit = 100, split.initial.starts = 1,readline = T)
@@ -143,19 +143,21 @@ The energy function \emph{\strong{E}} is given by:
 E(Y1, F1; ...; Yk, Fk) = \sum(p(Yi) * (-ln(p(Yi)) + H(Yi | Fi)))}
 where \emph{Yi} denotes the \emph{i}-th cluster, \emph{p(Yi)} is the ratio of the number of points in \emph{i}-th cluster to the total number points, \emph{\strong{H}(Yi|Fi)} is the value of cross-entropy, which represents the internal cluster energy function of data \emph{Yi} defined with respect to a certain Gaussian density family \emph{Fi}, which encodes the type of clustering we consider.
 
-The value of the internal energy function \emph{\strong{H}} depends only on the covariance matrix of the points in the cluster (computed using maximum-likelihood method). Five implementations of \emph{\strong{H}} have been proposed (expressed as a type - model - of the clustering):
+The value of the internal energy function \emph{\strong{H}} depends on the covariance matrix (computed using maximum-likelihood method) and the mean (in case of the \emph{mean} model) of the points in the cluster.
+Seven implementations of \emph{\strong{H}} have been proposed (expressed as a type - model - of the clustering):
 
 \itemize{
-\item"covariance" - Gaussian densities with a fixed given covariance. The shapes of clusters depend on the given covariance 
+\item"all" - All Gaussian densities. Data will form ellipsoids with arbitrary radiuses.
+\item"covariance" - Gaussian densities with a fixed given covariance. The shapes of clusters depend on the given covariance
 matrix (additional parameter).
-\item"fixedr" - Special case of "covariance", where the covariance matrix equals \emph{rI} for the given \emph{r} 
-(additional parameter). The clustering will have a tendency to divide data into balls with approximate radius proportional to the square 
-root of \emph{r}.
-\item"spherical" - Spherical (radial) Gaussian densities (covariance proportional to the indentity). 
+\item"fixedr" - Special case of "covariance", where the covariance matrix equals \emph{rI} for the given \emph{r}
+(additional parameter). The clustering will have a tendency to divide data into balls with approximate radius proportional to the square root of \emph{r}.
+\item"spherical" - Spherical (radial) Gaussian densities (covariance proportional to the identity).
 Clusters will have a tendency to form balls of arbitrary sizes.
 \item"diagonal" - Gaussian densities with diagonal covariane. Data will form ellipsoids with radiuses parallel to the coordinate axes.
-\item"eigenvalues" - Gaussian densities with covariance matrix having fixed eigenvalues (additional parameter). The clustering will try to divide the data into ellipsoids with fixed shape rotated by an arbitrary angle. 
-\item"all" - All Gaussian densities. Data will form ellipsoids with arbitrary radiuses. 
+\item"eigenvalues" - Gaussian densities with covariance matrix having fixed eigenvalues (additional parameter).
+The clustering will try to divide the data into fixed-shaped ellipsoids rotated by an arbitrary angle.
+\item"mean" Gaussian densities with a fixed mean. Data will be covered with ellipsoids with fixed centers. 
 }
 
 The implementation of \code{cec} function allows mixing of clustering types.
@@ -172,7 +174,7 @@ Konrad Kamieniecki, Jacek Tabor, Przemysław Spurek
 # Cross-Entropy Clustering
 #
 
-## Example of clustering random dataset of 3 Gaussians using spherical Gaussian densities, 
+## Example of clustering random data set of 3 Gaussians, 
 ## 10 random initial centers and 7\% as minimal cluster size.
 
 m1 = matrix(rnorm(2000, sd=1), ncol=2)
@@ -180,21 +182,19 @@ m2 = matrix(rnorm(2000, mean = 3, sd = 1.5), ncol = 2)
 m3 = matrix(rnorm(2000, mean = 3, sd = 1), ncol = 2)
 m3[,2] = m3[,2] - 5
 m = rbind(m1, m2, m3)
-centers = init.centers(m, 10)
 par(ask = TRUE)
 plot(m, cex = 0.5, pch = 19)
 ## Clustering result:
-Z = cec(m, centers, type="sp", iter.max = 100, card.min="7\%")
+Z = cec(m, 10, iter.max = 100, card.min="7\%")
 plot(Z)
 # Result:
 Z
-## Example of clustering mouse-like set.
+## Example of clustering mouse-like set using spherical Gaussian densities.
 m = mouseset(n=7000, r.head=2, r.left.ear=1.1, r.right.ear=1.1, left.ear.dist=2.5,
 right.ear.dist=2.5, dim=2)
 plot(m, cex = 0.5, pch = 19)
-centers = init.centers(m, 3)
 ## Clustering result:
-Z = cec(m, centers, type="sp", iter.max = 100, nstart=4, card.min="5\%")
+Z = cec(m, 3, type="sp", iter.max = 100, nstart=4, card.min="5\%")
 plot(Z)
 # Result:
 Z
@@ -209,7 +209,7 @@ plot(Z)
 # Result:
 Z
 
-## Example of using CEC split method starting with single cluster.
+## Example of using CEC split method starting with a single cluster.
 data(mixShapes)
 plot(mixShapes, cex = 0.5, pch = 19)
 ## Clustering result:

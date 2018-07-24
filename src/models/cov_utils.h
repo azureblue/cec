@@ -27,9 +27,30 @@ namespace cec {
 
     private:
         mutable mat tmp;
-        mutable std::vector<double> workspace;
+        mutable vec workspace;
         static const int WORKSPACE_SIZE_MUL = 130;
     };
 
+    class determinant_calculator {
+    public:
+        explicit determinant_calculator(const int n)
+                : tmp(n, n) {}
+
+        double determinant(const mat &cov) const noexcept;
+
+    private:
+        mutable mat tmp;
+    };
+
+    class mahalanobis_dist_calculator {
+    public:
+        explicit mahalanobis_dist_calculator(const int n)
+                : tmp(n) {}
+
+        double mahalanobis2(const mat &cov_inv, const row &mean, const row &x) const;
+
+    private:
+        mutable vec tmp;
+    };
 }
 #endif //CEC_COV_UTILS_H

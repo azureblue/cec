@@ -5,12 +5,12 @@
 #include "model.h"
 
 namespace cec {
-    class diagonal : public model {
+    class diagonal: public model {
     public:
         explicit diagonal(int n)
                 : ce_constant(n * std::log(2.0 * m::PI * m::E)) {}
 
-        double cross_entropy(const mat &cov) const noexcept override {
+        double cross_entropy(const covariance &cov) const noexcept override {
             double diag = diagonal_product(cov);
             return (ce_constant + std::log(diag)) / 2;
         }

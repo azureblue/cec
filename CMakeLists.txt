@@ -20,7 +20,7 @@ if (WIN32)
     set(CEC_LIB ${WINDOWS_CEC_LIB})
 else (WIN32)
     include_directories(${LINUX_R_INCLUDE_PATH})
-    link_libraries(m R lapack blas)
+    link_libraries(m R lapack blas pthread)
     set(R ${LINUX_R})
     set(CEC_LIB ${LINUX_CEC_LIB})
 endif (WIN32)
@@ -42,10 +42,11 @@ set(SOURCE_FILES
         src/models/all.h
         src/models/cov_utils.cpp
         src/models/cov_utils.h
-        src/models/covariance.h
+        src/models/fixed_covariance.h
         src/models/diagonal.h
-        src/models/eigenvalues.h
+        src/models/fixed_eigenvalues.h
         src/models/fixed_radius.h
+        src/models/fixed_mean.h
         src/models/model.h
         src/models/spherical.h
         src/parallel_starter.h

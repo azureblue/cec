@@ -50,6 +50,11 @@ namespace cec {
                     case model_type::EIGENVALUES: {
                         auto evals = params_r["eigenvalues"].get<r_ext_ptr<vector<double>>>();
                         specs->push_back(make_shared<model_eigenvalues_spec>(n, *evals));
+                        break;
+                    }
+                    case model_type::MEAN: {
+                        auto mean = params_r["mean"].get<r_ext_ptr<vector<double>>>();
+                        specs->push_back(make_shared<model_mean_spec>(n, *mean));
                     }
                 }
             }

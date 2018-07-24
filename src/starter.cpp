@@ -1,4 +1,5 @@
 #include "starter.h"
+#include "cov.h"
 #include "cluster.h"
 #include "exceptions.h"
 
@@ -20,7 +21,7 @@ cec::cross_entropy_clustering::start(const mat &x, const vector<int> &initial_as
     for (int i = 0; i < k; i++) {
         const mat &cluster_split = split[i].points();
         if (cluster_split.m >= min_card) {
-            covariance_mat cov = covariance_mat::estimate(cluster_split);
+            covariance cov = covariance::estimate(cluster_split);
             clusters[i].reset(new cluster(*models[i], cov, m));
         }
     }

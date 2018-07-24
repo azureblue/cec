@@ -1,7 +1,9 @@
-testname <- "Energy calculation and covariances (mouseset3d)"
+testname <- "energy calculation (various data sets)"
 setup <- function()
 {
-    B <- as.matrix(read.table(system.file("cec_tests", "mouse3d.data", package="CEC")))
+    two.gausses.4d = as.matrix(read.table(system.file("cec_tests", "two.gausses.4d.data", package="CEC")))
+    
+    mouse3d <- as.matrix(read.table(system.file("cec_tests", "mouse3d.data", package="CEC")))
     C <- as.matrix(read.table(system.file("cec_tests", "centers3d.data", package="CEC")))
     C4 <- as.matrix(read.table(system.file("cec_tests", "centers43d.data", package="CEC")))
 }
@@ -12,7 +14,7 @@ test.type.covariance <- function()
     
     expected.energy <-  4.365855156
     
-    CE <- cec(B, centers=C, type="cov", param = given.cov, iter.max=20)
+    CE <- cec(mouse3d, centers=C, type="cov", param = given.cov, iter.max=20)
 
     CEC:::checkNumericVectorEquals(expected.energy, CE$cost, msg="Energy")
 }
@@ -23,7 +25,7 @@ test.type.fixedr.mixture <- function()
 
     expected.energy <- 4.853461033
     
-    CE <- cec(B, centers=C, type=c("fi", "fi", "fi"), param = r)
+    CE <- cec(mouse3d, centers=C, type=c("fi", "fi", "fi"), param = r)
     
     CEC:::checkNumericVectorEquals(expected.energy, CE$cost, msg="Energy")
 }
@@ -34,7 +36,7 @@ test.type.spherical.one.cluster.removed <- function()
     expected.energy <- 4.179257781
     expected.number.of.clusters <- 3
      
-    CE <- cec(B, C4, type="sp")
+    CE <- cec(mouse3d, C4, type="sp")
     
     CEC:::checkNumericVectorEquals(expected.number.of.clusters, CE$nclusters, msg="Number of clusters")
     CEC:::checkNumericVectorEquals(expected.energy, CE$cost, msg="Energy")
@@ -45,7 +47,7 @@ test.type.diagonal.spherical.mixture <- function()
     expected.energy <- 4.177793598
     expected.number.of.clusters <- 3
     
-    CE <- cec(B, C, type=c("diag", "diag", "sp"))  
+    CE <- cec(mouse3d, C, type=c("diag", "diag", "sp"))  
 
     CEC:::checkNumericVectorEquals(expected.number.of.clusters, CE$nclusters, msg="Number of clusters")
     CEC:::checkNumericVectorEquals(expected.energy, CE$cost, msg="Energy")
@@ -60,8 +62,20 @@ test.type.eigenvalues.all.fixedr.mixture <- function()
     expected.energy <- 4.323007035
     expected.number.of.clusters <- 3
     
-    CE <- cec(B, C4, type=c("all", "eigen", "fixedr", "eigen"), param=list(evals1, r, evals2))
+    CE <- cec(mouse3d, C4, type=c("all", "eigen", "fixedr", "eigen"), param=list(evals1, r, evals2))
     
     CEC:::checkNumericVectorEquals(expected.number.of.clusters, CE$nclusters, msg="Number of clusters")
     CEC:::checkNumericVectorEquals(expected.energy, CE$cost, msg="Energy")
+}
+
+test.type.mean.two.gaussians <- function()
+{
+    centers = matrix(c(2, 4, 2, 4, 2, 4, 2, 4), 2, 4)
+    means.param = list(c(0, 0, 0, 0), c(5, 5, 5, 5))
+    
+    expected.energy = 6.142651451
+    
+    cec = cec(two.gausses.4d, centers, c("mean", "mean"), param=means.param)
+    
+    CEC:::checkNumericVectorEquals(expected.energy, cec$cost, msg="Energy")
 }

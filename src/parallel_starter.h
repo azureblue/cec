@@ -7,6 +7,7 @@
 #include "starter.h"
 #include "cec_starter.h"
 #include "split_starter.h"
+#include "exceptions.h"
 
 namespace cec {
 

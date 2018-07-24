@@ -19,22 +19,27 @@ plot.cec <- function(x, col, cex = 0.5, pch = 19, cex.centers = 1, pch.centers =
     if (hasArg(xlab)) xl <- xlab
     if (hasArg(ylab)) yl <- ylab
     
-    plot(x$data, col=col, cex = cex, pch = pch, xlab = xl, ylab = yl, ...)    
-    points(x$centers, cex = cex.centers, pch = pch.centers)   
+    plot(x$data, col=col, cex = cex, pch = pch, xlab = xl, ylab = yl, ...)
+    
+    if (model == T) {
+        covs <- x$covariances.model
+        means <- x$means.model
+    } else {
+        covs <- x$covariances
+        means <- x$centers
+    }
+    
+    points(x$means.model, cex = cex.centers, pch = pch.centers)   
     if (ellipses)
     {    
-        for (i in 1:nrow(x$centers))     
-            if (! is.na(x$centers[i, 1]))
+        for (i in 1:nrow(means))     
+            if (! is.na(means[i, 1]))
             {         
                 err = FALSE        
                 tryCatch(
                     {
-                        cov <- NA
-                        if (model == T)
-                            cov <- x$covariances.model[[i]]
-                        else
-                            cov <- x$covariances[[i]]
-                        pts <- ellipse(x$centers[i, ], cov)
+                        cov <- covs[[i]]
+                        pts <- ellipse(means[i, ], cov)
                         lines(pts, lwd = ellipses.lwd)
                     },
                     finally = {})     

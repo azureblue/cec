@@ -69,6 +69,17 @@ test.type.all <- function()
     CEC:::checkNumericVectorEquals(expected.energy, CE$cost, msg="Energy")
 }
 
+test.type.mean <- function()
+{
+    expected.energy <- 1.455960581
+    
+    CE <- cec(B, 1, type="mean", param=c(0, 0), iter.max=0)
+    
+    CEC:::checkNumericVectorEquals(expected.energy, CE$cost, msg="Energy")
+}
+
+
+
 ####################################################################################################################
 
 test.type.spherical.cluster.removing <- function()
@@ -78,7 +89,6 @@ test.type.spherical.cluster.removing <- function()
     CE <- cec(B, C, type="sp", iter.max=20)
     
     CEC:::checkNumericVectorEquals(expected.energy, CE$cost, msg="Energy")
-    
 }
 
 
