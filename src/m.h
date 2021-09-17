@@ -2,6 +2,7 @@
 #define CEC_M_H
 
 #include <cmath>
+#include <limits>
 
 namespace cec {
     namespace m {
