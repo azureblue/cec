@@ -7,15 +7,15 @@ cec <- function(
     param,
     centers.init  = c("kmeans++", "random"), 
     card.min      = "5%",
-    keep.removed  = F,
-    interactive   = F,
+    keep.removed  = FALSE,
+    interactive   = FALSE,
     threads       = 1,
-    split         = F,
+    split         = FALSE,
     split.depth   = 8,
     split.tries   = 5,
     split.limit   = 100,
     split.initial.starts = 1,
-    readline      = T
+    readline      = TRUE
 )
 {
     # check arguments  
@@ -207,13 +207,14 @@ cec.interactive <- function(
     param,
     centers.init  = c("kmeans++", "random"), 
     card.min      = "5%",
-    keep.removed  = F,
-    readline      = T
+    keep.removed  = FALSE,
+    readline      = TRUE
 )
 {
     par 
     {
         old.ask = par()["ask"]   
+        on.exit(par(old.ask))
         n = ncol(x)
         if (n != 2) 
             stop("interactive mode available only for 2-dimensional data")    
@@ -261,7 +262,6 @@ cec.interactive <- function(
             i = i + 1
         }    
         plot(Z, ellipses="TRUE")
-        par(ask = old.ask)
         if (readline)
             ignore = readline(prompt="Press <Enter>:")
         

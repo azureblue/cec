@@ -13,7 +13,7 @@ Ellipses are drawn with regards to the covariance (either model or sample) of ea
 
 \usage{
 \method{plot}{cec}(x, col, cex = 0.5, pch = 19, cex.centers = 1, pch.centers = 8, 
-ellipses.lwd = 4, ellipses = TRUE, model = T, xlab, ylab, ...)
+ellipses.lwd = 4, ellipses = TRUE, model = TRUE, xlab, ylab, ...)
 }
 
 \arguments{
@@ -67,6 +67,8 @@ Arguments are passed to \code{plot} function when drawing data points.
 }
 }
 
+\value{No return value.}
+
 \seealso{
 \code{\link{print.cec}}
 }
@@ -75,5 +77,5 @@ Arguments are passed to \code{plot} function when drawing data points.
 ## See the examples of function cec.
 }
 
-\keyword{ ~plot }
-\keyword{ ~cec }
+\keyword{hplot}
+

@@ -24,6 +24,8 @@ Ignored.
 }
 }
 
+\value{Returns the summary of the \code{cec} function result as text.}
+
 \seealso{
 \code{\link{plot.cec}}
 }
@@ -31,6 +33,3 @@ Ignored.
 \examples{
 ## See the examples of function cec.
 }
-
-\keyword{ ~print }
-\keyword{ ~cec }

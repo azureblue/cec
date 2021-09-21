@@ -59,7 +59,4 @@ right.ear.dist=2.5, dim=2)
 plot(M, cex = 0.5, pch = 19)
 }
 
-\keyword{ ~mouse}
-\keyword{ ~mouseset}
-\keyword{ ~points}
-\keyword{ ~uniform}
+\keyword{datagen}

@@ -41,6 +41,4 @@ M = ball(4000, 0.9)
 plot(M, cex = 0.5, pch = 19)
 }
 
-\keyword{ ~ball }
-\keyword{ ~points }
-\keyword{ ~uniform }
+\keyword{datagen}

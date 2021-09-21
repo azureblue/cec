@@ -12,9 +12,9 @@ Performs Cross-Entropy Clustering on a data matrix.
 \usage{
 cec(x, centers, type = c("covariance", "fixedr", "spherical", "diagonal",  
 "eigenvalues", "mean", "all"), iter.max = 25, nstart = 1, param,
-centers.init = c("kmeans++", "random"), card.min = "5\%", keep.removed = F, 
-interactive = F, threads = 1, split = F, split.depth = 8, split.tries = 5, 
-split.limit = 100, split.initial.starts = 1,readline = T)
+centers.init = c("kmeans++", "random"), card.min = "5\%", keep.removed = FALSE, 
+interactive = FALSE, threads = 1, split = FALSE, split.depth = 8, split.tries = 5, 
+split.limit = 100, split.initial.starts = 1, readline = TRUE)
 }
 
 \arguments{
@@ -56,7 +56,7 @@ only if the \code{centers} argument is a number or a vector.
 If the \code{centers} argument is a vector, \code{length(centers)} clusterings will be performed
 for each start and the total number of clusterings will be \code{length(centers) * nstart}.
 
-If the split mode is on (\code{split = T}), it's rarely desired use change this parameter as the whole procedure (initial clustering + split) will be performed \code{nstart} times.
+If the split mode is on (\code{split = TRUE}), it's rarely desired use change this parameter as the whole procedure (initial clustering + split) will be performed \code{nstart} times.
 }
 
 \item{centers.init}{
@@ -182,7 +182,8 @@ m2 = matrix(rnorm(2000, mean = 3, sd = 1.5), ncol = 2)
 m3 = matrix(rnorm(2000, mean = 3, sd = 1), ncol = 2)
 m3[,2] = m3[,2] - 5
 m = rbind(m1, m2, m3)
-par(ask = TRUE)
+oldpar = par(ask = TRUE)
+on.exit(par(oldpar))
 plot(m, cex = 0.5, pch = 19)
 ## Clustering result:
 Z = cec(m, 10, iter.max = 100, card.min="7\%")
@@ -223,5 +224,13 @@ Spurek, P. and Tabor, J. (2014)
 Cross-Entropy Clustering
 \emph{Pattern Recognition} \bold{47, 9} 3046--3059
 }
-\keyword{ ~cec }
-\keyword{ ~clustering }
+
+\keyword{cluster}
+\keyword{models}
+\keyword{multivariate}
+\keyword{package}
+\concept{entropy}
+\concept{gaussian}
+\concept{gaussian mixture models}
+\concept{kmeans}
+

@@ -14,6 +14,5 @@ defining each test case. This is also used for R CMD check.
 run.cec.tests()
 }
 
-\keyword{ ~tests }
-\keyword{ ~unit }
-\keyword{ ~cec }
+\value{No return value. Stops with error when a test fails.}
+\concept{unit testing}
