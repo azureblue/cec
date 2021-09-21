@@ -1,4 +1,10 @@
+v0.10.3
+-------
+- fixing gcc-11 issues
+- fixing other CRAN issues
+
 v0.10.2
+-------
 - adding fixed mean model
 - adding data set: threeGaussians
 - fixing compilation issues on some platforms
