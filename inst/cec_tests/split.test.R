@@ -1,6 +1,7 @@
 testname <- "Split method"
 
 setup <- function() {
+    set.seed(12345678)
     data("threeGaussians", package = "CEC")
     data("fourGaussians", package = "CEC")
     data("mixShapes", package = "CEC")

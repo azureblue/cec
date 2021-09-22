@@ -1,7 +1,7 @@
 testname <- "Variable centers number"
 
 setup <- function() {
-    set.seed(1234)
+    set.seed(1234567)
     X1 = matrix(rnorm(1000), 500, 2)
     X2 = rbind(X1, X1 + 5)
     X3 = rbind(X2, X1 + 10)
